@@ -689,27 +689,47 @@ p { color: var(--color-gray-light); line-height: 1.75; }
   color: var(--color-white);
 }
 
+/* ── Recipes section ─────────────────────────────────── */
+.recipes-section { background: var(--color-bg); }
+.recipes-empty {
+  text-align: center;
+  padding: 4rem 0;
+  color: var(--color-gray-light);
+}
+.recipes-empty span { font-size: 3rem; display: block; margin-bottom: 1rem; }
+
 /* ── Recipe card ─────────────────────────────────────── */
 .recipe-card { border: 1px solid var(--color-border); }
-.recipe-emoji {
-  background: var(--color-pink-light);
-  font-size: 4rem;
-  text-align: center;
+.recipe-emoji-wrap {
+  background: linear-gradient(145deg, var(--color-pink-light), #fff0f5);
   padding: 2rem;
-  line-height: 1;
+  text-align: center;
+  position: relative;
+}
+.recipe-emoji { font-size: 4rem; line-height: 1; display: block; }
+.recipe-category-badge {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  font-size: 0.7rem;
 }
 .recipe-body { padding: 1.5rem; }
-.recipe-meta {
+.recipe-title { margin-bottom: 0.5rem; font-size: 1.05rem; }
+.recipe-body p { font-size: 0.875rem; margin-bottom: 1.25rem; }
+.recipe-meta-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.75rem;
+  gap: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
 }
-.recipe-time { font-size: 0.85rem; color: var(--color-gray-light); }
-.recipe-title { margin-bottom: 0.5rem; font-size: 1.1rem; }
-.recipe-body p { font-size: 0.9rem; margin-bottom: 1rem; }
-.recipe-footer { padding-top: 1rem; border-top: 1px solid var(--color-border); }
-.recipe-calories { font-size: 0.85rem; font-weight: 500; color: var(--color-gray); }
+.recipe-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-gray-light);
+}
 
 /* ── Blog card ───────────────────────────────────────── */
 .blog-card { border: 1px solid var(--color-border); }
