@@ -1,1 +1,1 @@
-export {}
+export function renderBlog(): string { return '' }
