@@ -54,7 +54,7 @@ export function renderContact(): string {
             <div class="contact-info-card card">
               <div class="contact-info-header">
                 <div class="contact-info-avatar">
-                  <img src="/shyla.JPG" alt="Shyla" />
+                  <img src="${import.meta.env.BASE_URL}shyla.JPG" alt="Shyla" />
                 </div>
                 <div>
                   <strong>Shyla</strong>

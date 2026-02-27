@@ -45,7 +45,7 @@ export function renderHome(): string {
           <div class="hero-ring hero-ring--inner" aria-hidden="true"></div>
           <div class="hero-image-bg" aria-hidden="true"></div>
           <img
-            src="/shyla.JPG"
+            src="${import.meta.env.BASE_URL}shyla.JPG"
             alt="Shyla, voedingscoach"
             class="hero-image"
           />

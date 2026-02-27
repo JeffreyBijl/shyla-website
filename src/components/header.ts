@@ -3,7 +3,7 @@ export function renderHeader(): string {
     <nav class="header-nav" id="header-nav">
       <div class="container header-inner">
         <a href="#home" class="header-logo" aria-label="fit.foodbyshyla home">
-          <img src="/logo.jpeg" alt="fit.foodbyshyla logo" class="header-logo-img" />
+          <img src="${import.meta.env.BASE_URL}logo.jpeg" alt="fit.foodbyshyla logo" class="header-logo-img" />
         </a>
         <ul class="header-links" id="header-links" role="list">
           <li><a href="#home"     class="header-link">Home</a></li>

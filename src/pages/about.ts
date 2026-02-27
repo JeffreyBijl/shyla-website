@@ -12,7 +12,7 @@ export function renderAbout(): string {
         <div class="about-grid">
           <div class="about-image-wrap">
             <div class="about-image-decoration" aria-hidden="true"></div>
-            <img src="/shyla.JPG" alt="Shyla, voedingscoach" class="about-image" />
+            <img src="${import.meta.env.BASE_URL}shyla.JPG" alt="Shyla, voedingscoach" class="about-image" />
             <div class="about-image-badge">
               <span>🌿</span>
               <span>Gecertificeerd voedingscoach</span>
