@@ -213,6 +213,7 @@ p { color: var(--color-gray-light); line-height: 1.75; }
 .header-link--active { color: var(--color-pink); }
 .header-cta { padding: 0.5rem 1.25rem; }
 .header-cta::after { display: none; }
+.header-cta.header-link--active { color: var(--color-white); }
 
 .hamburger {
   display: none;
@@ -980,6 +981,7 @@ p { color: var(--color-gray-light); line-height: 1.75; }
   }
   .header-links--open { display: flex; }
   .header-link { padding: 0.75rem 0; width: 100%; border-bottom: 1px solid var(--color-border); }
+  .header-link::after { display: none; }
   .header-link:last-child { border: none; }
   .header-cta { margin-top: 0.5rem; }
 

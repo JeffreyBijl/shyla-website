@@ -4,7 +4,6 @@ export function renderFooter(): string {
     <footer class="footer">
       <div class="container footer-inner">
         <div class="footer-brand">
-          <img src="${import.meta.env.BASE_URL}logo.jpeg" alt="fit.foodbyshyla" class="footer-logo" />
           <p>Eet lekker. Leef gezond.<br>Jouw voedingscoach voor een duurzame leefstijl.</p>
         </div>
         <div class="footer-links">
