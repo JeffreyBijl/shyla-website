@@ -6,6 +6,12 @@ import {
 } from '../lib/github.js'
 import { compressImage, slugify } from '../lib/image.js'
 
+function escapeHtml(str: string): string {
+  const div = document.createElement('div')
+  div.textContent = str
+  return div.innerHTML
+}
+
 // --- State ---
 let activeTab: 'recipes' | 'blog' = 'recipes'
 let recipes: Recipe[] = []
@@ -181,12 +187,12 @@ function renderRecipeItems(): void {
     <div class="admin-item" data-id="${r.id}">
       <div class="admin-item-thumbnail">
         ${r.image
-          ? `<img src="${import.meta.env.BASE_URL}${r.image}" alt="${r.title}">`
-          : `<span class="emoji-fallback">${r.emoji}</span>`}
+          ? `<img src="${import.meta.env.BASE_URL}${r.image}" alt="${escapeHtml(r.title)}">`
+          : `<span class="emoji-fallback">${escapeHtml(r.emoji)}</span>`}
       </div>
       <div class="admin-item-info">
-        <div class="admin-item-title">${r.title}</div>
-        <div class="admin-item-meta">${r.category} · ${r.time}</div>
+        <div class="admin-item-title">${escapeHtml(r.title)}</div>
+        <div class="admin-item-meta">${escapeHtml(r.category)} · ${escapeHtml(r.time)}</div>
       </div>
       <button class="admin-item-delete" data-id="${r.id}" data-type="recipe" title="Verwijderen">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -204,12 +210,12 @@ function renderBlogItems(): void {
     <div class="admin-item" data-id="${p.id}">
       <div class="admin-item-thumbnail">
         ${p.image
-          ? `<img src="${import.meta.env.BASE_URL}${p.image}" alt="${p.title}">`
+          ? `<img src="${import.meta.env.BASE_URL}${p.image}" alt="${escapeHtml(p.title)}">`
           : `<span class="emoji-fallback">${categoryEmoji(p.category)}</span>`}
       </div>
       <div class="admin-item-info">
-        <div class="admin-item-title">${p.title}</div>
-        <div class="admin-item-meta">${p.category} · ${p.date}</div>
+        <div class="admin-item-title">${escapeHtml(p.title)}</div>
+        <div class="admin-item-meta">${escapeHtml(p.category)} · ${escapeHtml(p.date)}</div>
       </div>
       <button class="admin-item-delete" data-id="${p.id}" data-type="blog" title="Verwijderen">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -386,6 +392,9 @@ async function handleRecipeSubmit(): Promise<void> {
     return
   }
 
+  const submitBtn = document.getElementById('recipe-submit') as HTMLButtonElement
+  submitBtn.disabled = true
+
   hideFeedback(feedback)
   showProgress(progress, progressText, 'Foto verkleinen...')
 
@@ -407,7 +416,7 @@ async function handleRecipeSubmit(): Promise<void> {
       id: newId,
       title,
       category,
-      image: imagePath,
+      image: imagePath.replace(/^public\//, ''),
       emoji: '',
       time,
       calories,
@@ -432,6 +441,8 @@ async function handleRecipeSubmit(): Promise<void> {
     hideProgress(progress)
     const msg = err instanceof Error ? err.message : 'Er ging iets mis'
     showFeedback(feedback, msg, 'error')
+  } finally {
+    submitBtn.disabled = false
   }
 }
 
@@ -451,6 +462,9 @@ async function handleBlogSubmit(): Promise<void> {
     showFeedback(feedback, 'Vul alle verplichte velden in', 'error')
     return
   }
+
+  const submitBtn = document.getElementById('blog-submit') as HTMLButtonElement
+  submitBtn.disabled = true
 
   hideFeedback(feedback)
   let imagePath: string | null = null
@@ -482,7 +496,7 @@ async function handleBlogSubmit(): Promise<void> {
       title,
       date: dateStr,
       category,
-      image: imagePath,
+      image: imagePath?.replace(/^public\//, '') ?? null,
       excerpt,
       readTime,
     }
@@ -505,6 +519,8 @@ async function handleBlogSubmit(): Promise<void> {
     hideProgress(progress)
     const msg = err instanceof Error ? err.message : 'Er ging iets mis'
     showFeedback(feedback, msg, 'error')
+  } finally {
+    submitBtn.disabled = false
   }
 }
 
@@ -525,7 +541,7 @@ async function handleDelete(id: number, type: 'recipe' | 'blog'): Promise<void> 
 
   try {
     if (item.image) {
-      await deleteFile(item.image, `Verwijder afbeelding: ${item.title}`)
+      await deleteFile(`public/${item.image}`, `Verwijder afbeelding: ${item.title}`)
     }
 
     if (type === 'recipe') {
@@ -550,7 +566,7 @@ async function handleDelete(id: number, type: 'recipe' | 'blog'): Promise<void> 
       renderBlogItems()
     }
 
-    showFeedback(feedback, `"${item.title}" verwijderd`, 'success')
+    showFeedback(feedback, `"${escapeHtml(item.title)}" verwijderd`, 'success')
     pollDeploy(type === 'recipe' ? 'deploy-status-recipes' : 'deploy-status-blog')
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Verwijderen mislukt'

@@ -762,7 +762,7 @@ p { color: var(--color-gray-light); line-height: 1.75; }
 .blog-card { border: 1px solid var(--color-border); }
 .blog-card-visual {
   position: relative;
-  height: 140px;
+  height: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -774,7 +774,8 @@ p { color: var(--color-gray-light); line-height: 1.75; }
 .blog-card-accent--green {
   background: linear-gradient(135deg, #E8F5E4 0%, #d4eecf 100%);
 }
-.blog-card-visual::after {
+.blog-card-accent--pink::after,
+.blog-card-accent--green::after {
   content: '';
   position: absolute;
   bottom: -30px; right: -30px;

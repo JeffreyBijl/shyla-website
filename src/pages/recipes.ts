@@ -3,32 +3,38 @@ import type { Recipe, RecipeCategory } from '../data/types.js'
 
 const recipes: Recipe[] = recipesData as Recipe[]
 
+function escapeHtml(str: string): string {
+  const div = document.createElement('div')
+  div.textContent = str
+  return div.innerHTML
+}
+
 function recipeCard(recipe: Recipe): string {
   const imageHTML = recipe.image
-    ? `<img src="${import.meta.env.BASE_URL}${recipe.image}" alt="${recipe.title}" loading="lazy">`
-    : `<span class="recipe-emoji">${recipe.emoji}</span>`
+    ? `<img src="${import.meta.env.BASE_URL}${recipe.image}" alt="${escapeHtml(recipe.title)}" loading="lazy">`
+    : `<span class="recipe-emoji">${escapeHtml(recipe.emoji)}</span>`
 
   return `
-    <article class="card recipe-card" data-category="${recipe.category}">
+    <article class="card recipe-card" data-category="${escapeHtml(recipe.category)}">
       <div class="recipe-image-wrap ${recipe.image ? '' : 'recipe-image-wrap--fallback'}">
         ${imageHTML}
-        <span class="recipe-category-badge badge badge-pink">${recipe.category}</span>
+        <span class="recipe-category-badge badge badge-pink">${escapeHtml(recipe.category)}</span>
       </div>
       <div class="recipe-body">
-        <h3 class="recipe-title">${recipe.title}</h3>
-        <p>${recipe.description}</p>
+        <h3 class="recipe-title">${escapeHtml(recipe.title)}</h3>
+        <p>${escapeHtml(recipe.description)}</p>
         <div class="recipe-meta-row">
           <span class="recipe-meta-item">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
             </svg>
-            ${recipe.time}
+            ${escapeHtml(recipe.time)}
           </span>
           <span class="recipe-meta-item">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
             </svg>
-            ${recipe.calories}
+            ${escapeHtml(recipe.calories)}
           </span>
         </div>
       </div>

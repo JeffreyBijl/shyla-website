@@ -3,6 +3,12 @@ import type { BlogPost } from '../data/types.js'
 
 const blogPosts: BlogPost[] = blogData as BlogPost[]
 
+function escapeHtml(str: string): string {
+  const div = document.createElement('div')
+  div.textContent = str
+  return div.innerHTML
+}
+
 const categoryColors: Record<string, string> = {
   Voeding:   'badge-pink',
   Educatie:  'badge-green',
@@ -22,7 +28,7 @@ function blogCard(post: BlogPost, index: number): string {
 
   const visualHTML = post.image
     ? `<div class="blog-card-visual">
-        <img src="${import.meta.env.BASE_URL}${post.image}" alt="${post.title}" loading="lazy">
+        <img src="${import.meta.env.BASE_URL}${post.image}" alt="${escapeHtml(post.title)}" loading="lazy">
       </div>`
     : `<div class="blog-card-visual ${accentHue}">
         <span class="blog-card-emoji">${emoji}</span>
@@ -33,22 +39,22 @@ function blogCard(post: BlogPost, index: number): string {
       ${visualHTML}
       <div class="blog-body">
         <div class="blog-meta">
-          <span class="badge ${colorClass}">${post.category}</span>
+          <span class="badge ${colorClass}">${escapeHtml(post.category)}</span>
           <span class="blog-read-time">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
             </svg>
-            ${post.readTime} leestijd
+            ${escapeHtml(post.readTime)} leestijd
           </span>
         </div>
-        <h3 class="blog-title">${post.title}</h3>
-        <p>${post.excerpt}</p>
+        <h3 class="blog-title">${escapeHtml(post.title)}</h3>
+        <p>${escapeHtml(post.excerpt)}</p>
         <div class="blog-footer">
           <span class="blog-date">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
             </svg>
-            ${post.date}
+            ${escapeHtml(post.date)}
           </span>
           <a href="#" class="blog-read-btn">
             Lees meer
