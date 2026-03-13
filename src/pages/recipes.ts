@@ -1,10 +1,17 @@
-import { recipes, type RecipeCategory } from '../data/recipes.js'
+import recipesData from '../data/recipes.json'
+import type { Recipe, RecipeCategory } from '../data/types.js'
 
-function recipeCard(recipe: typeof recipes[0]): string {
+const recipes: Recipe[] = recipesData as Recipe[]
+
+function recipeCard(recipe: Recipe): string {
+  const imageHTML = recipe.image
+    ? `<img src="${import.meta.env.BASE_URL}${recipe.image}" alt="${recipe.title}" loading="lazy">`
+    : `<span class="recipe-emoji">${recipe.emoji}</span>`
+
   return `
     <article class="card recipe-card" data-category="${recipe.category}">
-      <div class="recipe-emoji-wrap">
-        <span class="recipe-emoji">${recipe.emoji}</span>
+      <div class="recipe-image-wrap ${recipe.image ? '' : 'recipe-image-wrap--fallback'}">
+        ${imageHTML}
         <span class="recipe-category-badge badge badge-pink">${recipe.category}</span>
       </div>
       <div class="recipe-body">
