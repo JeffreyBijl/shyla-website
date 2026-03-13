@@ -58,5 +58,15 @@
     "time": "5 min",
     "calories": "210 kcal",
     "description": "Roze smoothie met banaan, aardbei, Griekse yoghurt en een schepje proteïnepoeder."
+  },
+  {
+    "id": 7,
+    "title": "Muscle meat mexicano",
+    "category": "diner",
+    "image": "images/recipes/muscle-meat-mexicano-1773439494697.jpg",
+    "emoji": "",
+    "time": "10 min",
+    "calories": "650",
+    "description": "Zo klaar. 10 min verwarmen en eten maar !"
   }
 ]
