@@ -43,5 +43,14 @@
     "image": "images/blog/soms-zit-het-mee-1773439899362.jpg",
     "excerpt": "Soms zit het mee en soms zit het tegen",
     "readTime": "1 min"
+  },
+  {
+    "id": 6,
+    "title": "TEST",
+    "date": "13 maart 2026",
+    "category": "Voeding",
+    "image": null,
+    "excerpt": "test test test",
+    "readTime": "1 min"
   }
 ]
