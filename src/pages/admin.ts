@@ -187,8 +187,9 @@ function renderRecipeItems(): void {
     <div class="admin-item" data-id="${r.id}">
       <div class="admin-item-thumbnail">
         ${r.image
-          ? `<img src="${import.meta.env.BASE_URL}${r.image}" alt="${escapeHtml(r.title)}">`
-          : `<span class="emoji-fallback">${escapeHtml(r.emoji)}</span>`}
+          ? `<img src="${import.meta.env.BASE_URL}${r.image}" alt="${escapeHtml(r.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display=''">`
+          : ''}
+        <span class="emoji-fallback" ${r.image ? 'style="display:none"' : ''}>${escapeHtml(r.emoji || '🍽️')}</span>
       </div>
       <div class="admin-item-info">
         <div class="admin-item-title">${escapeHtml(r.title)}</div>
@@ -210,8 +211,9 @@ function renderBlogItems(): void {
     <div class="admin-item" data-id="${p.id}">
       <div class="admin-item-thumbnail">
         ${p.image
-          ? `<img src="${import.meta.env.BASE_URL}${p.image}" alt="${escapeHtml(p.title)}">`
-          : `<span class="emoji-fallback">${categoryEmoji(p.category)}</span>`}
+          ? `<img src="${import.meta.env.BASE_URL}${p.image}" alt="${escapeHtml(p.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display=''">`
+          : ''}
+        <span class="emoji-fallback" ${p.image ? 'style="display:none"' : ''}>${categoryEmoji(p.category)}</span>
       </div>
       <div class="admin-item-info">
         <div class="admin-item-title">${escapeHtml(p.title)}</div>
