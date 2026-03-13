@@ -3,6 +3,7 @@ import { renderAbout }                     from './pages/about.js'
 import { renderRecipes, setupRecipes }     from './pages/recipes.js'
 import { renderBlog }                      from './pages/blog.js'
 import { renderContact, setupContact }     from './pages/contact.js'
+import { renderAdmin, setupAdmin }         from './pages/admin.js'
 
 type PageSetup = () => void
 
@@ -16,7 +17,8 @@ const routes: Record<string, Route> = {
   '#about':    { render: renderAbout },
   '#recepten': { render: renderRecipes, setup: setupRecipes },
   '#blog':     { render: renderBlog },
-  '#contact':  { render: renderContact, setup: setupContact },
+  '#contact':     { render: renderContact, setup: setupContact },
+  '#admin-shyla': { render: renderAdmin, setup: setupAdmin },
 }
 
 export function navigate(): void {
