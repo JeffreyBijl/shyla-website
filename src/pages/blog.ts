@@ -1,4 +1,7 @@
-import { blogPosts } from '../data/blog.js'
+import blogData from '../data/blog.json'
+import type { BlogPost } from '../data/types.js'
+
+const blogPosts: BlogPost[] = blogData as BlogPost[]
 
 const categoryColors: Record<string, string> = {
   Voeding:   'badge-pink',
@@ -12,16 +15,22 @@ const categoryEmojis: Record<string, string> = {
   Lifestyle: '✨',
 }
 
-function blogCard(post: typeof blogPosts[0], index: number): string {
+function blogCard(post: BlogPost, index: number): string {
   const colorClass = categoryColors[post.category] ?? 'badge-pink'
   const emoji      = categoryEmojis[post.category] ?? '📖'
   const accentHue  = index % 2 === 0 ? 'blog-card-accent--pink' : 'blog-card-accent--green'
 
+  const visualHTML = post.image
+    ? `<div class="blog-card-visual">
+        <img src="${import.meta.env.BASE_URL}${post.image}" alt="${post.title}" loading="lazy">
+      </div>`
+    : `<div class="blog-card-visual ${accentHue}">
+        <span class="blog-card-emoji">${emoji}</span>
+      </div>`
+
   return `
     <article class="card blog-card">
-      <div class="blog-card-visual ${accentHue}">
-        <span class="blog-card-emoji">${emoji}</span>
-      </div>
+      ${visualHTML}
       <div class="blog-body">
         <div class="blog-meta">
           <span class="badge ${colorClass}">${post.category}</span>
