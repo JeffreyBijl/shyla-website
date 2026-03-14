@@ -414,15 +414,21 @@ async function handleRecipeSubmit(): Promise<void> {
     recipesSha = latest.sha
 
     const newId = recipes.length > 0 ? Math.max(...recipes.map(r => r.id)) + 1 : 1
+    const slug = title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-')
     const newRecipe: Recipe = {
       id: newId,
       title,
+      slug,
       category,
       image: imagePath.replace(/^public\//, ''),
       emoji: '',
       time,
       calories,
       description,
+      servings: '',
+      ingredients: [],
+      steps: [],
+      nutrition: { kcal: 0, protein: 0, carbs: 0, fat: 0 },
     }
 
     recipes.push(newRecipe)

@@ -2,71 +2,106 @@
   {
     "id": 1,
     "title": "Overnight oats met aardbei",
+    "slug": "overnight-oats-met-aardbei",
     "category": "ontbijt",
     "image": null,
     "emoji": "🍓",
     "time": "10 min",
     "calories": "320 kcal",
-    "description": "Romige haver met verse aardbeien en een vleugje honing. Bereid de avond van tevoren voor een zorgeloos ochtend."
+    "description": "Romige haver met verse aardbeien en een vleugje honing. Bereid de avond van tevoren voor een zorgeloos ochtend.",
+    "servings": "",
+    "ingredients": [],
+    "steps": [],
+    "nutrition": { "kcal": 0, "protein": 0, "carbs": 0, "fat": 0 }
   },
   {
     "id": 2,
     "title": "Avocado toast met ei",
+    "slug": "avocado-toast-met-ei",
     "category": "ontbijt",
     "image": null,
     "emoji": "🥑",
     "time": "15 min",
     "calories": "380 kcal",
-    "description": "Knapperig volkorenbrood met gecremede avocado, een gepocheerd ei en chilivlokken."
+    "description": "Knapperig volkorenbrood met gecremede avocado, een gepocheerd ei en chilivlokken.",
+    "servings": "",
+    "ingredients": [],
+    "steps": [],
+    "nutrition": { "kcal": 0, "protein": 0, "carbs": 0, "fat": 0 }
   },
   {
     "id": 3,
     "title": "Griekse salade bowl",
+    "slug": "griekse-salade-bowl",
     "category": "lunch",
     "image": null,
     "emoji": "🥗",
     "time": "20 min",
     "calories": "290 kcal",
-    "description": "Frisse bowl met komkommer, tomaat, olijven, feta en een citroen-olijfolie dressing."
+    "description": "Frisse bowl met komkommer, tomaat, olijven, feta en een citroen-olijfolie dressing.",
+    "servings": "",
+    "ingredients": [],
+    "steps": [],
+    "nutrition": { "kcal": 0, "protein": 0, "carbs": 0, "fat": 0 }
   },
   {
     "id": 4,
     "title": "Kip teriyaki met quinoa",
+    "slug": "kip-teriyaki-met-quinoa",
     "category": "diner",
     "image": null,
     "emoji": "🍗",
     "time": "35 min",
     "calories": "520 kcal",
-    "description": "Sappige kipfilet in een zoet-zoute teriyaki saus, geserveerd op luchtige quinoa met broccolini."
+    "description": "Sappige kipfilet in een zoet-zoute teriyaki saus, geserveerd op luchtige quinoa met broccolini.",
+    "servings": "",
+    "ingredients": [],
+    "steps": [],
+    "nutrition": { "kcal": 0, "protein": 0, "carbs": 0, "fat": 0 }
   },
   {
     "id": 5,
     "title": "Zalm met geroosterde groenten",
+    "slug": "zalm-met-geroosterde-groenten",
     "category": "diner",
     "image": null,
     "emoji": "🐟",
     "time": "40 min",
     "calories": "480 kcal",
-    "description": "Oven gebakken zalmfilet met kleurrijke geroosterde paprika, courgette en zoete aardappel."
+    "description": "Oven gebakken zalmfilet met kleurrijke geroosterde paprika, courgette en zoete aardappel.",
+    "servings": "",
+    "ingredients": [],
+    "steps": [],
+    "nutrition": { "kcal": 0, "protein": 0, "carbs": 0, "fat": 0 }
   },
   {
     "id": 6,
     "title": "Proteïne smoothie",
+    "slug": "proteine-smoothie",
     "category": "snack",
     "image": null,
     "emoji": "🥤",
     "time": "5 min",
     "calories": "210 kcal",
-    "description": "Roze smoothie met banaan, aardbei, Griekse yoghurt en een schepje proteïnepoeder."
+    "description": "Roze smoothie met banaan, aardbei, Griekse yoghurt en een schepje proteïnepoeder.",
+    "servings": "",
+    "ingredients": [],
+    "steps": [],
+    "nutrition": { "kcal": 0, "protein": 0, "carbs": 0, "fat": 0 }
   },
   {
     "id": 7,
     "title": "Muscle meat mexicano",
+    "slug": "muscle-meat-mexicano",
     "category": "diner",
     "image": "images/recipes/muscle-meat-mexicano-1773439494697.jpg",
     "emoji": "",
     "time": "10 min",
     "calories": "650",
-    "description": "Zo klaar. 10 min verwarmen en eten maar !"
+    "description": "Zo klaar. 10 min verwarmen en eten maar !",
+    "servings": "",
+    "ingredients": [],
+    "steps": [],
+    "nutrition": { "kcal": 0, "protein": 0, "carbs": 0, "fat": 0 }
   }
 ]
