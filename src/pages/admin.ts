@@ -14,6 +14,9 @@ let blogPosts: BlogPost[] = []
 let recipesSha = ''
 let blogSha = ''
 let editingRecipeId: number | null = null
+let isDeploying = false
+let stopCurrentPolling: (() => void) | null = null
+let deployFinishResolvers: Array<() => void> = []
 
 // --- Render ---
 export function renderAdmin(): string {
@@ -52,6 +55,11 @@ function renderDashboard(): string {
           <button class="btn" id="admin-logout" style="margin-top:0.5rem;margin-left:0.5rem;color:var(--color-gray-light);">Uitloggen</button>
         </div>
 
+        <div class="admin-deploy-banner" id="deploy-banner">
+          <div class="admin-spinner admin-spinner--sm"></div>
+          <span id="deploy-banner-text">Website wordt bijgewerkt...</span>
+        </div>
+
         <div class="admin-tabs">
           <button class="admin-tab admin-tab--active" data-tab="recipes">Recepten</button>
           <button class="admin-tab" data-tab="blog">Blog</button>
@@ -86,6 +94,22 @@ function renderDashboard(): string {
         </div>
       </div>
     </section>
+
+    <div class="admin-modal-overlay" id="delete-modal">
+      <div class="admin-modal">
+        <div class="admin-modal-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+          </svg>
+        </div>
+        <h3 class="admin-modal-title">Verwijderen</h3>
+        <p class="admin-modal-text" id="delete-modal-text"></p>
+        <div class="admin-modal-actions">
+          <button class="btn btn-outline" id="delete-modal-cancel">Annuleren</button>
+          <button class="btn admin-modal-delete-btn" id="delete-modal-confirm">Verwijderen</button>
+        </div>
+      </div>
+    </div>
   `
 }
 
@@ -739,6 +763,36 @@ async function handleBlogSubmit(): Promise<void> {
 
 // --- Delete handler ---
 
+function showDeleteModal(title: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const overlay = document.getElementById('delete-modal')
+    const text = document.getElementById('delete-modal-text')
+    const confirmBtn = document.getElementById('delete-modal-confirm')
+    const cancelBtn = document.getElementById('delete-modal-cancel')
+    if (!overlay || !text || !confirmBtn || !cancelBtn) { resolve(false); return }
+
+    text.textContent = `Weet je zeker dat je "${title}" wilt verwijderen? Dit kan niet ongedaan worden gemaakt.`
+    overlay.classList.add('visible')
+
+    const cleanup = () => {
+      overlay.classList.remove('visible')
+      confirmBtn.removeEventListener('click', onConfirm)
+      cancelBtn.removeEventListener('click', onCancel)
+      overlay.removeEventListener('click', onOverlay)
+      document.removeEventListener('keydown', onKey)
+    }
+    const onConfirm = () => { cleanup(); resolve(true) }
+    const onCancel = () => { cleanup(); resolve(false) }
+    const onOverlay = (e: Event) => { if (e.target === overlay) { cleanup(); resolve(false) } }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { cleanup(); resolve(false) } }
+
+    confirmBtn.addEventListener('click', onConfirm)
+    cancelBtn.addEventListener('click', onCancel)
+    overlay.addEventListener('click', onOverlay)
+    document.addEventListener('keydown', onKey)
+  })
+}
+
 async function handleDelete(id: number, type: 'recipe' | 'blog'): Promise<void> {
   const item = type === 'recipe'
     ? recipes.find(r => r.id === id)
@@ -746,11 +800,18 @@ async function handleDelete(id: number, type: 'recipe' | 'blog'): Promise<void> 
 
   if (!item) return
 
-  const confirmed = confirm(`Weet je zeker dat je "${item.title}" wilt verwijderen?`)
+  const confirmed = await showDeleteModal(item.title)
   if (!confirmed) return
 
   const feedbackId = type === 'recipe' ? 'feedback-recipes' : 'feedback-blog'
   const feedback = document.getElementById(feedbackId)
+
+  // Wait for any active deploy to finish before making changes
+  if (isDeploying) {
+    showFeedback(feedback, 'Website wordt bijgewerkt, even geduld...', 'success')
+    await waitForDeployFinish()
+    hideFeedback(feedback)
+  }
 
   try {
     if (item.image) {
@@ -787,6 +848,11 @@ async function handleDelete(id: number, type: 'recipe' | 'blog'): Promise<void> 
   }
 }
 
+function waitForDeployFinish(): Promise<void> {
+  if (!isDeploying) return Promise.resolve()
+  return new Promise((resolve) => { deployFinishResolvers.push(resolve) })
+}
+
 // --- Deploy polling ---
 
 function pollDeploy(statusElementId: string): void {
@@ -796,27 +862,69 @@ function pollDeploy(statusElementId: string): void {
   el.className = 'admin-deploy-status visible admin-deploy-status--pending'
   el.textContent = 'Wachtrij...'
 
-  startDeployPolling((status) => {
+  // Update global deploy state & banner
+  isDeploying = true
+  updateDeployBanner('queued')
+
+  if (stopCurrentPolling) stopCurrentPolling()
+
+  stopCurrentPolling = startDeployPolling((status) => {
     switch (status) {
       case 'queued':
         el.className = 'admin-deploy-status visible admin-deploy-status--pending'
         el.textContent = 'Wachtrij...'
+        updateDeployBanner('queued')
         break
       case 'in_progress':
         el.className = 'admin-deploy-status visible admin-deploy-status--pending'
         el.textContent = 'Publiceren...'
+        updateDeployBanner('in_progress')
         break
       case 'completed':
         el.className = 'admin-deploy-status visible admin-deploy-status--success'
         el.textContent = 'Live!'
+        finishDeploy()
+        updateDeployBanner('completed')
         setTimeout(() => { el.classList.remove('visible') }, 10_000)
         break
       case 'failed':
         el.className = 'admin-deploy-status visible admin-deploy-status--error'
         el.textContent = 'Publicatie mislukt. Probeer opnieuw of neem contact op.'
+        finishDeploy()
+        updateDeployBanner('failed')
         break
     }
   })
+}
+
+function finishDeploy(): void {
+  isDeploying = false
+  stopCurrentPolling = null
+  for (const resolve of deployFinishResolvers) resolve()
+  deployFinishResolvers = []
+}
+
+function updateDeployBanner(status: string): void {
+  const banner = document.getElementById('deploy-banner')
+  const text = document.getElementById('deploy-banner-text')
+  if (!banner || !text) return
+
+  banner.classList.remove('admin-deploy-banner--success', 'admin-deploy-banner--error')
+
+  if (status === 'queued' || status === 'in_progress') {
+    banner.classList.add('visible')
+    text.textContent = status === 'queued'
+      ? 'Website wordt bijgewerkt — in de wachtrij...'
+      : 'Website wordt bijgewerkt — publiceren...'
+  } else if (status === 'completed') {
+    text.textContent = 'Website is live!'
+    banner.classList.add('admin-deploy-banner--success')
+    setTimeout(() => { banner.classList.remove('visible', 'admin-deploy-banner--success') }, 8_000)
+  } else {
+    text.textContent = 'Publicatie mislukt'
+    banner.classList.add('admin-deploy-banner--error')
+    setTimeout(() => { banner.classList.remove('visible', 'admin-deploy-banner--error') }, 10_000)
+  }
 }
 
 // --- UI helpers ---

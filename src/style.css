@@ -1440,14 +1440,132 @@ p { color: var(--color-gray-light); line-height: 1.75; }
   color: #E65100;
 }
 
+/* Deploy banner */
+.admin-deploy-banner {
+  display: none;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-sm);
+  background: #FFF3E0;
+  color: #E65100;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.admin-deploy-banner.visible {
+  display: flex;
+}
+
+.admin-deploy-banner--success,
 .admin-deploy-status--success {
   background: #E8F5E9;
   color: #2E7D32;
 }
 
+.admin-deploy-banner--error,
 .admin-deploy-status--error {
   background: #FFEBEE;
   color: #C62828;
+}
+
+.admin-spinner--sm {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+/* Delete modal */
+.admin-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.admin-modal-overlay.visible {
+  display: flex;
+}
+
+.admin-modal {
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  animation: modalSlideIn 0.25s ease;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.admin-modal-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #FFEBEE;
+  color: #C62828;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.admin-modal-title {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  color: var(--color-gray);
+  margin-bottom: 0.5rem;
+}
+
+.admin-modal-text {
+  color: var(--color-gray-light);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.admin-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.admin-modal-actions .btn {
+  flex: 1;
+  max-width: 160px;
+}
+
+.admin-modal-delete-btn {
+  background: #C62828;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.admin-modal-delete-btn:hover {
+  background: #a51c1c;
 }
 
 /* Item list */
