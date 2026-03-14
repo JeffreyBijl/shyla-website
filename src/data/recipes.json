@@ -20,26 +20,6 @@
     }
   },
   {
-    "id": 3,
-    "title": "Griekse salade bowl",
-    "slug": "griekse-salade-bowl",
-    "category": "lunch",
-    "image": null,
-    "emoji": "🥗",
-    "time": "20 min",
-    "calories": "290 kcal",
-    "description": "Frisse bowl met komkommer, tomaat, olijven, feta en een citroen-olijfolie dressing.",
-    "servings": "",
-    "ingredients": [],
-    "steps": [],
-    "nutrition": {
-      "kcal": 0,
-      "protein": 0,
-      "carbs": 0,
-      "fat": 0
-    }
-  },
-  {
     "id": 4,
     "title": "Kip teriyaki met quinoa",
     "slug": "kip-teriyaki-met-quinoa",
