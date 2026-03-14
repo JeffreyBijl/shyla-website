@@ -6,6 +6,7 @@ import {
 } from '../lib/github.js'
 import { compressImage, slugify } from '../lib/image.js'
 import { escapeHtml } from '../lib/html.js'
+import { OperationQueue } from '../lib/queue.js'
 
 // --- State ---
 let activeTab: 'recipes' | 'blog' = 'recipes'
@@ -17,6 +18,7 @@ let editingRecipeId: number | null = null
 let isDeploying = false
 let stopCurrentPolling: (() => void) | null = null
 let deployFinishResolvers: Array<() => void> = []
+const operationQueue = new OperationQueue()
 
 // --- Render ---
 export function renderAdmin(): string {
@@ -489,6 +491,51 @@ function setupDashboard(): void {
     const btn = (e.target as HTMLElement).closest('.admin-item-delete') as HTMLElement | null
     if (btn) handleDelete(Number(btn.dataset.id), 'blog')
   })
+
+  setupQueueStatus()
+
+  document.getElementById('queue-retry')?.addEventListener('click', () => {
+    operationQueue.retry()
+  })
+  document.getElementById('queue-clear')?.addEventListener('click', () => {
+    operationQueue.clear()
+    loadData()
+  })
+}
+
+function setupQueueStatus(): void {
+  operationQueue.setStatusCallback((status) => {
+    const el = document.getElementById('queue-status')
+    const textEl = document.getElementById('queue-status-text')
+    const retryBtn = document.getElementById('queue-retry')
+    const clearBtn = document.getElementById('queue-clear')
+    if (!el || !textEl || !retryBtn || !clearBtn) return
+
+    if (status.total === 0 && !status.error) {
+      el.classList.remove('visible', 'admin-queue-status--error')
+      return
+    }
+
+    el.classList.add('visible')
+
+    if (status.error) {
+      el.classList.add('admin-queue-status--error')
+      textEl.textContent = `Fout: ${status.error}`
+      retryBtn.style.display = ''
+      clearBtn.style.display = ''
+    } else if (status.completed === status.total) {
+      el.classList.remove('admin-queue-status--error')
+      textEl.textContent = 'Alle acties verwerkt!'
+      retryBtn.style.display = 'none'
+      clearBtn.style.display = 'none'
+      setTimeout(() => el.classList.remove('visible'), 4000)
+    } else {
+      el.classList.remove('admin-queue-status--error')
+      textEl.textContent = `Verwerken: ${status.completed + 1} van ${status.total} acties — ${status.current}`
+      retryBtn.style.display = 'none'
+      clearBtn.style.display = 'none'
+    }
+  })
 }
 
 function setupImagePreview(
@@ -811,51 +858,61 @@ async function handleDelete(id: number, type: 'recipe' | 'blog'): Promise<void> 
   const confirmed = await showDeleteModal(item.title)
   if (!confirmed) return
 
+  // Optimistic UI update — remove from in-memory state and re-render immediately
+  if (type === 'recipe') {
+    recipes = recipes.filter(r => r.id !== id)
+    renderRecipeItems()
+  } else {
+    blogPosts = blogPosts.filter(p => p.id !== id)
+    renderBlogItems()
+  }
+
   const feedbackId = type === 'recipe' ? 'feedback-recipes' : 'feedback-blog'
   const feedback = document.getElementById(feedbackId)
+  showFeedback(feedback, `"${escapeHtml(item.title)}" wordt verwijderd...`, 'success')
 
-  // Wait for any active deploy to finish before making changes
-  if (isDeploying) {
-    showFeedback(feedback, 'Website wordt bijgewerkt, even geduld...', 'success')
-    await waitForDeployFinish()
-    hideFeedback(feedback)
-  }
+  // Enqueue the actual GitHub operation
+  operationQueue.enqueue({
+    label: `Verwijder: ${item.title}`,
+    execute: async () => {
+      // Delete image file if exists
+      if (item.image) {
+        await deleteFile(`public/${item.image}`, `Verwijder afbeelding: ${item.title}`)
+      }
 
-  try {
-    if (item.image) {
-      await deleteFile(`public/${item.image}`, `Verwijder afbeelding: ${item.title}`)
-    }
+      // Read fresh data + SHA, apply deletion, write back
+      if (type === 'recipe') {
+        const latest = await readFile<Recipe[]>(CONFIG.RECIPES_PATH)
+        const updated = latest.content.filter(r => r.id !== id)
+        await writeFile(
+          CONFIG.RECIPES_PATH,
+          JSON.stringify(updated, null, 2),
+          `Verwijder recept: ${item.title}`,
+          latest.sha
+        )
+        recipes = updated
+        recipesSha = latest.sha
+      } else {
+        const latest = await readFile<BlogPost[]>(CONFIG.BLOG_PATH)
+        const updated = latest.content.filter(p => p.id !== id)
+        await writeFile(
+          CONFIG.BLOG_PATH,
+          JSON.stringify(updated, null, 2),
+          `Verwijder blogpost: ${item.title}`,
+          latest.sha
+        )
+        blogPosts = updated
+        blogSha = latest.sha
+      }
 
-    if (type === 'recipe') {
-      const latest = await readFile<Recipe[]>(CONFIG.RECIPES_PATH)
-      recipes = latest.content.filter(r => r.id !== id)
-      await writeFile(
-        CONFIG.RECIPES_PATH,
-        JSON.stringify(recipes, null, 2),
-        `Verwijder recept: ${item.title}`,
-        latest.sha
-      )
-      renderRecipeItems()
-    } else {
-      const latest = await readFile<BlogPost[]>(CONFIG.BLOG_PATH)
-      blogPosts = latest.content.filter(p => p.id !== id)
-      await writeFile(
-        CONFIG.BLOG_PATH,
-        JSON.stringify(blogPosts, null, 2),
-        `Verwijder blogpost: ${item.title}`,
-        latest.sha
-      )
-      renderBlogItems()
-    }
-
-    showFeedback(feedback, `"${escapeHtml(item.title)}" verwijderd`, 'success')
-    pollDeploy(type === 'recipe' ? 'deploy-status-recipes' : 'deploy-status-blog')
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Verwijderen mislukt'
-    showFeedback(feedback, msg, 'error')
-  }
+      showFeedback(feedback, `"${escapeHtml(item.title)}" verwijderd`, 'success')
+      pollDeploy(type === 'recipe' ? 'deploy-status-recipes' : 'deploy-status-blog')
+    },
+  })
 }
 
+// TODO: remove in Task 5 cleanup — still used by deploy polling system
+// @ts-expect-error kept for Task 5
 function waitForDeployFinish(): Promise<void> {
   if (!isDeploying) return Promise.resolve()
   return new Promise((resolve) => { deployFinishResolvers.push(resolve) })
