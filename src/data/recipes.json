@@ -1,25 +1,5 @@
 [
   {
-    "id": 1,
-    "title": "Overnight oats met aardbei",
-    "slug": "overnight-oats-met-aardbei",
-    "category": "ontbijt",
-    "image": null,
-    "emoji": "🍓",
-    "time": "10 min",
-    "calories": "320 kcal",
-    "description": "Romige haver met verse aardbeien en een vleugje honing. Bereid de avond van tevoren voor een zorgeloos ochtend.",
-    "servings": "",
-    "ingredients": [],
-    "steps": [],
-    "nutrition": {
-      "kcal": 0,
-      "protein": 0,
-      "carbs": 0,
-      "fat": 0
-    }
-  },
-  {
     "id": 2,
     "title": "Avocado toast met ei",
     "slug": "avocado-toast-met-ei",
