@@ -15,30 +15,32 @@ function recipeCard(recipe: Recipe): string {
     : `<span class="recipe-emoji">${escapeHtml(recipe.emoji)}</span>`
 
   return `
-    <article class="card recipe-card" data-category="${escapeHtml(recipe.category)}">
-      <div class="recipe-image-wrap ${recipe.image ? '' : 'recipe-image-wrap--fallback'}">
-        ${imageHTML}
-        <span class="recipe-category-badge badge badge-pink">${escapeHtml(recipe.category)}</span>
-      </div>
-      <div class="recipe-body">
-        <h3 class="recipe-title">${escapeHtml(recipe.title)}</h3>
-        <p>${escapeHtml(recipe.description)}</p>
-        <div class="recipe-meta-row">
-          <span class="recipe-meta-item">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-            </svg>
-            ${escapeHtml(recipe.time)}
-          </span>
-          <span class="recipe-meta-item">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-            </svg>
-            ${escapeHtml(recipe.calories)}
-          </span>
+    <a href="#recept/${encodeURIComponent(recipe.slug)}" class="recipe-card-link" data-category="${escapeHtml(recipe.category)}">
+      <article class="card recipe-card">
+        <div class="recipe-image-wrap ${recipe.image ? '' : 'recipe-image-wrap--fallback'}">
+          ${imageHTML}
+          <span class="recipe-category-badge badge badge-pink">${escapeHtml(recipe.category)}</span>
         </div>
-      </div>
-    </article>
+        <div class="recipe-body">
+          <h3 class="recipe-title">${escapeHtml(recipe.title)}</h3>
+          <p>${escapeHtml(recipe.description)}</p>
+          <div class="recipe-meta-row">
+            <span class="recipe-meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+              ${escapeHtml(recipe.time)}
+            </span>
+            <span class="recipe-meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+              </svg>
+              ${escapeHtml(recipe.calories)}
+            </span>
+          </div>
+        </div>
+      </article>
+    </a>
   `
 }
 
@@ -86,9 +88,9 @@ export function setupRecipes(): void {
       btn.classList.add('filter-btn--active')
 
       let visibleCount = 0
-      grid?.querySelectorAll<HTMLElement>('.recipe-card').forEach(card => {
-        const show = filter === 'alle' || card.dataset.category === filter
-        card.style.display = show ? '' : 'none'
+      grid?.querySelectorAll<HTMLElement>('.recipe-card-link').forEach(link => {
+        const show = filter === 'alle' || link.dataset.category === filter
+        link.style.display = show ? '' : 'none'
         if (show) visibleCount++
       })
 

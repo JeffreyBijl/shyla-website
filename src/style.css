@@ -747,6 +747,19 @@ p { color: var(--color-gray-light); line-height: 1.75; }
   color: var(--color-gray-light);
 }
 
+/* ── Recipe card link ───────────────────────────────── */
+.recipe-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--radius-md);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.recipe-card-link:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
 /* ── Blog section ────────────────────────────────────── */
 .blog-section { background: var(--color-white); }
 .badge-purple { background: #F0EAFF; color: #7C4DFF; }
