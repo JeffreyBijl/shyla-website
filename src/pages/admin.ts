@@ -12,8 +12,6 @@ import { OperationQueue } from '../lib/queue.js'
 let activeTab: 'recipes' | 'blog' = 'recipes'
 let recipes: Recipe[] = []
 let blogPosts: BlogPost[] = []
-let recipesSha = ''
-let blogSha = ''
 let editingRecipeId: number | null = null
 let isDeploying = false
 let stopCurrentPolling: (() => void) | null = null
@@ -569,9 +567,7 @@ async function loadData(): Promise<void> {
       readFile<BlogPost[]>(CONFIG.BLOG_PATH),
     ])
     recipes = recipesResult.content
-    recipesSha = recipesResult.sha
     blogPosts = blogResult.content
-    blogSha = blogResult.sha
     renderRecipeItems()
     renderBlogItems()
   } catch (err) {
@@ -593,10 +589,8 @@ async function handleRecipeSubmit(): Promise<void> {
   const description = (document.getElementById('recipe-description') as HTMLTextAreaElement)?.value.trim()
   const imageInput = document.getElementById('recipe-image') as HTMLInputElement
   const file = imageInput?.files?.[0]
-
   const servings = (document.getElementById('recipe-servings') as HTMLInputElement)?.value.trim()
 
-  // Collect ingredients
   const ingredientRows = document.querySelectorAll('.admin-ingredient-row')
   const ingredients: Array<{ amount: string; name: string }> = []
   ingredientRows.forEach(row => {
@@ -605,7 +599,6 @@ async function handleRecipeSubmit(): Promise<void> {
     if (amount || name) ingredients.push({ amount, name })
   })
 
-  // Collect steps
   const stepRows = document.querySelectorAll('.admin-step-row textarea')
   const steps: string[] = []
   stepRows.forEach(ta => {
@@ -613,7 +606,6 @@ async function handleRecipeSubmit(): Promise<void> {
     if (text) steps.push(text)
   })
 
-  // Collect nutrition
   const kcal = Number((document.getElementById('recipe-kcal') as HTMLInputElement)?.value) || 0
   const protein = Number((document.getElementById('recipe-protein') as HTMLInputElement)?.value) || 0
   const carbs = Number((document.getElementById('recipe-carbs') as HTMLInputElement)?.value) || 0
@@ -624,6 +616,7 @@ async function handleRecipeSubmit(): Promise<void> {
   const progressText = document.getElementById('progress-text-recipes')
 
   const isEditing = editingRecipeId !== null
+  const editId = editingRecipeId
 
   if (!title || !time || !calories || !description) {
     showFeedback(feedback, 'Vul alle velden in', 'error')
@@ -634,40 +627,33 @@ async function handleRecipeSubmit(): Promise<void> {
     return
   }
 
-  const submitBtn = document.getElementById('recipe-submit') as HTMLButtonElement
-  submitBtn.disabled = true
-
   hideFeedback(feedback)
 
+  // Compress image before enqueuing (CPU work, fast)
+  let compressed: { base64: string } | null = null
   try {
-    showProgress(progress, progressText, file ? 'Foto verkleinen...' : 'Gegevens ophalen...')
-    const [compressed, latest] = await Promise.all([
-      file ? compressImage(file) : Promise.resolve(null),
-      readFile<Recipe[]>(CONFIG.RECIPES_PATH),
-    ])
-    recipes = latest.content
-    recipesSha = latest.sha
-
-    let imagePath: string | undefined
-    if (compressed) {
-      showProgress(progress, progressText, 'Foto uploaden...')
-      const filename = `${slugify(title)}-${Date.now()}.jpg`
-      const uploadedPath = await uploadImage(CONFIG.RECIPE_IMAGES_DIR, filename, compressed.base64)
-      imagePath = uploadedPath.replace(/^public\//, '')
+    if (file) {
+      showProgress(progress, progressText, 'Foto verkleinen...')
+      compressed = await compressImage(file)
+      hideProgress(progress)
     }
+  } catch (err) {
+    hideProgress(progress)
+    const msg = err instanceof Error ? err.message : 'Foto verkleinen mislukt'
+    showFeedback(feedback, msg, 'error')
+    return
+  }
 
-    showProgress(progress, progressText, 'Gegevens opslaan...')
-
-    if (isEditing) {
-      const index = recipes.findIndex(r => r.id === editingRecipeId)
-      if (index === -1) throw new Error('Recept niet gevonden')
+  // Optimistic UI update
+  if (isEditing && editId !== null) {
+    const index = recipes.findIndex(r => r.id === editId)
+    if (index !== -1) {
       const existing = recipes[index]
       recipes[index] = {
         ...existing,
         title,
         slug: slugify(title),
         category,
-        image: imagePath ?? existing.image,
         time,
         calories,
         description,
@@ -676,49 +662,96 @@ async function handleRecipeSubmit(): Promise<void> {
         steps,
         nutrition: { kcal, protein, carbs, fat },
       }
-    } else {
-      const newId = recipes.length > 0 ? Math.max(...recipes.map(r => r.id)) + 1 : 1
-      recipes.push({
-        id: newId,
-        title,
-        slug: slugify(title),
-        category,
-        image: imagePath!,
-        emoji: '',
-        time,
-        calories,
-        description,
-        servings,
-        ingredients,
-        steps,
-        nutrition: { kcal, protein, carbs, fat },
-      })
     }
-
-    const commitMsg = isEditing ? `Recept bijgewerkt: ${title}` : `Nieuw recept: ${title}`
-    await writeFile(
-      CONFIG.RECIPES_PATH,
-      JSON.stringify(recipes, null, 2),
-      commitMsg,
-      recipesSha
-    )
-
-    hideProgress(progress)
-    const successMsg = isEditing
-      ? 'Recept bijgewerkt! Wordt binnen 1-2 minuten gepubliceerd.'
-      : 'Recept opgeslagen! Wordt binnen 1-2 minuten gepubliceerd.'
-    showFeedback(feedback, successMsg, 'success')
-    cancelRecipeEdit()
-    renderRecipeItems()
-
-    pollDeploy('deploy-status-recipes')
-  } catch (err) {
-    hideProgress(progress)
-    const msg = err instanceof Error ? err.message : 'Er ging iets mis'
-    showFeedback(feedback, msg, 'error')
-  } finally {
-    submitBtn.disabled = false
+  } else {
+    const newId = recipes.length > 0 ? Math.max(...recipes.map(r => r.id)) + 1 : 1
+    recipes.push({
+      id: newId,
+      title,
+      slug: slugify(title),
+      category,
+      image: '',
+      emoji: '',
+      time,
+      calories,
+      description,
+      servings,
+      ingredients,
+      steps,
+      nutrition: { kcal, protein, carbs, fat },
+    })
   }
+
+  renderRecipeItems()
+  cancelRecipeEdit()
+
+  const commitMsg = isEditing ? `Recept bijgewerkt: ${title}` : `Nieuw recept: ${title}`
+  showFeedback(feedback, isEditing ? 'Recept wordt bijgewerkt...' : 'Recept wordt opgeslagen...', 'success')
+
+  // Enqueue the actual GitHub operation
+  operationQueue.enqueue({
+    label: commitMsg,
+    execute: async () => {
+      let imagePath: string | undefined
+
+      if (compressed) {
+        const filename = `${slugify(title)}-${Date.now()}.jpg`
+        const uploadedPath = await uploadImage(CONFIG.RECIPE_IMAGES_DIR, filename, compressed.base64)
+        imagePath = uploadedPath.replace(/^public\//, '')
+      }
+
+      const latest = await readFile<Recipe[]>(CONFIG.RECIPES_PATH)
+
+      if (isEditing && editId !== null) {
+        const index = latest.content.findIndex(r => r.id === editId)
+        if (index === -1) throw new Error('Recept niet gevonden')
+        const existing = latest.content[index]
+        latest.content[index] = {
+          ...existing,
+          title,
+          slug: slugify(title),
+          category,
+          image: imagePath ?? existing.image,
+          time,
+          calories,
+          description,
+          servings,
+          ingredients,
+          steps,
+          nutrition: { kcal, protein, carbs, fat },
+        }
+      } else {
+        const newId = latest.content.length > 0 ? Math.max(...latest.content.map(r => r.id)) + 1 : 1
+        latest.content.push({
+          id: newId,
+          title,
+          slug: slugify(title),
+          category,
+          image: imagePath!,
+          emoji: '',
+          time,
+          calories,
+          description,
+          servings,
+          ingredients,
+          steps,
+          nutrition: { kcal, protein, carbs, fat },
+        })
+      }
+
+      await writeFile(
+        CONFIG.RECIPES_PATH,
+        JSON.stringify(latest.content, null, 2),
+        commitMsg,
+        latest.sha
+      )
+
+      recipes = latest.content
+      renderRecipeItems()
+      showFeedback(feedback, isEditing ? 'Recept bijgewerkt!' : 'Recept opgeslagen!', 'success')
+      pollDeploy('deploy-status-recipes')
+    },
+  })
 }
 
 async function handleBlogSubmit(): Promise<void> {
@@ -738,65 +771,81 @@ async function handleBlogSubmit(): Promise<void> {
     return
   }
 
-  const submitBtn = document.getElementById('blog-submit') as HTMLButtonElement
-  submitBtn.disabled = true
-
   hideFeedback(feedback)
-  let imagePath: string | null = null
 
+  // Compress image before enqueuing
+  let compressed: { base64: string } | null = null
   try {
     if (file) {
       showProgress(progress, progressText, 'Foto verkleinen...')
-      const compressed = await compressImage(file)
-
-      showProgress(progress, progressText, 'Foto uploaden...')
-      const filename = `${slugify(title)}-${Date.now()}.jpg`
-      imagePath = await uploadImage(CONFIG.BLOG_IMAGES_DIR, filename, compressed.base64)
+      compressed = await compressImage(file)
+      hideProgress(progress)
     }
-
-    showProgress(progress, progressText, 'Gegevens opslaan...')
-
-    const latest = await readFile<BlogPost[]>(CONFIG.BLOG_PATH)
-    blogPosts = latest.content
-    blogSha = latest.sha
-
-    const newId = blogPosts.length > 0 ? Math.max(...blogPosts.map(p => p.id)) + 1 : 1
-
-    const now = new Date()
-    const months = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december']
-    const dateStr = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`
-
-    const newPost: BlogPost = {
-      id: newId,
-      title,
-      date: dateStr,
-      category,
-      image: imagePath?.replace(/^public\//, '') ?? null,
-      excerpt,
-      readTime,
-    }
-
-    blogPosts.push(newPost)
-    await writeFile(
-      CONFIG.BLOG_PATH,
-      JSON.stringify(blogPosts, null, 2),
-      `Nieuwe blogpost: ${title}`,
-      blogSha
-    )
-
-    hideProgress(progress)
-    showFeedback(feedback, 'Blogpost opgeslagen! Wordt binnen 1-2 minuten gepubliceerd.', 'success')
-    clearBlogForm()
-    renderBlogItems()
-
-    pollDeploy('deploy-status-blog')
   } catch (err) {
     hideProgress(progress)
-    const msg = err instanceof Error ? err.message : 'Er ging iets mis'
+    const msg = err instanceof Error ? err.message : 'Foto verkleinen mislukt'
     showFeedback(feedback, msg, 'error')
-  } finally {
-    submitBtn.disabled = false
+    return
   }
+
+  // Optimistic UI update
+  const now = new Date()
+  const months = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december']
+  const dateStr = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`
+  const newId = blogPosts.length > 0 ? Math.max(...blogPosts.map(p => p.id)) + 1 : 1
+
+  blogPosts.push({
+    id: newId,
+    title,
+    date: dateStr,
+    category,
+    image: null,
+    excerpt,
+    readTime,
+  })
+
+  renderBlogItems()
+  clearBlogForm()
+  showFeedback(feedback, 'Blogpost wordt opgeslagen...', 'success')
+
+  // Enqueue the actual GitHub operation
+  operationQueue.enqueue({
+    label: `Nieuwe blogpost: ${title}`,
+    execute: async () => {
+      let imagePath: string | null = null
+
+      if (compressed) {
+        const filename = `${slugify(title)}-${Date.now()}.jpg`
+        imagePath = await uploadImage(CONFIG.BLOG_IMAGES_DIR, filename, compressed.base64)
+      }
+
+      const latest = await readFile<BlogPost[]>(CONFIG.BLOG_PATH)
+      const freshId = latest.content.length > 0 ? Math.max(...latest.content.map(p => p.id)) + 1 : 1
+
+      const newPost: BlogPost = {
+        id: freshId,
+        title,
+        date: dateStr,
+        category,
+        image: imagePath?.replace(/^public\//, '') ?? null,
+        excerpt,
+        readTime,
+      }
+
+      latest.content.push(newPost)
+      await writeFile(
+        CONFIG.BLOG_PATH,
+        JSON.stringify(latest.content, null, 2),
+        `Nieuwe blogpost: ${title}`,
+        latest.sha
+      )
+
+      blogPosts = latest.content
+      renderBlogItems()
+      showFeedback(feedback, 'Blogpost opgeslagen!', 'success')
+      pollDeploy('deploy-status-blog')
+    },
+  })
 }
 
 // --- Delete handler ---
@@ -891,7 +940,6 @@ async function handleDelete(id: number, type: 'recipe' | 'blog'): Promise<void> 
           latest.sha
         )
         recipes = updated
-        recipesSha = latest.sha
       } else {
         const latest = await readFile<BlogPost[]>(CONFIG.BLOG_PATH)
         const updated = latest.content.filter(p => p.id !== id)
@@ -902,7 +950,6 @@ async function handleDelete(id: number, type: 'recipe' | 'blog'): Promise<void> 
           latest.sha
         )
         blogPosts = updated
-        blogSha = latest.sha
       }
 
       showFeedback(feedback, `"${escapeHtml(item.title)}" verwijderd`, 'success')
