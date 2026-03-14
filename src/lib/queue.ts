@@ -63,10 +63,19 @@ export class OperationQueue {
   private async processNext(): Promise<void> {
     if (this.queue.length === 0) {
       this.processing = false
-      this.completed = 0
-      this.total = 0
       this.currentLabel = null
+      // Notify with final completed/total so UI can show "Alle acties verwerkt!"
       this.notifyStatus()
+      // Reset counters after a delay so the success message has time to display
+      const t = this.total
+      if (t > 0) {
+        setTimeout(() => {
+          if (this.completed === t && this.queue.length === 0) {
+            this.completed = 0
+            this.total = 0
+          }
+        }, 5000)
+      }
       return
     }
 
@@ -80,7 +89,7 @@ export class OperationQueue {
       this.queue.shift()
       this.completed++
       this.notifyStatus()
-      this.processNext()
+      await this.processNext()
     } catch (err) {
       this.processing = false
       this.error = err instanceof Error ? err.message : String(err)

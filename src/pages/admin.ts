@@ -519,8 +519,12 @@ function setupQueueStatus(): void {
       textEl.textContent = `Fout: ${status.error}`
       retryBtn.style.display = ''
       clearBtn.style.display = ''
-      loadData() // Reload fresh data to undo optimistic updates
-    } else if (status.completed === status.total) {
+      // Reload fresh data to undo optimistic updates (only once per error)
+      if (!el.dataset.errorHandled) {
+        el.dataset.errorHandled = '1'
+        loadData()
+      }
+    } else if (status.completed === status.total && status.total > 0) {
       el.classList.remove('admin-queue-status--error')
       textEl.textContent = 'Alle acties verwerkt!'
       retryBtn.style.display = 'none'
@@ -528,6 +532,7 @@ function setupQueueStatus(): void {
       setTimeout(() => el.classList.remove('visible'), 4000)
     } else {
       el.classList.remove('admin-queue-status--error')
+      delete el.dataset.errorHandled
       textEl.textContent = `Verwerken: ${status.completed + 1} van ${status.total} acties — ${status.current}`
       retryBtn.style.display = 'none'
       clearBtn.style.display = 'none'
@@ -923,12 +928,8 @@ async function handleDelete(id: number, type: 'recipe' | 'blog'): Promise<void> 
   operationQueue.enqueue({
     label: `Verwijder: ${item.title}`,
     execute: async () => {
-      // Delete image file if exists
-      if (item.image) {
-        await deleteFile(`public/${item.image}`, `Verwijder afbeelding: ${item.title}`)
-      }
-
-      // Read fresh data + SHA, apply deletion, write back
+      // Update data file first (remove reference), then delete image
+      // This way, if image deletion fails, we have an orphan file instead of a broken reference
       if (type === 'recipe') {
         const latest = await readFile<Recipe[]>(CONFIG.RECIPES_PATH)
         const updated = latest.content.filter(r => r.id !== id)
@@ -949,6 +950,15 @@ async function handleDelete(id: number, type: 'recipe' | 'blog'): Promise<void> 
           latest.sha
         )
         blogPosts = updated
+      }
+
+      // Delete image file after data is updated (non-critical if this fails)
+      if (item.image) {
+        try {
+          await deleteFile(`public/${item.image}`, `Verwijder afbeelding: ${item.title}`)
+        } catch {
+          // Orphan image is acceptable — data reference is already removed
+        }
       }
 
       showFeedback(feedback, `"${escapeHtml(item.title)}" verwijderd`, 'success')
