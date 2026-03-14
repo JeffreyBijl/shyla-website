@@ -133,6 +133,41 @@ function renderRecipeForm(): string {
         <label for="recipe-description">Beschrijving</label>
         <textarea id="recipe-description" placeholder="Korte beschrijving (1-2 zinnen)"></textarea>
       </div>
+      <div class="form-group">
+        <label for="recipe-servings">Porties</label>
+        <input type="text" id="recipe-servings" placeholder="bijv. 4 personen">
+      </div>
+      <div class="form-group">
+        <label>Ingrediënten</label>
+        <div id="recipe-ingredients-list"></div>
+        <button type="button" class="btn btn-outline btn-sm" id="add-ingredient">+ Ingredient</button>
+      </div>
+      <div class="form-group">
+        <label>Bereidingsstappen</label>
+        <div id="recipe-steps-list"></div>
+        <button type="button" class="btn btn-outline btn-sm" id="add-step">+ Stap</button>
+      </div>
+      <div class="form-group">
+        <label>Voedingswaarde (per portie)</label>
+        <div class="admin-nutrition-grid">
+          <div>
+            <label for="recipe-kcal">kcal</label>
+            <input type="number" id="recipe-kcal" placeholder="0">
+          </div>
+          <div>
+            <label for="recipe-protein">Eiwit (g)</label>
+            <input type="number" id="recipe-protein" placeholder="0">
+          </div>
+          <div>
+            <label for="recipe-carbs">Koolhydraten (g)</label>
+            <input type="number" id="recipe-carbs" placeholder="0">
+          </div>
+          <div>
+            <label for="recipe-fat">Vet (g)</label>
+            <input type="number" id="recipe-fat" placeholder="0">
+          </div>
+        </div>
+      </div>
       <button class="btn btn-primary" id="recipe-submit">Opslaan</button>
     </div>
   `
@@ -233,6 +268,31 @@ function categoryEmoji(category: string): string {
   return map[category] ?? '📖'
 }
 
+// --- Dynamic row helpers ---
+
+function addIngredientRow(container: HTMLElement, amount = '', name = ''): void {
+  const row = document.createElement('div')
+  row.className = 'admin-ingredient-row'
+  row.innerHTML = `
+    <input type="text" placeholder="Hoeveelheid" value="${escapeHtml(amount)}" class="ingredient-amount-input">
+    <input type="text" placeholder="Ingredient" value="${escapeHtml(name)}" class="ingredient-name-input">
+    <button type="button" class="admin-row-remove" title="Verwijderen">×</button>
+  `
+  row.querySelector('.admin-row-remove')?.addEventListener('click', () => row.remove())
+  container.appendChild(row)
+}
+
+function addStepRow(container: HTMLElement, text = ''): void {
+  const row = document.createElement('div')
+  row.className = 'admin-step-row'
+  row.innerHTML = `
+    <textarea placeholder="Beschrijf deze stap...">${escapeHtml(text)}</textarea>
+    <button type="button" class="admin-row-remove" title="Verwijderen">×</button>
+  `
+  row.querySelector('.admin-row-remove')?.addEventListener('click', () => row.remove())
+  container.appendChild(row)
+}
+
 // --- Setup (event listeners) ---
 
 export function setupAdmin(): void {
@@ -311,6 +371,18 @@ function setupDashboard(): void {
   // Recipe submit
   document.getElementById('recipe-submit')?.addEventListener('click', () => handleRecipeSubmit())
 
+  // Ingredient add button
+  document.getElementById('add-ingredient')?.addEventListener('click', () => {
+    const list = document.getElementById('recipe-ingredients-list')
+    if (list) addIngredientRow(list)
+  })
+
+  // Step add button
+  document.getElementById('add-step')?.addEventListener('click', () => {
+    const list = document.getElementById('recipe-steps-list')
+    if (list) addStepRow(list)
+  })
+
   // Blog submit
   document.getElementById('blog-submit')?.addEventListener('click', () => handleBlogSubmit())
 
@@ -381,6 +453,31 @@ async function handleRecipeSubmit(): Promise<void> {
   const imageInput = document.getElementById('recipe-image') as HTMLInputElement
   const file = imageInput?.files?.[0]
 
+  const servings = (document.getElementById('recipe-servings') as HTMLInputElement)?.value.trim()
+
+  // Collect ingredients
+  const ingredientRows = document.querySelectorAll('.admin-ingredient-row')
+  const ingredients: Array<{ amount: string; name: string }> = []
+  ingredientRows.forEach(row => {
+    const amount = (row.querySelector('.ingredient-amount-input') as HTMLInputElement)?.value.trim()
+    const name = (row.querySelector('.ingredient-name-input') as HTMLInputElement)?.value.trim()
+    if (amount || name) ingredients.push({ amount, name })
+  })
+
+  // Collect steps
+  const stepRows = document.querySelectorAll('.admin-step-row textarea')
+  const steps: string[] = []
+  stepRows.forEach(ta => {
+    const text = (ta as HTMLTextAreaElement).value.trim()
+    if (text) steps.push(text)
+  })
+
+  // Collect nutrition
+  const kcal = Number((document.getElementById('recipe-kcal') as HTMLInputElement)?.value) || 0
+  const protein = Number((document.getElementById('recipe-protein') as HTMLInputElement)?.value) || 0
+  const carbs = Number((document.getElementById('recipe-carbs') as HTMLInputElement)?.value) || 0
+  const fat = Number((document.getElementById('recipe-fat') as HTMLInputElement)?.value) || 0
+
   const feedback = document.getElementById('feedback-recipes')
   const progress = document.getElementById('progress-recipes')
   const progressText = document.getElementById('progress-text-recipes')
@@ -425,10 +522,10 @@ async function handleRecipeSubmit(): Promise<void> {
       time,
       calories,
       description,
-      servings: '',
-      ingredients: [],
-      steps: [],
-      nutrition: { kcal: 0, protein: 0, carbs: 0, fat: 0 },
+      servings,
+      ingredients,
+      steps,
+      nutrition: { kcal, protein, carbs, fat },
     }
 
     recipes.push(newRecipe)
@@ -645,6 +742,15 @@ function clearRecipeForm(): void {
   document.getElementById('recipe-preview')?.classList.remove('has-image')
   const info = document.getElementById('recipe-image-info')
   if (info) info.textContent = ''
+  ;(document.getElementById('recipe-servings') as HTMLInputElement).value = ''
+  const ingredientsList = document.getElementById('recipe-ingredients-list')
+  if (ingredientsList) ingredientsList.innerHTML = ''
+  const stepsList = document.getElementById('recipe-steps-list')
+  if (stepsList) stepsList.innerHTML = ''
+  ;(document.getElementById('recipe-kcal') as HTMLInputElement).value = ''
+  ;(document.getElementById('recipe-protein') as HTMLInputElement).value = ''
+  ;(document.getElementById('recipe-carbs') as HTMLInputElement).value = ''
+  ;(document.getElementById('recipe-fat') as HTMLInputElement).value = ''
 }
 
 function clearBlogForm(): void {
