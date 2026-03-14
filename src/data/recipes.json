@@ -40,26 +40,6 @@
     }
   },
   {
-    "id": 5,
-    "title": "Zalm met geroosterde groenten",
-    "slug": "zalm-met-geroosterde-groenten",
-    "category": "diner",
-    "image": null,
-    "emoji": "🐟",
-    "time": "40 min",
-    "calories": "480 kcal",
-    "description": "Oven gebakken zalmfilet met kleurrijke geroosterde paprika, courgette en zoete aardappel.",
-    "servings": "",
-    "ingredients": [],
-    "steps": [],
-    "nutrition": {
-      "kcal": 0,
-      "protein": 0,
-      "carbs": 0,
-      "fat": 0
-    }
-  },
-  {
     "id": 8,
     "title": "Maaltijdsalade met kruidige kip",
     "slug": "maaltijdsalade-met-kruidige-kip",
