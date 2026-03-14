@@ -299,18 +299,20 @@ function addStepRow(container: HTMLElement, text = ''): void {
 
 // --- Edit helpers ---
 
+function setRecipeFormMode(mode: 'create' | 'edit', title?: string): void {
+  const formTitle = document.getElementById('recipe-form-title')
+  if (formTitle) formTitle.textContent = mode === 'edit' ? `Recept bewerken: ${title}` : 'Nieuw recept toevoegen'
+  const imageRequired = document.getElementById('recipe-image-required')
+  if (imageRequired) imageRequired.textContent = mode === 'edit' ? '(optioneel — bestaande foto blijft behouden)' : '(verplicht)'
+  const submitBtn = document.getElementById('recipe-submit')
+  if (submitBtn) submitBtn.textContent = mode === 'edit' ? 'Bijwerken' : 'Opslaan'
+  const cancelBtn = document.getElementById('recipe-cancel-edit')
+  if (cancelBtn) cancelBtn.style.display = mode === 'edit' ? '' : 'none'
+}
+
 function populateRecipeForm(recipe: Recipe): void {
   editingRecipeId = recipe.id
-
-  // Update form title and buttons
-  const formTitle = document.getElementById('recipe-form-title')
-  if (formTitle) formTitle.textContent = `Recept bewerken: ${recipe.title}`
-  const imageRequired = document.getElementById('recipe-image-required')
-  if (imageRequired) imageRequired.textContent = '(optioneel — bestaande foto blijft behouden)'
-  const submitBtn = document.getElementById('recipe-submit')
-  if (submitBtn) submitBtn.textContent = 'Bijwerken'
-  const cancelBtn = document.getElementById('recipe-cancel-edit')
-  if (cancelBtn) cancelBtn.style.display = ''
+  setRecipeFormMode('edit', recipe.title)
 
   // Fill fields
   ;(document.getElementById('recipe-title') as HTMLInputElement).value = recipe.title
@@ -357,14 +359,7 @@ function populateRecipeForm(recipe: Recipe): void {
 function cancelRecipeEdit(): void {
   editingRecipeId = null
   clearRecipeForm()
-  const formTitle = document.getElementById('recipe-form-title')
-  if (formTitle) formTitle.textContent = 'Nieuw recept toevoegen'
-  const imageRequired = document.getElementById('recipe-image-required')
-  if (imageRequired) imageRequired.textContent = '(verplicht)'
-  const submitBtn = document.getElementById('recipe-submit')
-  if (submitBtn) submitBtn.textContent = 'Opslaan'
-  const cancelBtn = document.getElementById('recipe-cancel-edit')
-  if (cancelBtn) cancelBtn.style.display = 'none'
+  setRecipeFormMode('create')
 }
 
 // --- Setup (event listeners) ---
@@ -583,26 +578,20 @@ async function handleRecipeSubmit(): Promise<void> {
   hideFeedback(feedback)
 
   try {
+    showProgress(progress, progressText, file ? 'Foto verkleinen...' : 'Gegevens ophalen...')
+    const [compressed, latest] = await Promise.all([
+      file ? compressImage(file) : Promise.resolve(null),
+      readFile<Recipe[]>(CONFIG.RECIPES_PATH),
+    ])
+    recipes = latest.content
+    recipesSha = latest.sha
+
     let imagePath: string | undefined
-
-    if (file) {
-      showProgress(progress, progressText, 'Foto verkleinen...')
-      const [compressed, latest] = await Promise.all([
-        compressImage(file),
-        readFile<Recipe[]>(CONFIG.RECIPES_PATH),
-      ])
-      recipes = latest.content
-      recipesSha = latest.sha
-
+    if (compressed) {
       showProgress(progress, progressText, 'Foto uploaden...')
       const filename = `${slugify(title)}-${Date.now()}.jpg`
       const uploadedPath = await uploadImage(CONFIG.RECIPE_IMAGES_DIR, filename, compressed.base64)
       imagePath = uploadedPath.replace(/^public\//, '')
-    } else {
-      showProgress(progress, progressText, 'Gegevens ophalen...')
-      const latest = await readFile<Recipe[]>(CONFIG.RECIPES_PATH)
-      recipes = latest.content
-      recipesSha = latest.sha
     }
 
     showProgress(progress, progressText, 'Gegevens opslaan...')
