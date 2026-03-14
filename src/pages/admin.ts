@@ -13,9 +13,7 @@ let activeTab: 'recipes' | 'blog' = 'recipes'
 let recipes: Recipe[] = []
 let blogPosts: BlogPost[] = []
 let editingRecipeId: number | null = null
-let isDeploying = false
 let stopCurrentPolling: (() => void) | null = null
-let deployFinishResolvers: Array<() => void> = []
 const operationQueue = new OperationQueue()
 
 // --- Render ---
@@ -521,6 +519,7 @@ function setupQueueStatus(): void {
       textEl.textContent = `Fout: ${status.error}`
       retryBtn.style.display = ''
       clearBtn.style.display = ''
+      loadData() // Reload fresh data to undo optimistic updates
     } else if (status.completed === status.total) {
       el.classList.remove('admin-queue-status--error')
       textEl.textContent = 'Alle acties verwerkt!'
@@ -958,13 +957,6 @@ async function handleDelete(id: number, type: 'recipe' | 'blog'): Promise<void> 
   })
 }
 
-// TODO: remove in Task 5 cleanup — still used by deploy polling system
-// @ts-expect-error kept for Task 5
-function waitForDeployFinish(): Promise<void> {
-  if (!isDeploying) return Promise.resolve()
-  return new Promise((resolve) => { deployFinishResolvers.push(resolve) })
-}
-
 // --- Deploy polling ---
 
 function pollDeploy(statusElementId: string): void {
@@ -974,8 +966,7 @@ function pollDeploy(statusElementId: string): void {
   el.className = 'admin-deploy-status visible admin-deploy-status--pending'
   el.textContent = 'Wachtrij...'
 
-  // Update global deploy state & banner
-  isDeploying = true
+  // Update deploy banner
   updateDeployBanner('queued')
 
   if (stopCurrentPolling) stopCurrentPolling()
@@ -1010,10 +1001,7 @@ function pollDeploy(statusElementId: string): void {
 }
 
 function finishDeploy(): void {
-  isDeploying = false
   stopCurrentPolling = null
-  for (const resolve of deployFinishResolvers) resolve()
-  deployFinishResolvers = []
 }
 
 function updateDeployBanner(status: string): void {
