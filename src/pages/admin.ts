@@ -95,21 +95,6 @@ function renderDashboard(): string {
       </div>
     </section>
 
-    <div class="admin-modal-overlay" id="delete-modal">
-      <div class="admin-modal">
-        <div class="admin-modal-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
-          </svg>
-        </div>
-        <h3 class="admin-modal-title">Verwijderen</h3>
-        <p class="admin-modal-text" id="delete-modal-text"></p>
-        <div class="admin-modal-actions">
-          <button class="btn btn-outline" id="delete-modal-cancel">Annuleren</button>
-          <button class="btn admin-modal-delete-btn" id="delete-modal-confirm">Verwijderen</button>
-        </div>
-      </div>
-    </div>
   `
 }
 
@@ -765,20 +750,37 @@ async function handleBlogSubmit(): Promise<void> {
 
 function showDeleteModal(title: string): Promise<boolean> {
   return new Promise((resolve) => {
-    const overlay = document.getElementById('delete-modal')
-    const text = document.getElementById('delete-modal-text')
-    const confirmBtn = document.getElementById('delete-modal-confirm')
-    const cancelBtn = document.getElementById('delete-modal-cancel')
-    if (!overlay || !text || !confirmBtn || !cancelBtn) { resolve(false); return }
+    // Create modal on document.body so position:fixed isn't broken by parent transforms
+    const overlay = document.createElement('div')
+    overlay.className = 'admin-modal-overlay visible'
+    overlay.innerHTML = `
+      <div class="admin-modal">
+        <div class="admin-modal-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+          </svg>
+        </div>
+        <h3 class="admin-modal-title">Verwijderen</h3>
+        <p class="admin-modal-text">${escapeHtml(`Weet je zeker dat je "${title}" wilt verwijderen? Dit kan niet ongedaan worden gemaakt.`)}</p>
+        <div class="admin-modal-actions">
+          <button class="btn btn-outline" id="delete-modal-cancel">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+            Annuleren
+          </button>
+          <button class="btn admin-modal-delete-btn" id="delete-modal-confirm">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+            Verwijderen
+          </button>
+        </div>
+      </div>
+    `
+    document.body.appendChild(overlay)
 
-    text.textContent = `Weet je zeker dat je "${title}" wilt verwijderen? Dit kan niet ongedaan worden gemaakt.`
-    overlay.classList.add('visible')
+    const confirmBtn = document.getElementById('delete-modal-confirm')!
+    const cancelBtn = document.getElementById('delete-modal-cancel')!
 
     const cleanup = () => {
-      overlay.classList.remove('visible')
-      confirmBtn.removeEventListener('click', onConfirm)
-      cancelBtn.removeEventListener('click', onCancel)
-      overlay.removeEventListener('click', onOverlay)
+      overlay.remove()
       document.removeEventListener('keydown', onKey)
     }
     const onConfirm = () => { cleanup(); resolve(true) }
