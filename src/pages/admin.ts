@@ -60,6 +60,12 @@ function renderDashboard(): string {
           <span id="deploy-banner-text">Website wordt bijgewerkt...</span>
         </div>
 
+        <div class="admin-queue-status" id="queue-status">
+          <div class="admin-queue-status-text" id="queue-status-text"></div>
+          <button class="btn btn-sm btn-outline" id="queue-retry" style="display:none;">Opnieuw proberen</button>
+          <button class="btn btn-sm btn-outline" id="queue-clear" style="display:none;">Annuleren</button>
+        </div>
+
         <div class="admin-tabs">
           <button class="admin-tab admin-tab--active" data-tab="recipes">Recepten</button>
           <button class="admin-tab" data-tab="blog">Blog</button>

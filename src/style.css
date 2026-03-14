@@ -1477,6 +1477,31 @@ p { color: var(--color-gray-light); line-height: 1.75; }
   border-width: 2px;
 }
 
+.admin-queue-status {
+  display: none;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  background: var(--color-cream);
+  border: 1px solid var(--color-sage);
+  font-size: 0.9rem;
+}
+
+.admin-queue-status.visible {
+  display: flex;
+}
+
+.admin-queue-status.admin-queue-status--error {
+  border-color: #e74c3c;
+  background: #fdf0ef;
+}
+
+.admin-queue-status-text {
+  flex: 1;
+}
+
 /* Delete modal */
 .admin-modal-overlay {
   display: none;
