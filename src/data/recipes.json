@@ -116,5 +116,78 @@
       "carbs": 50,
       "fat": 25
     }
+  },
+  {
+    "id": 9,
+    "title": "Gezonde lasagne met spinazie",
+    "slug": "gezonde-lasagne-met-spinazie",
+    "category": "diner",
+    "image": "images/recipes/gezonde-lasagne-met-spinazie-1773532389495.jpg",
+    "emoji": "",
+    "time": "45 min",
+    "calories": "500 kcal",
+    "description": "Deze gezonde(re) en light versie op de bekende lasagne bevat geen bechamelsaus maar een lichte saus met Huttenkase en extra veel groenten. Lekker licht en voedzaam dus.",
+    "servings": "2 personen",
+    "ingredients": [
+      {
+        "amount": "6",
+        "name": "volkoren lasagnebladen"
+      },
+      {
+        "amount": "200 gr",
+        "name": "hüttenkäse"
+      },
+      {
+        "amount": "400 ml",
+        "name": "tomatenblokjes (Heinz)"
+      },
+      {
+        "amount": "1 thee lepel",
+        "name": "Italiaanse kruiden"
+      },
+      {
+        "amount": "snuf",
+        "name": "peper en zout"
+      },
+      {
+        "amount": "125 gr",
+        "name": "champignons"
+      },
+      {
+        "amount": "200 gr",
+        "name": "spinazie"
+      },
+      {
+        "amount": "0.5",
+        "name": "paprika"
+      },
+      {
+        "amount": "handje",
+        "name": "verse basilicum"
+      },
+      {
+        "amount": "0.5",
+        "name": "ui"
+      },
+      {
+        "amount": "1",
+        "name": "teen knoflook"
+      },
+      {
+        "amount": "0.5 handje",
+        "name": "30+ kaas (Beemster)"
+      }
+    ],
+    "steps": [
+      "Snipper de uiFruit de ui en knoflook aan in een pan met een klein beetje olie of boter. Voeg de champignons toe. en knoflook. Snijd de champignons in plakjes.",
+      "Snijd de paprika in kleine blokjes en bak ook mee. Voeg dan de tomatenblokjes toe en breng op smaak met peper, zout en Italiaanse kruiden. Voeg ook wat verse basilicum toe in stukjes.",
+      "Laat dit mengsel ca. 20 minuutjes pruttelen. Roer af en toe door."
+    ],
+    "nutrition": {
+      "kcal": 500,
+      "protein": 20,
+      "carbs": 100,
+      "fat": 25
+    }
   }
 ]
