@@ -13,6 +13,7 @@ let recipes: Recipe[] = []
 let blogPosts: BlogPost[] = []
 let recipesSha = ''
 let blogSha = ''
+let editingRecipeId: number | null = null
 
 // --- Render ---
 export function renderAdmin(): string {
@@ -91,9 +92,9 @@ function renderDashboard(): string {
 function renderRecipeForm(): string {
   return `
     <div class="admin-form">
-      <h3>Nieuw recept toevoegen</h3>
+      <h3 id="recipe-form-title">Nieuw recept toevoegen</h3>
       <div class="admin-image-upload">
-        <label>Foto (verplicht)</label>
+        <label>Foto <span id="recipe-image-required">(verplicht)</span></label>
         <div class="admin-image-input-wrap">
           <span class="admin-image-btn">Kies foto</span>
           <input type="file" accept="image/*" id="recipe-image">
@@ -163,7 +164,10 @@ function renderRecipeForm(): string {
           </div>
         </div>
       </div>
-      <button class="btn btn-primary" id="recipe-submit">Opslaan</button>
+      <div class="admin-form-actions">
+        <button class="btn btn-primary" id="recipe-submit">Opslaan</button>
+        <button class="btn btn-outline" id="recipe-cancel-edit" style="display:none;">Annuleren</button>
+      </div>
     </div>
   `
 }
@@ -225,6 +229,11 @@ function renderRecipeItems(): void {
         <div class="admin-item-title">${escapeHtml(r.title)}</div>
         <div class="admin-item-meta">${escapeHtml(r.category)} · ${escapeHtml(r.time)}</div>
       </div>
+      <button class="admin-item-edit" data-id="${r.id}" title="Bewerken">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+      </button>
       <button class="admin-item-delete" data-id="${r.id}" data-type="recipe" title="Verwijderen">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
@@ -286,6 +295,76 @@ function addStepRow(container: HTMLElement, text = ''): void {
   `
   row.querySelector('.admin-row-remove')?.addEventListener('click', () => row.remove())
   container.appendChild(row)
+}
+
+// --- Edit helpers ---
+
+function populateRecipeForm(recipe: Recipe): void {
+  editingRecipeId = recipe.id
+
+  // Update form title and buttons
+  const formTitle = document.getElementById('recipe-form-title')
+  if (formTitle) formTitle.textContent = `Recept bewerken: ${recipe.title}`
+  const imageRequired = document.getElementById('recipe-image-required')
+  if (imageRequired) imageRequired.textContent = '(optioneel — bestaande foto blijft behouden)'
+  const submitBtn = document.getElementById('recipe-submit')
+  if (submitBtn) submitBtn.textContent = 'Bijwerken'
+  const cancelBtn = document.getElementById('recipe-cancel-edit')
+  if (cancelBtn) cancelBtn.style.display = ''
+
+  // Fill fields
+  ;(document.getElementById('recipe-title') as HTMLInputElement).value = recipe.title
+  ;(document.getElementById('recipe-category') as HTMLSelectElement).value = recipe.category
+  ;(document.getElementById('recipe-time') as HTMLInputElement).value = recipe.time
+  ;(document.getElementById('recipe-calories') as HTMLInputElement).value = recipe.calories
+  ;(document.getElementById('recipe-description') as HTMLTextAreaElement).value = recipe.description
+  ;(document.getElementById('recipe-servings') as HTMLInputElement).value = recipe.servings
+
+  // Show existing image preview
+  if (recipe.image) {
+    const preview = document.getElementById('recipe-preview')
+    const img = document.getElementById('recipe-preview-img') as HTMLImageElement
+    if (preview && img) {
+      img.src = `${import.meta.env.BASE_URL}${recipe.image}`
+      preview.classList.add('has-image')
+    }
+  }
+
+  // Fill ingredients
+  const ingredientsList = document.getElementById('recipe-ingredients-list')
+  if (ingredientsList) {
+    ingredientsList.innerHTML = ''
+    recipe.ingredients.forEach(ing => addIngredientRow(ingredientsList, ing.amount, ing.name))
+  }
+
+  // Fill steps
+  const stepsList = document.getElementById('recipe-steps-list')
+  if (stepsList) {
+    stepsList.innerHTML = ''
+    recipe.steps.forEach(step => addStepRow(stepsList, step))
+  }
+
+  // Fill nutrition
+  ;(document.getElementById('recipe-kcal') as HTMLInputElement).value = recipe.nutrition.kcal ? String(recipe.nutrition.kcal) : ''
+  ;(document.getElementById('recipe-protein') as HTMLInputElement).value = recipe.nutrition.protein ? String(recipe.nutrition.protein) : ''
+  ;(document.getElementById('recipe-carbs') as HTMLInputElement).value = recipe.nutrition.carbs ? String(recipe.nutrition.carbs) : ''
+  ;(document.getElementById('recipe-fat') as HTMLInputElement).value = recipe.nutrition.fat ? String(recipe.nutrition.fat) : ''
+
+  // Scroll to form
+  document.querySelector('.admin-form')?.scrollIntoView({ behavior: 'smooth' })
+}
+
+function cancelRecipeEdit(): void {
+  editingRecipeId = null
+  clearRecipeForm()
+  const formTitle = document.getElementById('recipe-form-title')
+  if (formTitle) formTitle.textContent = 'Nieuw recept toevoegen'
+  const imageRequired = document.getElementById('recipe-image-required')
+  if (imageRequired) imageRequired.textContent = '(verplicht)'
+  const submitBtn = document.getElementById('recipe-submit')
+  if (submitBtn) submitBtn.textContent = 'Opslaan'
+  const cancelBtn = document.getElementById('recipe-cancel-edit')
+  if (cancelBtn) cancelBtn.style.display = 'none'
 }
 
 // --- Setup (event listeners) ---
@@ -381,8 +460,17 @@ function setupDashboard(): void {
   // Blog submit
   document.getElementById('blog-submit')?.addEventListener('click', () => handleBlogSubmit())
 
-  // Delete buttons (event delegation)
+  // Cancel edit
+  document.getElementById('recipe-cancel-edit')?.addEventListener('click', () => cancelRecipeEdit())
+
+  // Edit & delete buttons (event delegation)
   document.getElementById('recipes-items')?.addEventListener('click', (e) => {
+    const editBtn = (e.target as HTMLElement).closest('.admin-item-edit') as HTMLElement | null
+    if (editBtn) {
+      const recipe = recipes.find(r => r.id === Number(editBtn.dataset.id))
+      if (recipe) populateRecipeForm(recipe)
+      return
+    }
     const btn = (e.target as HTMLElement).closest('.admin-item-delete') as HTMLElement | null
     if (btn) handleDelete(Number(btn.dataset.id), 'recipe')
   })
@@ -478,11 +566,13 @@ async function handleRecipeSubmit(): Promise<void> {
   const progress = document.getElementById('progress-recipes')
   const progressText = document.getElementById('progress-text-recipes')
 
+  const isEditing = editingRecipeId !== null
+
   if (!title || !time || !calories || !description) {
     showFeedback(feedback, 'Vul alle velden in', 'error')
     return
   }
-  if (!file) {
+  if (!isEditing && !file) {
     showFeedback(feedback, 'Kies een foto', 'error')
     return
   }
@@ -491,51 +581,83 @@ async function handleRecipeSubmit(): Promise<void> {
   submitBtn.disabled = true
 
   hideFeedback(feedback)
-  showProgress(progress, progressText, 'Foto verkleinen...')
 
   try {
-    const [compressed, latest] = await Promise.all([
-      compressImage(file),
-      readFile<Recipe[]>(CONFIG.RECIPES_PATH),
-    ])
-    recipes = latest.content
-    recipesSha = latest.sha
+    let imagePath: string | undefined
 
-    showProgress(progress, progressText, 'Foto uploaden...')
-    const filename = `${slugify(title)}-${Date.now()}.jpg`
-    const imagePath = await uploadImage(CONFIG.RECIPE_IMAGES_DIR, filename, compressed.base64)
+    if (file) {
+      showProgress(progress, progressText, 'Foto verkleinen...')
+      const [compressed, latest] = await Promise.all([
+        compressImage(file),
+        readFile<Recipe[]>(CONFIG.RECIPES_PATH),
+      ])
+      recipes = latest.content
+      recipesSha = latest.sha
+
+      showProgress(progress, progressText, 'Foto uploaden...')
+      const filename = `${slugify(title)}-${Date.now()}.jpg`
+      const uploadedPath = await uploadImage(CONFIG.RECIPE_IMAGES_DIR, filename, compressed.base64)
+      imagePath = uploadedPath.replace(/^public\//, '')
+    } else {
+      showProgress(progress, progressText, 'Gegevens ophalen...')
+      const latest = await readFile<Recipe[]>(CONFIG.RECIPES_PATH)
+      recipes = latest.content
+      recipesSha = latest.sha
+    }
 
     showProgress(progress, progressText, 'Gegevens opslaan...')
 
-    const newId = recipes.length > 0 ? Math.max(...recipes.map(r => r.id)) + 1 : 1
-    const slug = slugify(title)
-    const newRecipe: Recipe = {
-      id: newId,
-      title,
-      slug,
-      category,
-      image: imagePath.replace(/^public\//, ''),
-      emoji: '',
-      time,
-      calories,
-      description,
-      servings,
-      ingredients,
-      steps,
-      nutrition: { kcal, protein, carbs, fat },
+    if (isEditing) {
+      const index = recipes.findIndex(r => r.id === editingRecipeId)
+      if (index === -1) throw new Error('Recept niet gevonden')
+      const existing = recipes[index]
+      recipes[index] = {
+        ...existing,
+        title,
+        slug: slugify(title),
+        category,
+        image: imagePath ?? existing.image,
+        time,
+        calories,
+        description,
+        servings,
+        ingredients,
+        steps,
+        nutrition: { kcal, protein, carbs, fat },
+      }
+    } else {
+      const newId = recipes.length > 0 ? Math.max(...recipes.map(r => r.id)) + 1 : 1
+      recipes.push({
+        id: newId,
+        title,
+        slug: slugify(title),
+        category,
+        image: imagePath!,
+        emoji: '',
+        time,
+        calories,
+        description,
+        servings,
+        ingredients,
+        steps,
+        nutrition: { kcal, protein, carbs, fat },
+      })
     }
 
-    recipes.push(newRecipe)
+    const commitMsg = isEditing ? `Recept bijgewerkt: ${title}` : `Nieuw recept: ${title}`
     await writeFile(
       CONFIG.RECIPES_PATH,
       JSON.stringify(recipes, null, 2),
-      `Nieuw recept: ${title}`,
+      commitMsg,
       recipesSha
     )
 
     hideProgress(progress)
-    showFeedback(feedback, 'Recept opgeslagen! Wordt binnen 1-2 minuten gepubliceerd.', 'success')
-    clearRecipeForm()
+    const successMsg = isEditing
+      ? 'Recept bijgewerkt! Wordt binnen 1-2 minuten gepubliceerd.'
+      : 'Recept opgeslagen! Wordt binnen 1-2 minuten gepubliceerd.'
+    showFeedback(feedback, successMsg, 'success')
+    cancelRecipeEdit()
     renderRecipeItems()
 
     pollDeploy('deploy-status-recipes')
