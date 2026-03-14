@@ -12,7 +12,12 @@
     "servings": "",
     "ingredients": [],
     "steps": [],
-    "nutrition": { "kcal": 0, "protein": 0, "carbs": 0, "fat": 0 }
+    "nutrition": {
+      "kcal": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0
+    }
   },
   {
     "id": 2,
@@ -27,7 +32,12 @@
     "servings": "",
     "ingredients": [],
     "steps": [],
-    "nutrition": { "kcal": 0, "protein": 0, "carbs": 0, "fat": 0 }
+    "nutrition": {
+      "kcal": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0
+    }
   },
   {
     "id": 3,
@@ -42,7 +52,12 @@
     "servings": "",
     "ingredients": [],
     "steps": [],
-    "nutrition": { "kcal": 0, "protein": 0, "carbs": 0, "fat": 0 }
+    "nutrition": {
+      "kcal": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0
+    }
   },
   {
     "id": 4,
@@ -57,7 +72,12 @@
     "servings": "",
     "ingredients": [],
     "steps": [],
-    "nutrition": { "kcal": 0, "protein": 0, "carbs": 0, "fat": 0 }
+    "nutrition": {
+      "kcal": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0
+    }
   },
   {
     "id": 5,
@@ -72,7 +92,12 @@
     "servings": "",
     "ingredients": [],
     "steps": [],
-    "nutrition": { "kcal": 0, "protein": 0, "carbs": 0, "fat": 0 }
+    "nutrition": {
+      "kcal": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0
+    }
   },
   {
     "id": 6,
@@ -87,7 +112,12 @@
     "servings": "",
     "ingredients": [],
     "steps": [],
-    "nutrition": { "kcal": 0, "protein": 0, "carbs": 0, "fat": 0 }
+    "nutrition": {
+      "kcal": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0
+    }
   },
   {
     "id": 7,
@@ -102,6 +132,84 @@
     "servings": "",
     "ingredients": [],
     "steps": [],
-    "nutrition": { "kcal": 0, "protein": 0, "carbs": 0, "fat": 0 }
+    "nutrition": {
+      "kcal": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0
+    }
+  },
+  {
+    "id": 8,
+    "title": "Maaltijdsalade met kruidige kip",
+    "slug": "maaltijdsalade-met-kruidige-kip",
+    "category": "diner",
+    "image": "images/recipes/maaltijdsalade-met-kruidige-kip-1773474265025.jpg",
+    "emoji": "",
+    "time": "30 min",
+    "calories": "400 kcal",
+    "description": "Lekkere salade met gemarineerde gebakken stukjes kip en diverse groenten zoals tomaatjes, komkommer en wortel. Een perfecte combinatie met de lichte dressing en krokante stukjes cashewnoot.",
+    "servings": "2",
+    "ingredients": [
+      {
+        "amount": "75 gr",
+        "name": "sla"
+      },
+      {
+        "amount": "1",
+        "name": "rode ui"
+      },
+      {
+        "amount": "150 gr",
+        "name": "cherrytomaatjes"
+      },
+      {
+        "amount": "0.5",
+        "name": "komkommer"
+      },
+      {
+        "amount": "1 handje",
+        "name": "cashewnoten"
+      },
+      {
+        "amount": "100 gr",
+        "name": "wortel"
+      },
+      {
+        "amount": "180 gr",
+        "name": "stukjes kip"
+      },
+      {
+        "amount": "0.5",
+        "name": "eetlepel tomatenpuree"
+      },
+      {
+        "amount": "1 snuf",
+        "name": "paprikapoeder"
+      },
+      {
+        "amount": "1 teen",
+        "name": "knoflook"
+      },
+      {
+        "amount": "1 eetlepel",
+        "name": "sojasaus"
+      },
+      {
+        "amount": "2 eetlepels",
+        "name": "olie"
+      },
+      {
+        "amount": "1 snufje",
+        "name": "chilipeper (optioneel)"
+      }
+    ],
+    "steps": [],
+    "nutrition": {
+      "kcal": 350,
+      "protein": 20,
+      "carbs": 50,
+      "fat": 25
+    }
   }
 ]
