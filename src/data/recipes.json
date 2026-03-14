@@ -100,26 +100,6 @@
     }
   },
   {
-    "id": 6,
-    "title": "Proteïne smoothie",
-    "slug": "proteine-smoothie",
-    "category": "snack",
-    "image": null,
-    "emoji": "🥤",
-    "time": "5 min",
-    "calories": "210 kcal",
-    "description": "Roze smoothie met banaan, aardbei, Griekse yoghurt en een schepje proteïnepoeder.",
-    "servings": "",
-    "ingredients": [],
-    "steps": [],
-    "nutrition": {
-      "kcal": 0,
-      "protein": 0,
-      "carbs": 0,
-      "fat": 0
-    }
-  },
-  {
     "id": 8,
     "title": "Maaltijdsalade met kruidige kip",
     "slug": "maaltijdsalade-met-kruidige-kip",
