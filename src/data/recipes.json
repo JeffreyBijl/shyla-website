@@ -120,26 +120,6 @@
     }
   },
   {
-    "id": 7,
-    "title": "Muscle meat mexicano",
-    "slug": "muscle-meat-mexicano",
-    "category": "diner",
-    "image": "images/recipes/muscle-meat-mexicano-1773439494697.jpg",
-    "emoji": "",
-    "time": "10 min",
-    "calories": "650",
-    "description": "Zo klaar. 10 min verwarmen en eten maar !",
-    "servings": "",
-    "ingredients": [],
-    "steps": [],
-    "nutrition": {
-      "kcal": 0,
-      "protein": 0,
-      "carbs": 0,
-      "fat": 0
-    }
-  },
-  {
     "id": 8,
     "title": "Maaltijdsalade met kruidige kip",
     "slug": "maaltijdsalade-met-kruidige-kip",
