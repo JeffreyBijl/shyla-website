@@ -14,6 +14,7 @@ let recipes: Recipe[] = []
 let blogPosts: BlogPost[] = []
 let editingRecipeId: number | null = null
 let stopCurrentPolling: (() => void) | null = null
+let deployFadeTimers: number[] = []
 const operationQueue = new OperationQueue()
 
 // --- Render ---
@@ -500,12 +501,13 @@ function setupDashboard(): void {
 }
 
 function setupQueueStatus(): void {
+  const el = document.getElementById('queue-status')
+  const textEl = document.getElementById('queue-status-text')
+  const retryBtn = document.getElementById('queue-retry')
+  const clearBtn = document.getElementById('queue-clear')
+  if (!el || !textEl || !retryBtn || !clearBtn) return
+
   operationQueue.setStatusCallback((status) => {
-    const el = document.getElementById('queue-status')
-    const textEl = document.getElementById('queue-status-text')
-    const retryBtn = document.getElementById('queue-retry')
-    const clearBtn = document.getElementById('queue-clear')
-    if (!el || !textEl || !retryBtn || !clearBtn) return
 
     if (status.total === 0 && !status.error) {
       el.classList.remove('visible', 'admin-queue-status--error')
@@ -952,13 +954,9 @@ async function handleDelete(id: number, type: 'recipe' | 'blog'): Promise<void> 
         blogPosts = updated
       }
 
-      // Delete image file after data is updated (non-critical if this fails)
+      // Delete image file after data is updated (fire-and-forget, non-critical)
       if (item.image) {
-        try {
-          await deleteFile(`public/${item.image}`, `Verwijder afbeelding: ${item.title}`)
-        } catch {
-          // Orphan image is acceptable — data reference is already removed
-        }
+        deleteFile(`public/${item.image}`, `Verwijder afbeelding: ${item.title}`).catch(() => {})
       }
 
       showFeedback(feedback, `"${escapeHtml(item.title)}" verwijderd`, 'success')
@@ -981,6 +979,10 @@ function pollDeploy(statusElementId: string): void {
 
   if (stopCurrentPolling) stopCurrentPolling()
 
+  // Clear stale fade timers from previous deploy
+  for (const t of deployFadeTimers) clearTimeout(t)
+  deployFadeTimers = []
+
   stopCurrentPolling = startDeployPolling((status) => {
     switch (status) {
       case 'queued':
@@ -998,7 +1000,7 @@ function pollDeploy(statusElementId: string): void {
         el.textContent = 'Live!'
         finishDeploy()
         updateDeployBanner('completed')
-        setTimeout(() => { el.classList.remove('visible') }, 10_000)
+        deployFadeTimers.push(window.setTimeout(() => { el.classList.remove('visible') }, 10_000))
         break
       case 'failed':
         el.className = 'admin-deploy-status visible admin-deploy-status--error'
@@ -1029,11 +1031,11 @@ function updateDeployBanner(status: string): void {
   } else if (status === 'completed') {
     text.textContent = 'Website is live!'
     banner.classList.add('admin-deploy-banner--success')
-    setTimeout(() => { banner.classList.remove('visible', 'admin-deploy-banner--success') }, 8_000)
+    deployFadeTimers.push(window.setTimeout(() => { banner.classList.remove('visible', 'admin-deploy-banner--success') }, 8_000))
   } else {
     text.textContent = 'Publicatie mislukt'
     banner.classList.add('admin-deploy-banner--error')
-    setTimeout(() => { banner.classList.remove('visible', 'admin-deploy-banner--error') }, 10_000)
+    deployFadeTimers.push(window.setTimeout(() => { banner.classList.remove('visible', 'admin-deploy-banner--error') }, 10_000))
   }
 }
 
