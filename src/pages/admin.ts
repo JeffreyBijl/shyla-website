@@ -5,12 +5,7 @@ import {
   startDeployPolling, CONFIG,
 } from '../lib/github.js'
 import { compressImage, slugify } from '../lib/image.js'
-
-function escapeHtml(str: string): string {
-  const div = document.createElement('div')
-  div.textContent = str
-  return div.innerHTML
-}
+import { escapeHtml } from '../lib/html.js'
 
 // --- State ---
 let activeTab: 'recipes' | 'blog' = 'recipes'
@@ -410,6 +405,7 @@ function setupImagePreview(
     const file = input.files?.[0]
     if (!file || !preview || !img || !info) return
 
+    if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src)
     const url = URL.createObjectURL(file)
     img.src = url
     preview.classList.add('has-image')
@@ -498,17 +494,18 @@ async function handleRecipeSubmit(): Promise<void> {
   showProgress(progress, progressText, 'Foto verkleinen...')
 
   try {
-    const compressed = await compressImage(file)
+    const [compressed, latest] = await Promise.all([
+      compressImage(file),
+      readFile<Recipe[]>(CONFIG.RECIPES_PATH),
+    ])
+    recipes = latest.content
+    recipesSha = latest.sha
 
     showProgress(progress, progressText, 'Foto uploaden...')
     const filename = `${slugify(title)}-${Date.now()}.jpg`
     const imagePath = await uploadImage(CONFIG.RECIPE_IMAGES_DIR, filename, compressed.base64)
 
     showProgress(progress, progressText, 'Gegevens opslaan...')
-
-    const latest = await readFile<Recipe[]>(CONFIG.RECIPES_PATH)
-    recipes = latest.content
-    recipesSha = latest.sha
 
     const newId = recipes.length > 0 ? Math.max(...recipes.map(r => r.id)) + 1 : 1
     const slug = slugify(title)

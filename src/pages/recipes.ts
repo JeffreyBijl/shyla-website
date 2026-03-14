@@ -1,13 +1,8 @@
 import recipesData from '../data/recipes.json'
 import type { Recipe, RecipeCategory } from '../data/types.js'
+import { escapeHtml } from '../lib/html.js'
 
 const recipes: Recipe[] = recipesData as Recipe[]
-
-function escapeHtml(str: string): string {
-  const div = document.createElement('div')
-  div.textContent = str
-  return div.innerHTML
-}
 
 function recipeCard(recipe: Recipe): string {
   const imageHTML = recipe.image

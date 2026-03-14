@@ -1,13 +1,8 @@
 import blogData from '../data/blog.json'
 import type { BlogPost } from '../data/types.js'
+import { escapeHtml } from '../lib/html.js'
 
 const blogPosts: BlogPost[] = blogData as BlogPost[]
-
-function escapeHtml(str: string): string {
-  const div = document.createElement('div')
-  div.textContent = str
-  return div.innerHTML
-}
 
 const categoryColors: Record<string, string> = {
   Voeding:   'badge-pink',
