@@ -1,6 +1,7 @@
 import { renderHome }                      from './pages/home.js'
 import { renderAbout }                     from './pages/about.js'
 import { renderRecipes, setupRecipes }     from './pages/recipes.js'
+import { renderRecipeDetail, setupRecipeDetail } from './pages/recipe-detail.js'
 import { renderBlog }                      from './pages/blog.js'
 import { renderContact, setupContact }     from './pages/contact.js'
 import { renderAdmin, setupAdmin }         from './pages/admin.js'
@@ -23,10 +24,19 @@ const routes: Record<string, Route> = {
 
 export function navigate(): void {
   const hash  = window.location.hash || '#home'
-  const route = routes[hash] ?? routes['#home']
   const app   = document.getElementById('app')
   if (!app) return
 
+  // Check for parameterized recipe route
+  if (hash.startsWith('#recept/')) {
+    const slug = decodeURIComponent(hash.slice('#recept/'.length))
+    app.innerHTML = `<div class="page-enter">${renderRecipeDetail(slug)}</div>`
+    setupRecipeDetail()
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    return
+  }
+
+  const route = routes[hash] ?? routes['#home']
   app.innerHTML = `<div class="page-enter">${route.render()}</div>`
   route.setup?.()
   window.scrollTo({ top: 0, behavior: 'smooth' })
