@@ -1,25 +1,5 @@
 [
   {
-    "id": 2,
-    "title": "Avocado toast met ei",
-    "slug": "avocado-toast-met-ei",
-    "category": "ontbijt",
-    "image": null,
-    "emoji": "🥑",
-    "time": "15 min",
-    "calories": "380 kcal",
-    "description": "Knapperig volkorenbrood met gecremede avocado, een gepocheerd ei en chilivlokken.",
-    "servings": "",
-    "ingredients": [],
-    "steps": [],
-    "nutrition": {
-      "kcal": 0,
-      "protein": 0,
-      "carbs": 0,
-      "fat": 0
-    }
-  },
-  {
     "id": 8,
     "title": "Maaltijdsalade met kruidige kip",
     "slug": "maaltijdsalade-met-kruidige-kip",
