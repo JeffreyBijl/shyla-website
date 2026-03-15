@@ -52,5 +52,16 @@
     "image": null,
     "excerpt": "test test test",
     "readTime": "1 min"
+  },
+  {
+    "id": 7,
+    "title": "TEST",
+    "slug": "test",
+    "date": "15 maart 2026",
+    "category": "Educatie",
+    "image": null,
+    "shortDescription": "",
+    "readTime": "",
+    "content": "<p>Dit is een <strong>test</strong></p>"
   }
 ]
