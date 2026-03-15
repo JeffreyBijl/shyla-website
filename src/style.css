@@ -1775,3 +1775,16 @@ p { color: var(--color-gray-light); line-height: 1.75; }
   margin-top: 0.25rem;
   display: block;
 }
+
+/* --- Quill editor in admin --- */
+#blog-editor {
+  min-height: 200px;
+  background: #fff;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+#blog-editor .ql-editor {
+  min-height: 200px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.7;
+}
