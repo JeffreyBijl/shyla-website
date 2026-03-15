@@ -152,21 +152,6 @@
     }
   },
   {
-    "id": 200,
-    "title": "Test recept A",
-    "slug": "test-recept-a",
-    "category": "ontbijt",
-    "image": "",
-    "emoji": "🧪",
-    "time": "5 min",
-    "calories": "100 kcal",
-    "description": "Test recept om te verwijderen",
-    "servings": "1",
-    "ingredients": [{"amount": "1", "name": "test"}],
-    "steps": ["Test stap"],
-    "nutrition": {"kcal": 100, "protein": 5, "carbs": 10, "fat": 3}
-  },
-  {
     "id": 201,
     "title": "Test recept B",
     "slug": "test-recept-b",
@@ -177,9 +162,21 @@
     "calories": "200 kcal",
     "description": "Test recept om te verwijderen",
     "servings": "1",
-    "ingredients": [{"amount": "2", "name": "test"}],
-    "steps": ["Test stap"],
-    "nutrition": {"kcal": 200, "protein": 10, "carbs": 20, "fat": 5}
+    "ingredients": [
+      {
+        "amount": "2",
+        "name": "test"
+      }
+    ],
+    "steps": [
+      "Test stap"
+    ],
+    "nutrition": {
+      "kcal": 200,
+      "protein": 10,
+      "carbs": 20,
+      "fat": 5
+    }
   },
   {
     "id": 202,
@@ -192,8 +189,20 @@
     "calories": "50 kcal",
     "description": "Test recept om te verwijderen",
     "servings": "1",
-    "ingredients": [{"amount": "1", "name": "test"}],
-    "steps": ["Test stap"],
-    "nutrition": {"kcal": 50, "protein": 2, "carbs": 5, "fat": 1}
+    "ingredients": [
+      {
+        "amount": "1",
+        "name": "test"
+      }
+    ],
+    "steps": [
+      "Test stap"
+    ],
+    "nutrition": {
+      "kcal": 50,
+      "protein": 2,
+      "carbs": 5,
+      "fat": 1
+    }
   }
 ]
