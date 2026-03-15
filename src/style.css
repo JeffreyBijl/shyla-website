@@ -1797,6 +1797,89 @@ p { color: var(--color-gray-light); line-height: 1.75; }
   .admin-ingredient-row input:first-child { flex: 0 0 80px; }
 }
 
+/* Toast notifications */
+.toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.5rem;
+  max-width: 400px;
+  width: calc(100% - 3rem);
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transform: translateY(0.5rem);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.toast--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast--success {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.toast--error {
+  background: #FFEBEE;
+  color: #C62828;
+}
+
+.toast--progress {
+  background: #FFF3E0;
+  color: #E65100;
+}
+
+.toast-text {
+  flex: 1;
+}
+
+.toast-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #E65100;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+.toast-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.toast-btn {
+  padding: 0.3rem 0.75rem;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: inherit;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toast-btn:hover {
+  background: rgba(0,0,0,0.05);
+}
+
 /* Admin responsive */
 @media (max-width: 768px) {
   .admin-form {

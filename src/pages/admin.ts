@@ -7,14 +7,13 @@ import {
 import { compressImage, slugify } from '../lib/image.js'
 import { escapeHtml } from '../lib/html.js'
 import { OperationQueue } from '../lib/queue.js'
+import { toastSuccess, toastError, toastProgress } from '../lib/toast.js'
 
 // --- State ---
-let activeTab: 'recipes' | 'blog' = 'recipes'
 let recipes: Recipe[] = []
 let blogPosts: BlogPost[] = []
 let editingRecipeId: number | null = null
 let stopCurrentPolling: (() => void) | null = null
-let deployFadeTimers: number[] = []
 const operationQueue = new OperationQueue()
 
 // --- Render ---
@@ -35,7 +34,6 @@ function renderTokenForm(): string {
             <label for="admin-token">Token</label>
             <input type="password" id="admin-token" placeholder="ghp_xxxxxxxxxxxx">
           </div>
-          <div class="admin-feedback" id="token-feedback"></div>
           <button class="btn btn-primary" id="token-submit">Inloggen</button>
           <p class="admin-token-warning">Deel dit token met niemand.</p>
         </div>
@@ -54,11 +52,6 @@ function renderDashboard(): string {
           <button class="btn" id="admin-logout" style="margin-top:0.5rem;margin-left:0.5rem;color:var(--color-gray-light);">Uitloggen</button>
         </div>
 
-        <div class="admin-deploy-banner" id="deploy-banner">
-          <div class="admin-spinner admin-spinner--sm"></div>
-          <span id="deploy-banner-text">Website wordt bijgewerkt...</span>
-        </div>
-
         <div class="admin-tabs">
           <button class="admin-tab admin-tab--active" data-tab="recipes">Recepten</button>
           <button class="admin-tab" data-tab="blog">Blog</button>
@@ -66,18 +59,7 @@ function renderDashboard(): string {
 
         <div class="admin-tab-content admin-tab-content--active" id="tab-recipes">
           ${renderRecipeForm()}
-          <div class="admin-deploy-status" id="deploy-status-recipes"></div>
-          <div class="admin-feedback" id="feedback-recipes"></div>
-          <div class="admin-progress" id="progress-recipes">
-            <div class="admin-spinner"></div>
-            <span id="progress-text-recipes"></span>
-          </div>
           <div class="admin-items-list" id="recipes-list">
-            <div class="admin-queue-status" id="queue-status">
-              <div class="admin-queue-status-text" id="queue-status-text"></div>
-              <button class="btn btn-sm btn-outline" id="queue-retry" style="display:none;">Opnieuw proberen</button>
-              <button class="btn btn-sm btn-outline" id="queue-clear" style="display:none;">Annuleren</button>
-            </div>
             <h3>Bestaande recepten</h3>
             <div id="recipes-items"></div>
           </div>
@@ -85,12 +67,6 @@ function renderDashboard(): string {
 
         <div class="admin-tab-content" id="tab-blog">
           ${renderBlogForm()}
-          <div class="admin-deploy-status" id="deploy-status-blog"></div>
-          <div class="admin-feedback" id="feedback-blog"></div>
-          <div class="admin-progress" id="progress-blog">
-            <div class="admin-spinner"></div>
-            <span id="progress-text-blog"></span>
-          </div>
           <div class="admin-items-list" id="blog-list">
             <h3>Bestaande blogposts</h3>
             <div id="blog-items"></div>
@@ -390,12 +366,11 @@ export function setupAdmin(): void {
 function setupTokenForm(): void {
   const input = document.getElementById('admin-token') as HTMLInputElement
   const submit = document.getElementById('token-submit')
-  const feedback = document.getElementById('token-feedback')
 
   submit?.addEventListener('click', async () => {
     const token = input?.value.trim()
     if (!token) {
-      showFeedback(feedback, 'Voer een token in', 'error')
+      toastError('Voer een token in')
       return
     }
     submit.textContent = 'Controleren...'
@@ -411,7 +386,7 @@ function setupTokenForm(): void {
         setupDashboard()
       }
     } else {
-      showFeedback(feedback, 'Token is ongeldig. Controleer of het correct is en "repo" scope heeft.', 'error')
+      toastError('Token is ongeldig. Controleer of het correct is en "repo" scope heeft.')
       submit.textContent = 'Inloggen'
       ;(submit as HTMLButtonElement).disabled = false
     }
@@ -423,7 +398,6 @@ function setupDashboard(): void {
   document.querySelectorAll<HTMLButtonElement>('.admin-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       const target = tab.dataset.tab as 'recipes' | 'blog'
-      activeTab = target
       document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('admin-tab--active'))
       tab.classList.add('admin-tab--active')
       document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('admin-tab-content--active'))
@@ -488,55 +462,41 @@ function setupDashboard(): void {
     if (btn) handleDelete(Number(btn.dataset.id), 'blog')
   })
 
-  setupQueueStatus()
-
-  document.getElementById('queue-retry')?.addEventListener('click', () => {
-    operationQueue.retry()
-  })
-  document.getElementById('queue-clear')?.addEventListener('click', () => {
-    operationQueue.clear()
-    loadData()
-  })
+  setupQueueToasts()
 }
 
-function setupQueueStatus(): void {
-  const el = document.getElementById('queue-status')
-  const textEl = document.getElementById('queue-status-text')
-  const retryBtn = document.getElementById('queue-retry')
-  const clearBtn = document.getElementById('queue-clear')
-  if (!el || !textEl || !retryBtn || !clearBtn) return
+function setupQueueToasts(): void {
+  let currentToast: ReturnType<typeof toastProgress> | null = null
+  let errorHandled = false
 
   operationQueue.setStatusCallback((status) => {
-
     if (status.total === 0 && !status.error) {
-      el.classList.remove('visible', 'admin-queue-status--error')
+      currentToast?.dismiss()
+      currentToast = null
       return
     }
 
-    el.classList.add('visible')
-
     if (status.error) {
-      el.classList.add('admin-queue-status--error')
-      textEl.textContent = `Fout: ${status.error}`
-      retryBtn.style.display = ''
-      clearBtn.style.display = ''
-      // Reload fresh data to undo optimistic updates (only once per error)
-      if (!el.dataset.errorHandled) {
-        el.dataset.errorHandled = '1'
+      currentToast?.dismiss()
+      currentToast = toastError(`Fout: ${status.error}`, [
+        { label: 'Opnieuw', onClick: () => operationQueue.retry() },
+        { label: 'Annuleren', onClick: () => { operationQueue.clear(); loadData() } },
+      ])
+      if (!errorHandled) {
+        errorHandled = true
         loadData()
       }
     } else if (status.completed === status.total && status.total > 0) {
-      el.classList.remove('admin-queue-status--error')
-      textEl.textContent = 'Alle acties verwerkt!'
-      retryBtn.style.display = 'none'
-      clearBtn.style.display = 'none'
-      setTimeout(() => el.classList.remove('visible'), 4000)
+      currentToast?.dismiss()
+      currentToast = null
+      toastSuccess('Alle acties verwerkt!')
     } else {
-      el.classList.remove('admin-queue-status--error')
-      delete el.dataset.errorHandled
-      textEl.textContent = `Verwerken: ${status.completed + 1} van ${status.total} acties — ${status.current}`
-      retryBtn.style.display = 'none'
-      clearBtn.style.display = 'none'
+      errorHandled = false
+      if (!currentToast) {
+        currentToast = toastProgress(`Verwerken: ${status.completed + 1} van ${status.total} — ${status.current}`)
+      } else {
+        currentToast.update(`Verwerken: ${status.completed + 1} van ${status.total} — ${status.current}`)
+      }
     }
   })
 }
@@ -577,10 +537,7 @@ async function loadData(): Promise<void> {
     renderBlogItems()
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Kan data niet laden'
-    showFeedback(
-      document.getElementById(activeTab === 'recipes' ? 'feedback-recipes' : 'feedback-blog'),
-      msg, 'error'
-    )
+    toastError(msg)
   }
 }
 
@@ -616,36 +573,31 @@ async function handleRecipeSubmit(): Promise<void> {
   const carbs = Number((document.getElementById('recipe-carbs') as HTMLInputElement)?.value) || 0
   const fat = Number((document.getElementById('recipe-fat') as HTMLInputElement)?.value) || 0
 
-  const feedback = document.getElementById('feedback-recipes')
-  const progress = document.getElementById('progress-recipes')
-  const progressText = document.getElementById('progress-text-recipes')
-
   const isEditing = editingRecipeId !== null
   const editId = editingRecipeId
 
   if (!title || !time || !calories || !description) {
-    showFeedback(feedback, 'Vul alle velden in', 'error')
+    toastError('Vul alle velden in')
     return
   }
   if (!isEditing && !file) {
-    showFeedback(feedback, 'Kies een foto', 'error')
+    toastError('Kies een foto')
     return
   }
 
-  hideFeedback(feedback)
-
   // Compress image before enqueuing (CPU work, fast)
   let compressed: { base64: string } | null = null
+  let compressToast: ReturnType<typeof toastProgress> | null = null
   try {
     if (file) {
-      showProgress(progress, progressText, 'Foto verkleinen...')
+      compressToast = toastProgress('Foto verkleinen...')
       compressed = await compressImage(file)
-      hideProgress(progress)
+      compressToast.dismiss()
     }
   } catch (err) {
-    hideProgress(progress)
+    compressToast?.dismiss()
     const msg = err instanceof Error ? err.message : 'Foto verkleinen mislukt'
-    showFeedback(feedback, msg, 'error')
+    toastError(msg)
     return
   }
 
@@ -691,7 +643,6 @@ async function handleRecipeSubmit(): Promise<void> {
   cancelRecipeEdit()
 
   const commitMsg = isEditing ? `Recept bijgewerkt: ${title}` : `Nieuw recept: ${title}`
-  showFeedback(feedback, isEditing ? 'Recept wordt bijgewerkt...' : 'Recept wordt opgeslagen...', 'success')
 
   // Enqueue the actual GitHub operation
   operationQueue.enqueue({
@@ -749,8 +700,7 @@ async function handleRecipeSubmit(): Promise<void> {
         commitMsg,
       )
       renderRecipeItems()
-      showFeedback(feedback, isEditing ? 'Recept bijgewerkt!' : 'Recept opgeslagen!', 'success')
-      pollDeploy('deploy-status-recipes')
+      pollDeploy()
     },
   })
 }
@@ -763,29 +713,24 @@ async function handleBlogSubmit(): Promise<void> {
   const imageInput = document.getElementById('blog-image') as HTMLInputElement
   const file = imageInput?.files?.[0]
 
-  const feedback = document.getElementById('feedback-blog')
-  const progress = document.getElementById('progress-blog')
-  const progressText = document.getElementById('progress-text-blog')
-
   if (!title || !excerpt || !readTime) {
-    showFeedback(feedback, 'Vul alle verplichte velden in', 'error')
+    toastError('Vul alle verplichte velden in')
     return
   }
 
-  hideFeedback(feedback)
-
   // Compress image before enqueuing
   let compressed: { base64: string } | null = null
+  let compressToast: ReturnType<typeof toastProgress> | null = null
   try {
     if (file) {
-      showProgress(progress, progressText, 'Foto verkleinen...')
+      compressToast = toastProgress('Foto verkleinen...')
       compressed = await compressImage(file)
-      hideProgress(progress)
+      compressToast.dismiss()
     }
   } catch (err) {
-    hideProgress(progress)
+    compressToast?.dismiss()
     const msg = err instanceof Error ? err.message : 'Foto verkleinen mislukt'
-    showFeedback(feedback, msg, 'error')
+    toastError(msg)
     return
   }
 
@@ -807,7 +752,6 @@ async function handleBlogSubmit(): Promise<void> {
 
   renderBlogItems()
   clearBlogForm()
-  showFeedback(feedback, 'Blogpost wordt opgeslagen...', 'success')
 
   // Enqueue the actual GitHub operation
   operationQueue.enqueue({
@@ -838,8 +782,7 @@ async function handleBlogSubmit(): Promise<void> {
         `Nieuwe blogpost: ${title}`,
       )
       renderBlogItems()
-      showFeedback(feedback, 'Blogpost opgeslagen!', 'success')
-      pollDeploy('deploy-status-blog')
+      pollDeploy()
     },
   })
 }
@@ -912,9 +855,7 @@ async function handleDelete(id: number, type: 'recipe' | 'blog'): Promise<void> 
     renderBlogItems()
   }
 
-  const feedbackId = type === 'recipe' ? 'feedback-recipes' : 'feedback-blog'
-  const feedback = document.getElementById(feedbackId)
-  showFeedback(feedback, `"${escapeHtml(item.title)}" wordt verwijderd...`, 'success')
+  toastSuccess(`"${item.title}" wordt verwijderd...`, 2000)
 
   // Enqueue the actual GitHub operation
   operationQueue.enqueue({
@@ -940,107 +881,45 @@ async function handleDelete(id: number, type: 'recipe' | 'blog'): Promise<void> 
         deleteFile(`public/${item.image}`, `Verwijder afbeelding: ${item.title}`).catch(() => {})
       }
 
-      showFeedback(feedback, `"${escapeHtml(item.title)}" verwijderd`, 'success')
-      pollDeploy(type === 'recipe' ? 'deploy-status-recipes' : 'deploy-status-blog')
+      pollDeploy()
     },
   })
 }
 
 // --- Deploy polling ---
 
-function pollDeploy(statusElementId: string): void {
-  const el = document.getElementById(statusElementId)
-  if (!el) return
+let deployToast: ReturnType<typeof toastProgress> | null = null
 
-  el.className = 'admin-deploy-status visible admin-deploy-status--pending'
-  el.textContent = 'Wachtrij...'
-
-  // Update deploy banner
-  updateDeployBanner('queued')
-
+function pollDeploy(): void {
   if (stopCurrentPolling) stopCurrentPolling()
 
-  // Clear stale fade timers from previous deploy
-  for (const t of deployFadeTimers) clearTimeout(t)
-  deployFadeTimers = []
+  deployToast?.dismiss()
+  deployToast = toastProgress('Website wordt bijgewerkt...')
 
   stopCurrentPolling = startDeployPolling((status) => {
     switch (status) {
       case 'queued':
-        el.className = 'admin-deploy-status visible admin-deploy-status--pending'
-        el.textContent = 'Wachtrij...'
-        updateDeployBanner('queued')
+        deployToast?.update('Website wordt bijgewerkt — in de wachtrij...')
         break
       case 'in_progress':
-        el.className = 'admin-deploy-status visible admin-deploy-status--pending'
-        el.textContent = 'Publiceren...'
-        updateDeployBanner('in_progress')
+        deployToast?.update('Website wordt bijgewerkt — publiceren...')
         break
       case 'completed':
-        el.className = 'admin-deploy-status visible admin-deploy-status--success'
-        el.textContent = 'Live!'
-        finishDeploy()
-        updateDeployBanner('completed')
-        deployFadeTimers.push(window.setTimeout(() => { el.classList.remove('visible') }, 10_000))
+        deployToast?.dismiss()
+        deployToast = null
+        stopCurrentPolling = null
+        toastSuccess('Website is live!')
         break
       case 'failed':
-        el.className = 'admin-deploy-status visible admin-deploy-status--error'
-        el.textContent = 'Publicatie mislukt. Probeer opnieuw of neem contact op.'
-        finishDeploy()
-        updateDeployBanner('failed')
+        deployToast?.dismiss()
+        deployToast = null
+        stopCurrentPolling = null
+        toastError('Publicatie mislukt')
         break
     }
   })
 }
 
-function finishDeploy(): void {
-  stopCurrentPolling = null
-}
-
-function updateDeployBanner(status: string): void {
-  const banner = document.getElementById('deploy-banner')
-  const text = document.getElementById('deploy-banner-text')
-  if (!banner || !text) return
-
-  banner.classList.remove('admin-deploy-banner--success', 'admin-deploy-banner--error')
-
-  if (status === 'queued' || status === 'in_progress') {
-    banner.classList.add('visible')
-    text.textContent = status === 'queued'
-      ? 'Website wordt bijgewerkt — in de wachtrij...'
-      : 'Website wordt bijgewerkt — publiceren...'
-  } else if (status === 'completed') {
-    text.textContent = 'Website is live!'
-    banner.classList.add('admin-deploy-banner--success')
-    deployFadeTimers.push(window.setTimeout(() => { banner.classList.remove('visible', 'admin-deploy-banner--success') }, 8_000))
-  } else {
-    text.textContent = 'Publicatie mislukt'
-    banner.classList.add('admin-deploy-banner--error')
-    deployFadeTimers.push(window.setTimeout(() => { banner.classList.remove('visible', 'admin-deploy-banner--error') }, 10_000))
-  }
-}
-
-// --- UI helpers ---
-
-function showFeedback(el: HTMLElement | null, msg: string, type: 'success' | 'error'): void {
-  if (!el) return
-  el.textContent = msg
-  el.className = `admin-feedback visible admin-feedback--${type}`
-}
-
-function hideFeedback(el: HTMLElement | null): void {
-  if (!el) return
-  el.className = 'admin-feedback'
-}
-
-function showProgress(el: HTMLElement | null, textEl: HTMLElement | null, msg: string): void {
-  if (el) el.classList.add('visible')
-  if (textEl) textEl.textContent = msg
-}
-
-function hideProgress(el: HTMLElement | null): void {
-  if (el) el.classList.remove('visible')
-}
 
 function clearRecipeForm(): void {
   ;(document.getElementById('recipe-title') as HTMLInputElement).value = ''
