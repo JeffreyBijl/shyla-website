@@ -1,45 +1,20 @@
-import type { Recipe, BlogPost, RecipeCategory } from '../data/types.js'
+import type { Recipe, BlogPost } from '../data/types.js'
 import {
-  getToken, saveToken, clearToken, validateToken,
-  readFile, readModifyWrite, uploadImage, deleteFile,
+  getToken, readFile, readModifyWrite, deleteFile,
   startDeployPolling, CONFIG,
 } from '../lib/github.js'
-import { compressImage, slugify } from '../lib/image.js'
 import { escapeHtml } from '../lib/html.js'
-import { OperationQueue } from '../lib/queue.js'
 import { toastSuccess, toastError, toastProgress } from '../lib/toast.js'
-
-// --- State ---
-let recipes: Recipe[] = []
-let blogPosts: BlogPost[] = []
-let editingRecipeId: number | null = null
-let stopCurrentPolling: (() => void) | null = null
-const operationQueue = new OperationQueue()
+import { adminState } from './admin-state.js'
+import { renderTokenForm, setupTokenForm, handleLogout } from './admin-auth.js'
+import { renderRecipeForm, renderRecipeItems, setupRecipes } from './admin-recipes.js'
+import { renderBlogForm, renderBlogItems, setupBlog } from './admin-blog.js'
 
 // --- Render ---
 export function renderAdmin(): string {
   const token = getToken()
   if (!token) return renderTokenForm()
   return renderDashboard()
-}
-
-function renderTokenForm(): string {
-  return `
-    <section class="section admin-section">
-      <div class="container">
-        <div class="admin-token-card">
-          <h2>Admin login</h2>
-          <p>Voer je GitHub Personal Access Token in om content te beheren.</p>
-          <div class="form-group">
-            <label for="admin-token">Token</label>
-            <input type="password" id="admin-token" placeholder="ghp_xxxxxxxxxxxx">
-          </div>
-          <button class="btn btn-primary" id="token-submit">Inloggen</button>
-          <p class="admin-token-warning">Deel dit token met niemand.</p>
-        </div>
-      </div>
-    </section>
-  `
 }
 
 function renderDashboard(): string {
@@ -74,323 +49,25 @@ function renderDashboard(): string {
         </div>
       </div>
     </section>
-
   `
 }
 
-function renderRecipeForm(): string {
-  return `
-    <div class="admin-form">
-      <h3 id="recipe-form-title">Nieuw recept toevoegen</h3>
-      <div class="admin-image-upload">
-        <label>Foto <span id="recipe-image-required">(verplicht)</span></label>
-        <div class="admin-image-input-wrap">
-          <span class="admin-image-btn">Kies foto</span>
-          <input type="file" accept="image/*" id="recipe-image">
-        </div>
-        <div class="admin-image-preview" id="recipe-preview">
-          <img id="recipe-preview-img" alt="Preview">
-        </div>
-        <div class="admin-image-info" id="recipe-image-info"></div>
-      </div>
-      <div class="form-group">
-        <label for="recipe-title">Titel</label>
-        <input type="text" id="recipe-title" placeholder="bijv. Overnight oats met aardbei">
-      </div>
-      <div class="form-group">
-        <label for="recipe-category">Categorie</label>
-        <select id="recipe-category">
-          <option value="ontbijt">Ontbijt</option>
-          <option value="lunch">Lunch</option>
-          <option value="diner">Diner</option>
-          <option value="snack">Snack</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="recipe-time">Bereidingstijd</label>
-        <input type="text" id="recipe-time" placeholder="bijv. 10 min">
-      </div>
-      <div class="form-group">
-        <label for="recipe-calories">Calorieën</label>
-        <input type="text" id="recipe-calories" placeholder="bijv. 320 kcal">
-      </div>
-      <div class="form-group">
-        <label for="recipe-description">Beschrijving</label>
-        <textarea id="recipe-description" placeholder="Korte beschrijving (1-2 zinnen)"></textarea>
-      </div>
-      <div class="form-group">
-        <label for="recipe-servings">Porties</label>
-        <input type="text" id="recipe-servings" placeholder="bijv. 4 personen">
-      </div>
-      <div class="form-group">
-        <label>Ingrediënten</label>
-        <div id="recipe-ingredients-list"></div>
-        <button type="button" class="btn btn-outline btn-sm" id="add-ingredient">+ Ingredient</button>
-      </div>
-      <div class="form-group">
-        <label>Bereidingsstappen</label>
-        <div id="recipe-steps-list"></div>
-        <button type="button" class="btn btn-outline btn-sm" id="add-step">+ Stap</button>
-      </div>
-      <div class="form-group">
-        <label>Voedingswaarde (per portie)</label>
-        <div class="admin-nutrition-grid">
-          <div>
-            <label for="recipe-kcal">kcal</label>
-            <input type="number" id="recipe-kcal" placeholder="0">
-          </div>
-          <div>
-            <label for="recipe-protein">Eiwit (g)</label>
-            <input type="number" id="recipe-protein" placeholder="0">
-          </div>
-          <div>
-            <label for="recipe-carbs">Koolhydraten (g)</label>
-            <input type="number" id="recipe-carbs" placeholder="0">
-          </div>
-          <div>
-            <label for="recipe-fat">Vet (g)</label>
-            <input type="number" id="recipe-fat" placeholder="0">
-          </div>
-        </div>
-      </div>
-      <div class="admin-form-actions">
-        <button class="btn btn-primary" id="recipe-submit">Opslaan</button>
-        <button class="btn btn-outline" id="recipe-cancel-edit" style="display:none;">Annuleren</button>
-      </div>
-    </div>
-  `
-}
-
-function renderBlogForm(): string {
-  return `
-    <div class="admin-form">
-      <h3>Nieuwe blogpost toevoegen</h3>
-      <div class="admin-image-upload">
-        <label>Foto (optioneel)</label>
-        <div class="admin-image-input-wrap">
-          <span class="admin-image-btn">Kies foto</span>
-          <input type="file" accept="image/*" id="blog-image">
-        </div>
-        <div class="admin-image-preview" id="blog-preview">
-          <img id="blog-preview-img" alt="Preview">
-        </div>
-        <div class="admin-image-info" id="blog-image-info"></div>
-      </div>
-      <div class="form-group">
-        <label for="blog-title">Titel</label>
-        <input type="text" id="blog-title" placeholder="Titel van de blogpost">
-      </div>
-      <div class="form-group">
-        <label for="blog-category">Categorie</label>
-        <select id="blog-category">
-          <option value="Voeding">Voeding</option>
-          <option value="Educatie">Educatie</option>
-          <option value="Lifestyle">Lifestyle</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="blog-excerpt">Samenvatting</label>
-        <textarea id="blog-excerpt" placeholder="Korte samenvatting voor de kaart"></textarea>
-      </div>
-      <div class="form-group">
-        <label for="blog-readtime">Leestijd</label>
-        <input type="text" id="blog-readtime" placeholder="bijv. 4 min">
-      </div>
-      <button class="btn btn-primary" id="blog-submit">Opslaan</button>
-    </div>
-  `
-}
-
-// --- Render item lists ---
-
-function renderRecipeItems(): void {
-  const container = document.getElementById('recipes-items')
-  if (!container) return
-  container.innerHTML = recipes.map(r => `
-    <div class="admin-item" data-id="${r.id}">
-      <div class="admin-item-thumbnail">
-        ${r.image
-          ? `<img src="${import.meta.env.BASE_URL}${r.image}" alt="${escapeHtml(r.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display=''">`
-          : ''}
-        <span class="emoji-fallback" ${r.image ? 'style="display:none"' : ''}>${escapeHtml(r.emoji || '🍽️')}</span>
-      </div>
-      <div class="admin-item-info">
-        <div class="admin-item-title">${escapeHtml(r.title)}</div>
-        <div class="admin-item-meta">${escapeHtml(r.category)} · ${escapeHtml(r.time)}</div>
-      </div>
-      <button class="admin-item-edit" data-id="${r.id}" title="Bewerken">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-        </svg>
-      </button>
-      <button class="admin-item-delete" data-id="${r.id}" data-type="recipe" title="Verwijderen">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
-        </svg>
-      </button>
-    </div>
-  `).join('')
-}
-
-function renderBlogItems(): void {
-  const container = document.getElementById('blog-items')
-  if (!container) return
-  container.innerHTML = blogPosts.map(p => `
-    <div class="admin-item" data-id="${p.id}">
-      <div class="admin-item-thumbnail">
-        ${p.image
-          ? `<img src="${import.meta.env.BASE_URL}${p.image}" alt="${escapeHtml(p.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display=''">`
-          : ''}
-        <span class="emoji-fallback" ${p.image ? 'style="display:none"' : ''}>${categoryEmoji(p.category)}</span>
-      </div>
-      <div class="admin-item-info">
-        <div class="admin-item-title">${escapeHtml(p.title)}</div>
-        <div class="admin-item-meta">${escapeHtml(p.category)} · ${escapeHtml(p.date)}</div>
-      </div>
-      <button class="admin-item-delete" data-id="${p.id}" data-type="blog" title="Verwijderen">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
-        </svg>
-      </button>
-    </div>
-  `).join('')
-}
-
-function categoryEmoji(category: string): string {
-  const map: Record<string, string> = { Voeding: '🥗', Educatie: '📚', Lifestyle: '✨' }
-  return map[category] ?? '📖'
-}
-
-// --- Dynamic row helpers ---
-
-function addIngredientRow(container: HTMLElement, amount = '', name = ''): void {
-  const row = document.createElement('div')
-  row.className = 'admin-ingredient-row'
-  row.innerHTML = `
-    <input type="text" placeholder="Hoeveelheid" value="${escapeHtml(amount)}" class="ingredient-amount-input">
-    <input type="text" placeholder="Ingredient" value="${escapeHtml(name)}" class="ingredient-name-input">
-    <button type="button" class="admin-row-remove" title="Verwijderen">×</button>
-  `
-  row.querySelector('.admin-row-remove')?.addEventListener('click', () => row.remove())
-  container.appendChild(row)
-}
-
-function addStepRow(container: HTMLElement, text = ''): void {
-  const row = document.createElement('div')
-  row.className = 'admin-step-row'
-  row.innerHTML = `
-    <textarea placeholder="Beschrijf deze stap...">${escapeHtml(text)}</textarea>
-    <button type="button" class="admin-row-remove" title="Verwijderen">×</button>
-  `
-  row.querySelector('.admin-row-remove')?.addEventListener('click', () => row.remove())
-  container.appendChild(row)
-}
-
-// --- Edit helpers ---
-
-function setRecipeFormMode(mode: 'create' | 'edit', title?: string): void {
-  const formTitle = document.getElementById('recipe-form-title')
-  if (formTitle) formTitle.textContent = mode === 'edit' ? `Recept bewerken: ${title}` : 'Nieuw recept toevoegen'
-  const imageRequired = document.getElementById('recipe-image-required')
-  if (imageRequired) imageRequired.textContent = mode === 'edit' ? '(optioneel — bestaande foto blijft behouden)' : '(verplicht)'
-  const submitBtn = document.getElementById('recipe-submit')
-  if (submitBtn) submitBtn.textContent = mode === 'edit' ? 'Bijwerken' : 'Opslaan'
-  const cancelBtn = document.getElementById('recipe-cancel-edit')
-  if (cancelBtn) cancelBtn.style.display = mode === 'edit' ? '' : 'none'
-}
-
-function populateRecipeForm(recipe: Recipe): void {
-  editingRecipeId = recipe.id
-  setRecipeFormMode('edit', recipe.title)
-
-  // Fill fields
-  ;(document.getElementById('recipe-title') as HTMLInputElement).value = recipe.title
-  ;(document.getElementById('recipe-category') as HTMLSelectElement).value = recipe.category
-  ;(document.getElementById('recipe-time') as HTMLInputElement).value = recipe.time
-  ;(document.getElementById('recipe-calories') as HTMLInputElement).value = recipe.calories
-  ;(document.getElementById('recipe-description') as HTMLTextAreaElement).value = recipe.description
-  ;(document.getElementById('recipe-servings') as HTMLInputElement).value = recipe.servings
-
-  // Show existing image preview
-  if (recipe.image) {
-    const preview = document.getElementById('recipe-preview')
-    const img = document.getElementById('recipe-preview-img') as HTMLImageElement
-    if (preview && img) {
-      img.src = `${import.meta.env.BASE_URL}${recipe.image}`
-      preview.classList.add('has-image')
-    }
-  }
-
-  // Fill ingredients
-  const ingredientsList = document.getElementById('recipe-ingredients-list')
-  if (ingredientsList) {
-    ingredientsList.innerHTML = ''
-    recipe.ingredients.forEach(ing => addIngredientRow(ingredientsList, ing.amount, ing.name))
-  }
-
-  // Fill steps
-  const stepsList = document.getElementById('recipe-steps-list')
-  if (stepsList) {
-    stepsList.innerHTML = ''
-    recipe.steps.forEach(step => addStepRow(stepsList, step))
-  }
-
-  // Fill nutrition
-  ;(document.getElementById('recipe-kcal') as HTMLInputElement).value = recipe.nutrition.kcal ? String(recipe.nutrition.kcal) : ''
-  ;(document.getElementById('recipe-protein') as HTMLInputElement).value = recipe.nutrition.protein ? String(recipe.nutrition.protein) : ''
-  ;(document.getElementById('recipe-carbs') as HTMLInputElement).value = recipe.nutrition.carbs ? String(recipe.nutrition.carbs) : ''
-  ;(document.getElementById('recipe-fat') as HTMLInputElement).value = recipe.nutrition.fat ? String(recipe.nutrition.fat) : ''
-
-  // Scroll to form
-  document.querySelector('.admin-form')?.scrollIntoView({ behavior: 'smooth' })
-}
-
-function cancelRecipeEdit(): void {
-  editingRecipeId = null
-  clearRecipeForm()
-  setRecipeFormMode('create')
-}
-
-// --- Setup (event listeners) ---
-
+// --- Setup ---
 export function setupAdmin(): void {
   const token = getToken()
   if (!token) {
-    setupTokenForm()
-  } else {
-    loadData()
-    setupDashboard()
-  }
-}
-
-function setupTokenForm(): void {
-  const input = document.getElementById('admin-token') as HTMLInputElement
-  const submit = document.getElementById('token-submit')
-
-  submit?.addEventListener('click', async () => {
-    const token = input?.value.trim()
-    if (!token) {
-      toastError('Voer een token in')
-      return
-    }
-    submit.textContent = 'Controleren...'
-    ;(submit as HTMLButtonElement).disabled = true
-
-    const valid = await validateToken(token)
-    if (valid) {
-      saveToken(token)
+    setupTokenForm(() => {
       const app = document.getElementById('app')
       if (app) {
         app.innerHTML = `<div class="page-enter">${renderDashboard()}</div>`
         loadData()
         setupDashboard()
       }
-    } else {
-      toastError('Token is ongeldig. Controleer of het correct is en "repo" scope heeft.')
-      submit.textContent = 'Inloggen'
-      ;(submit as HTMLButtonElement).disabled = false
-    }
-  })
+    })
+  } else {
+    loadData()
+    setupDashboard()
+  }
 }
 
 function setupDashboard(): void {
@@ -410,71 +87,37 @@ function setupDashboard(): void {
 
   // Logout
   document.getElementById('admin-logout')?.addEventListener('click', () => {
-    clearToken()
-    const app = document.getElementById('app')
-    if (app) {
-      app.innerHTML = `<div class="page-enter">${renderTokenForm()}</div>`
-      setupTokenForm()
-    }
+    handleLogout(() => {
+      const app = document.getElementById('app')
+      if (app) {
+        app.innerHTML = `<div class="page-enter">${renderTokenForm()}</div>`
+        setupTokenForm(() => {
+          app.innerHTML = `<div class="page-enter">${renderDashboard()}</div>`
+          loadData()
+          setupDashboard()
+        })
+      }
+    })
   })
 
-  // Recipe image preview
-  setupImagePreview('recipe-image', 'recipe-preview', 'recipe-preview-img', 'recipe-image-info')
+  // Delegate to sub-modules
+  setupRecipes()
+  setupBlog()
 
-  // Blog image preview
-  setupImagePreview('blog-image', 'blog-preview', 'blog-preview-img', 'blog-image-info')
-
-  // Recipe submit
-  document.getElementById('recipe-submit')?.addEventListener('click', () => handleRecipeSubmit())
-
-  // Ingredient add button
-  document.getElementById('add-ingredient')?.addEventListener('click', () => {
-    const list = document.getElementById('recipe-ingredients-list')
-    if (list) addIngredientRow(list)
-  })
-
-  // Step add button
-  document.getElementById('add-step')?.addEventListener('click', () => {
-    const list = document.getElementById('recipe-steps-list')
-    if (list) addStepRow(list)
-  })
-
-  // Blog submit
-  document.getElementById('blog-submit')?.addEventListener('click', () => handleBlogSubmit())
-
-  // Cancel edit
-  document.getElementById('recipe-cancel-edit')?.addEventListener('click', () => cancelRecipeEdit())
-
-  // Edit & delete buttons (event delegation)
-  document.getElementById('recipes-items')?.addEventListener('click', (e) => {
-    const editBtn = (e.target as HTMLElement).closest('.admin-item-edit') as HTMLElement | null
-    if (editBtn) {
-      const recipe = recipes.find(r => r.id === Number(editBtn.dataset.id))
-      if (recipe) populateRecipeForm(recipe)
-      return
-    }
-    const btn = (e.target as HTMLElement).closest('.admin-item-delete') as HTMLElement | null
-    if (btn) handleDelete(Number(btn.dataset.id), 'recipe')
-  })
-
-  document.getElementById('blog-items')?.addEventListener('click', (e) => {
-    const btn = (e.target as HTMLElement).closest('.admin-item-delete') as HTMLElement | null
-    if (btn) handleDelete(Number(btn.dataset.id), 'blog')
-  })
-
+  // Queue toasts
   setupQueueToasts()
 }
 
 function setupQueueToasts(): void {
   let errorHandled = false
 
-  operationQueue.setStatusCallback((status) => {
+  adminState.operationQueue.setStatusCallback((status) => {
     if (status.total === 0 && !status.error) return
 
     if (status.error) {
       toastError(`Fout: ${status.error}`, 'queue', [
-        { label: 'Opnieuw', onClick: () => operationQueue.retry() },
-        { label: 'Annuleren', onClick: () => { operationQueue.clear(); loadData() } },
+        { label: 'Opnieuw', onClick: () => adminState.operationQueue.retry() },
+        { label: 'Annuleren', onClick: () => { adminState.operationQueue.clear(); loadData() } },
       ])
       if (!errorHandled) {
         errorHandled = true
@@ -489,7 +132,50 @@ function setupQueueToasts(): void {
   })
 }
 
-function setupImagePreview(
+// --- Shared helpers (exported for recipes & blog modules) ---
+
+export async function loadData(): Promise<void> {
+  try {
+    const [recipesResult, blogResult] = await Promise.all([
+      readFile<Recipe[]>(CONFIG.RECIPES_PATH),
+      readFile<BlogPost[]>(CONFIG.BLOG_PATH),
+    ])
+    adminState.recipes = recipesResult.content
+    adminState.blogPosts = blogResult.content
+    renderRecipeItems()
+    renderBlogItems()
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Kan data niet laden'
+    toastError(msg)
+  }
+}
+
+export function pollDeploy(): void {
+  if (adminState.stopCurrentPolling) adminState.stopCurrentPolling()
+
+  toastProgress('Website wordt bijgewerkt...', 'deploy')
+
+  adminState.stopCurrentPolling = startDeployPolling((status) => {
+    switch (status) {
+      case 'queued':
+        toastProgress('Website wordt bijgewerkt — in de wachtrij...', 'deploy')
+        break
+      case 'in_progress':
+        toastProgress('Website wordt bijgewerkt — publiceren...', 'deploy')
+        break
+      case 'completed':
+        adminState.stopCurrentPolling = null
+        toastSuccess('Website is live!', 'deploy')
+        break
+      case 'failed':
+        adminState.stopCurrentPolling = null
+        toastError('Publicatie mislukt', 'deploy')
+        break
+    }
+  })
+}
+
+export function setupImagePreview(
   inputId: string, previewId: string, imgId: string, infoId: string
 ): void {
   const input = document.getElementById(inputId) as HTMLInputElement
@@ -511,275 +197,8 @@ function setupImagePreview(
   })
 }
 
-// --- Data loading ---
-
-async function loadData(): Promise<void> {
-  try {
-    const [recipesResult, blogResult] = await Promise.all([
-      readFile<Recipe[]>(CONFIG.RECIPES_PATH),
-      readFile<BlogPost[]>(CONFIG.BLOG_PATH),
-    ])
-    recipes = recipesResult.content
-    blogPosts = blogResult.content
-    renderRecipeItems()
-    renderBlogItems()
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Kan data niet laden'
-    toastError(msg)
-  }
-}
-
-// --- Submit handlers ---
-
-async function handleRecipeSubmit(): Promise<void> {
-  const title = (document.getElementById('recipe-title') as HTMLInputElement)?.value.trim()
-  const category = (document.getElementById('recipe-category') as HTMLSelectElement)?.value as RecipeCategory
-  const time = (document.getElementById('recipe-time') as HTMLInputElement)?.value.trim()
-  const calories = (document.getElementById('recipe-calories') as HTMLInputElement)?.value.trim()
-  const description = (document.getElementById('recipe-description') as HTMLTextAreaElement)?.value.trim()
-  const imageInput = document.getElementById('recipe-image') as HTMLInputElement
-  const file = imageInput?.files?.[0]
-  const servings = (document.getElementById('recipe-servings') as HTMLInputElement)?.value.trim()
-
-  const ingredientRows = document.querySelectorAll('.admin-ingredient-row')
-  const ingredients: Array<{ amount: string; name: string }> = []
-  ingredientRows.forEach(row => {
-    const amount = (row.querySelector('.ingredient-amount-input') as HTMLInputElement)?.value.trim()
-    const name = (row.querySelector('.ingredient-name-input') as HTMLInputElement)?.value.trim()
-    if (amount || name) ingredients.push({ amount, name })
-  })
-
-  const stepRows = document.querySelectorAll('.admin-step-row textarea')
-  const steps: string[] = []
-  stepRows.forEach(ta => {
-    const text = (ta as HTMLTextAreaElement).value.trim()
-    if (text) steps.push(text)
-  })
-
-  const kcal = Number((document.getElementById('recipe-kcal') as HTMLInputElement)?.value) || 0
-  const protein = Number((document.getElementById('recipe-protein') as HTMLInputElement)?.value) || 0
-  const carbs = Number((document.getElementById('recipe-carbs') as HTMLInputElement)?.value) || 0
-  const fat = Number((document.getElementById('recipe-fat') as HTMLInputElement)?.value) || 0
-
-  const isEditing = editingRecipeId !== null
-  const editId = editingRecipeId
-
-  if (!title || !time || !calories || !description) {
-    toastError('Vul alle velden in')
-    return
-  }
-  if (!isEditing && !file) {
-    toastError('Kies een foto')
-    return
-  }
-
-  // Compress image before enqueuing (CPU work, fast)
-  let compressed: { base64: string } | null = null
-  let compressToast: ReturnType<typeof toastProgress> | null = null
-  try {
-    if (file) {
-      compressToast = toastProgress('Foto verkleinen...')
-      compressed = await compressImage(file)
-      compressToast.dismiss()
-    }
-  } catch (err) {
-    compressToast?.dismiss()
-    const msg = err instanceof Error ? err.message : 'Foto verkleinen mislukt'
-    toastError(msg)
-    return
-  }
-
-  // Optimistic UI update
-  if (isEditing && editId !== null) {
-    const index = recipes.findIndex(r => r.id === editId)
-    if (index !== -1) {
-      const existing = recipes[index]
-      recipes[index] = {
-        ...existing,
-        title,
-        slug: slugify(title),
-        category,
-        time,
-        calories,
-        description,
-        servings,
-        ingredients,
-        steps,
-        nutrition: { kcal, protein, carbs, fat },
-      }
-    }
-  } else {
-    const newId = recipes.length > 0 ? Math.max(...recipes.map(r => r.id)) + 1 : 1
-    recipes.push({
-      id: newId,
-      title,
-      slug: slugify(title),
-      category,
-      image: '',
-      emoji: '',
-      time,
-      calories,
-      description,
-      servings,
-      ingredients,
-      steps,
-      nutrition: { kcal, protein, carbs, fat },
-    })
-  }
-
-  renderRecipeItems()
-  cancelRecipeEdit()
-
-  const commitMsg = isEditing ? `Recept bijgewerkt: ${title}` : `Nieuw recept: ${title}`
-
-  // Enqueue the actual GitHub operation
-  operationQueue.enqueue({
-    label: commitMsg,
-    execute: async () => {
-      let imagePath: string | undefined
-
-      if (compressed) {
-        const filename = `${slugify(title)}-${Date.now()}.jpg`
-        const uploadedPath = await uploadImage(CONFIG.RECIPE_IMAGES_DIR, filename, compressed.base64)
-        imagePath = uploadedPath.replace(/^public\//, '')
-      }
-
-      recipes = await readModifyWrite<Recipe[]>(
-        CONFIG.RECIPES_PATH,
-        (data) => {
-          if (isEditing && editId !== null) {
-            const index = data.findIndex(r => r.id === editId)
-            if (index === -1) throw new Error('Recept niet gevonden')
-            const existing = data[index]
-            data[index] = {
-              ...existing,
-              title,
-              slug: slugify(title),
-              category,
-              image: imagePath ?? existing.image,
-              time,
-              calories,
-              description,
-              servings,
-              ingredients,
-              steps,
-              nutrition: { kcal, protein, carbs, fat },
-            }
-          } else {
-            const newId = data.length > 0 ? Math.max(...data.map(r => r.id)) + 1 : 1
-            data.push({
-              id: newId,
-              title,
-              slug: slugify(title),
-              category,
-              image: imagePath!,
-              emoji: '',
-              time,
-              calories,
-              description,
-              servings,
-              ingredients,
-              steps,
-              nutrition: { kcal, protein, carbs, fat },
-            })
-          }
-          return data
-        },
-        commitMsg,
-      )
-      renderRecipeItems()
-      pollDeploy()
-    },
-  })
-}
-
-async function handleBlogSubmit(): Promise<void> {
-  const title = (document.getElementById('blog-title') as HTMLInputElement)?.value.trim()
-  const category = (document.getElementById('blog-category') as HTMLSelectElement)?.value
-  const excerpt = (document.getElementById('blog-excerpt') as HTMLTextAreaElement)?.value.trim()
-  const readTime = (document.getElementById('blog-readtime') as HTMLInputElement)?.value.trim()
-  const imageInput = document.getElementById('blog-image') as HTMLInputElement
-  const file = imageInput?.files?.[0]
-
-  if (!title || !excerpt || !readTime) {
-    toastError('Vul alle verplichte velden in')
-    return
-  }
-
-  // Compress image before enqueuing
-  let compressed: { base64: string } | null = null
-  let compressToast: ReturnType<typeof toastProgress> | null = null
-  try {
-    if (file) {
-      compressToast = toastProgress('Foto verkleinen...')
-      compressed = await compressImage(file)
-      compressToast.dismiss()
-    }
-  } catch (err) {
-    compressToast?.dismiss()
-    const msg = err instanceof Error ? err.message : 'Foto verkleinen mislukt'
-    toastError(msg)
-    return
-  }
-
-  // Optimistic UI update
-  const now = new Date()
-  const months = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december']
-  const dateStr = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`
-  const newId = blogPosts.length > 0 ? Math.max(...blogPosts.map(p => p.id)) + 1 : 1
-
-  blogPosts.push({
-    id: newId,
-    title,
-    date: dateStr,
-    category,
-    image: null,
-    excerpt,
-    readTime,
-  })
-
-  renderBlogItems()
-  clearBlogForm()
-
-  // Enqueue the actual GitHub operation
-  operationQueue.enqueue({
-    label: `Nieuwe blogpost: ${title}`,
-    execute: async () => {
-      let imagePath: string | null = null
-
-      if (compressed) {
-        const filename = `${slugify(title)}-${Date.now()}.jpg`
-        imagePath = await uploadImage(CONFIG.BLOG_IMAGES_DIR, filename, compressed.base64)
-      }
-
-      blogPosts = await readModifyWrite<BlogPost[]>(
-        CONFIG.BLOG_PATH,
-        (data) => {
-          const freshId = data.length > 0 ? Math.max(...data.map(p => p.id)) + 1 : 1
-          data.push({
-            id: freshId,
-            title,
-            date: dateStr,
-            category,
-            image: imagePath?.replace(/^public\//, '') ?? null,
-            excerpt,
-            readTime,
-          })
-          return data
-        },
-        `Nieuwe blogpost: ${title}`,
-      )
-      renderBlogItems()
-      pollDeploy()
-    },
-  })
-}
-
-// --- Delete handler ---
-
-function showDeleteModal(title: string): Promise<boolean> {
+export function showDeleteModal(title: string): Promise<boolean> {
   return new Promise((resolve) => {
-    // Create modal on document.body so position:fixed isn't broken by parent transforms
     const overlay = document.createElement('div')
     overlay.className = 'admin-modal-overlay visible'
     overlay.innerHTML = `
@@ -824,45 +243,41 @@ function showDeleteModal(title: string): Promise<boolean> {
   })
 }
 
-async function handleDelete(id: number, type: 'recipe' | 'blog'): Promise<void> {
+export async function handleDelete(id: number, type: 'recipe' | 'blog'): Promise<void> {
   const item = type === 'recipe'
-    ? recipes.find(r => r.id === id)
-    : blogPosts.find(p => p.id === id)
+    ? adminState.recipes.find(r => r.id === id)
+    : adminState.blogPosts.find(p => p.id === id)
 
   if (!item) return
 
   const confirmed = await showDeleteModal(item.title)
   if (!confirmed) return
 
-  // Optimistic UI update — remove from in-memory state and re-render immediately
   if (type === 'recipe') {
-    recipes = recipes.filter(r => r.id !== id)
+    adminState.recipes = adminState.recipes.filter(r => r.id !== id)
     renderRecipeItems()
   } else {
-    blogPosts = blogPosts.filter(p => p.id !== id)
+    adminState.blogPosts = adminState.blogPosts.filter(p => p.id !== id)
     renderBlogItems()
   }
 
-  // Enqueue the actual GitHub operation
-  operationQueue.enqueue({
+  adminState.operationQueue.enqueue({
     label: `Verwijder: ${item.title}`,
     execute: async () => {
-      // Update data file first (remove reference), then delete image
       if (type === 'recipe') {
-        recipes = await readModifyWrite<Recipe[]>(
+        adminState.recipes = await readModifyWrite<Recipe[]>(
           CONFIG.RECIPES_PATH,
           data => data.filter(r => r.id !== id),
           `Verwijder recept: ${item.title}`,
         )
       } else {
-        blogPosts = await readModifyWrite<BlogPost[]>(
+        adminState.blogPosts = await readModifyWrite<BlogPost[]>(
           CONFIG.BLOG_PATH,
           data => data.filter(p => p.id !== id),
           `Verwijder blogpost: ${item.title}`,
         )
       }
 
-      // Delete image file after data is updated (fire-and-forget, non-critical)
       if (item.image) {
         deleteFile(`public/${item.image}`, `Verwijder afbeelding: ${item.title}`).catch(() => {})
       }
@@ -870,62 +285,4 @@ async function handleDelete(id: number, type: 'recipe' | 'blog'): Promise<void> 
       pollDeploy()
     },
   })
-}
-
-// --- Deploy polling ---
-
-function pollDeploy(): void {
-  if (stopCurrentPolling) stopCurrentPolling()
-
-  toastProgress('Website wordt bijgewerkt...', 'deploy')
-
-  stopCurrentPolling = startDeployPolling((status) => {
-    switch (status) {
-      case 'queued':
-        toastProgress('Website wordt bijgewerkt — in de wachtrij...', 'deploy')
-        break
-      case 'in_progress':
-        toastProgress('Website wordt bijgewerkt — publiceren...', 'deploy')
-        break
-      case 'completed':
-        stopCurrentPolling = null
-        toastSuccess('Website is live!', 'deploy')
-        break
-      case 'failed':
-        stopCurrentPolling = null
-        toastError('Publicatie mislukt', 'deploy')
-        break
-    }
-  })
-}
-
-
-function clearRecipeForm(): void {
-  ;(document.getElementById('recipe-title') as HTMLInputElement).value = ''
-  ;(document.getElementById('recipe-time') as HTMLInputElement).value = ''
-  ;(document.getElementById('recipe-calories') as HTMLInputElement).value = ''
-  ;(document.getElementById('recipe-description') as HTMLTextAreaElement).value = ''
-  ;(document.getElementById('recipe-image') as HTMLInputElement).value = ''
-  document.getElementById('recipe-preview')?.classList.remove('has-image')
-  const info = document.getElementById('recipe-image-info')
-  if (info) info.textContent = ''
-  ;(document.getElementById('recipe-servings') as HTMLInputElement).value = ''
-  const ingredientsList = document.getElementById('recipe-ingredients-list')
-  if (ingredientsList) ingredientsList.innerHTML = ''
-  const stepsList = document.getElementById('recipe-steps-list')
-  if (stepsList) stepsList.innerHTML = ''
-  ;(document.getElementById('recipe-kcal') as HTMLInputElement).value = ''
-  ;(document.getElementById('recipe-protein') as HTMLInputElement).value = ''
-  ;(document.getElementById('recipe-carbs') as HTMLInputElement).value = ''
-  ;(document.getElementById('recipe-fat') as HTMLInputElement).value = ''
-}
-
-function clearBlogForm(): void {
-  ;(document.getElementById('blog-title') as HTMLInputElement).value = ''
-  ;(document.getElementById('blog-excerpt') as HTMLTextAreaElement).value = ''
-  ;(document.getElementById('blog-readtime') as HTMLInputElement).value = ''
-  ;(document.getElementById('blog-image') as HTMLInputElement).value = ''
-  document.getElementById('blog-preview')?.classList.remove('has-image')
-  const info = document.getElementById('blog-image-info')
-  if (info) info.textContent = ''
 }

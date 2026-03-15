@@ -6,7 +6,7 @@ import { compressImage, slugify } from '../lib/image.js'
 import { escapeHtml } from '../lib/html.js'
 import { toastError, toastProgress } from '../lib/toast.js'
 import { adminState } from './admin-state.js'
-import { pollDeploy, loadData, setupImagePreview, showDeleteModal, handleDelete } from './admin.js'
+import { pollDeploy, setupImagePreview, handleDelete } from './admin.js'
 import { validateField, validateFileField, setupFieldBlurValidation } from './admin-validation.js'
 
 // --- Render ---
