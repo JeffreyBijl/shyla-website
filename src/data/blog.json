@@ -45,15 +45,6 @@
     "readTime": "1 min"
   },
   {
-    "id": 6,
-    "title": "TEST",
-    "date": "13 maart 2026",
-    "category": "Voeding",
-    "image": null,
-    "excerpt": "test test test",
-    "readTime": "1 min"
-  },
-  {
     "id": 7,
     "title": "TEST",
     "slug": "test",
