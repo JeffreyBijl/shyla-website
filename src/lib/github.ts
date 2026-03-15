@@ -84,10 +84,13 @@ interface GitHubFileResponse {
   sha: string
 }
 
-export async function readFile<T>(path: string): Promise<{ content: T; sha: string }> {
-  const data = await apiRequest<GitHubFileResponse>(
-    `${API_BASE}/contents/${path}?ref=${CONFIG.BRANCH}`
-  )
+export async function readFile<T>(path: string, noCache = false): Promise<{ content: T; sha: string }> {
+  const url = noCache
+    ? `${API_BASE}/contents/${path}?ref=${CONFIG.BRANCH}&_=${Date.now()}`
+    : `${API_BASE}/contents/${path}?ref=${CONFIG.BRANCH}`
+  const data = await apiRequest<GitHubFileResponse>(url, noCache ? {
+    headers: { 'If-None-Match': '' },
+  } : undefined)
   const decoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))))
   return { content: JSON.parse(decoded) as T, sha: data.sha }
 }
@@ -119,8 +122,9 @@ export async function readModifyWrite<T>(
   modify: (data: T) => T,
   message: string,
 ): Promise<T> {
-  for (let attempt = 0; attempt < 3; attempt++) {
-    const latest = await readFile<T>(path)
+  for (let attempt = 0; attempt < 5; attempt++) {
+    // Use cache-busting on retries to avoid stale GitHub API responses
+    const latest = await readFile<T>(path, attempt > 0)
     const updated = modify(latest.content)
     try {
       await writeFile(
@@ -132,8 +136,9 @@ export async function readModifyWrite<T>(
       return updated
     } catch (err) {
       const is409 = err instanceof Error && (err as any).status === 409
-      if (is409 && attempt < 2) {
-        await new Promise(r => setTimeout(r, 1000 * (attempt + 1)))
+      if (is409 && attempt < 4) {
+        // Wait longer each retry: 2s, 4s, 6s, 8s
+        await new Promise(r => setTimeout(r, 2000 * (attempt + 1)))
         continue
       }
       throw err
