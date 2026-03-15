@@ -3,6 +3,7 @@ import { renderAbout }                     from './pages/about.js'
 import { renderRecipes, setupRecipes }     from './pages/recipes.js'
 import { renderRecipeDetail, setupRecipeDetail } from './pages/recipe-detail.js'
 import { renderBlog }                      from './pages/blog.js'
+import { renderBlogDetail, setupBlogDetail } from './pages/blog-detail.js'
 import { renderContact, setupContact }     from './pages/contact.js'
 import { renderAdmin, setupAdmin }         from './pages/admin.js'
 
@@ -32,6 +33,14 @@ export function navigate(): void {
     const slug = decodeURIComponent(hash.slice('#recept/'.length))
     app.innerHTML = `<div class="page-enter">${renderRecipeDetail(slug)}</div>`
     setupRecipeDetail()
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    return
+  }
+
+  if (hash.startsWith('#blog/')) {
+    const slug = decodeURIComponent(hash.slice('#blog/'.length))
+    app.innerHTML = `<div class="page-enter">${renderBlogDetail(slug)}</div>`
+    setupBlogDetail()
     window.scrollTo({ top: 0, behavior: 'smooth' })
     return
   }

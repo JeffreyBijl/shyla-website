@@ -1788,3 +1788,28 @@ p { color: var(--color-gray-light); line-height: 1.75; }
   font-size: 1rem;
   line-height: 1.7;
 }
+
+/* --- Blog detail --- */
+.blog-detail-section { padding-top: 2rem; }
+
+.blog-detail-header { margin-bottom: 2rem; }
+.blog-detail-header h1 { margin: 0.5rem 0; }
+
+.blog-detail-meta {
+  display: flex;
+  gap: 1.5rem;
+  color: var(--color-gray-light);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.blog-detail-content {
+  max-width: 700px;
+  line-height: 1.8;
+  font-size: 1.05rem;
+}
+.blog-detail-content h2 { margin-top: 2rem; margin-bottom: 0.5rem; }
+.blog-detail-content h3 { margin-top: 1.5rem; margin-bottom: 0.5rem; }
+.blog-detail-content p { margin-bottom: 1rem; }
+.blog-detail-content ul, .blog-detail-content ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+.blog-detail-content a { color: var(--color-primary); }
