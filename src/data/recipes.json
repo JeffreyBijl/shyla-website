@@ -20,26 +20,6 @@
     }
   },
   {
-    "id": 4,
-    "title": "Kip teriyaki met quinoa",
-    "slug": "kip-teriyaki-met-quinoa",
-    "category": "diner",
-    "image": null,
-    "emoji": "🍗",
-    "time": "35 min",
-    "calories": "520 kcal",
-    "description": "Sappige kipfilet in een zoet-zoute teriyaki saus, geserveerd op luchtige quinoa met broccolini.",
-    "servings": "",
-    "ingredients": [],
-    "steps": [],
-    "nutrition": {
-      "kcal": 0,
-      "protein": 0,
-      "carbs": 0,
-      "fat": 0
-    }
-  },
-  {
     "id": 8,
     "title": "Maaltijdsalade met kruidige kip",
     "slug": "maaltijdsalade-met-kruidige-kip",
