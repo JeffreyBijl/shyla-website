@@ -152,33 +152,6 @@
     }
   },
   {
-    "id": 101,
-    "title": "Test recept B",
-    "slug": "test-recept-b",
-    "category": "lunch",
-    "image": "",
-    "emoji": "🧪",
-    "time": "10 min",
-    "calories": "200 kcal",
-    "description": "Test recept om te verwijderen",
-    "servings": "1",
-    "ingredients": [
-      {
-        "amount": "2",
-        "name": "test"
-      }
-    ],
-    "steps": [
-      "Test stap"
-    ],
-    "nutrition": {
-      "kcal": 200,
-      "protein": 10,
-      "carbs": 20,
-      "fat": 5
-    }
-  },
-  {
     "id": 102,
     "title": "Test recept C",
     "slug": "test-recept-c",
