@@ -1,5 +1,6 @@
 import blogData from '../data/blog.json'
-import type { BlogPost } from '../data/types.js'
+import type { BlogPost, BlogCategory } from '../data/types.js'
+import { BLOG_CATEGORY_EMOJIS } from '../data/types.js'
 import { escapeHtml } from '../lib/html.js'
 
 const blogPosts: BlogPost[] = blogData as BlogPost[]
@@ -10,15 +11,9 @@ const categoryColors: Record<string, string> = {
   Lifestyle: 'badge-purple',
 }
 
-const categoryEmojis: Record<string, string> = {
-  Voeding:   '🥗',
-  Educatie:  '📚',
-  Lifestyle: '✨',
-}
-
 function blogCard(post: BlogPost, index: number): string {
   const colorClass = categoryColors[post.category] ?? 'badge-pink'
-  const emoji      = categoryEmojis[post.category] ?? '📖'
+  const emoji      = BLOG_CATEGORY_EMOJIS[post.category as BlogCategory] ?? '📖'
   const accentHue  = index % 2 === 0 ? 'blog-card-accent--pink' : 'blog-card-accent--green'
 
   const visualHTML = post.image

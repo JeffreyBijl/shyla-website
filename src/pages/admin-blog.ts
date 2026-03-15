@@ -1,16 +1,36 @@
-import type { BlogPost } from '../data/types.js'
+import type { BlogPost, BlogCategory } from '../data/types.js'
+import { BLOG_CATEGORY_EMOJIS } from '../data/types.js'
 import { adminState } from './admin-state.js'
 import { readModifyWrite, uploadImage, CONFIG } from '../lib/github.js'
-import { compressImage, slugify } from '../lib/image.js'
+import { compressWithToast, slugify } from '../lib/image.js'
 import { escapeHtml } from '../lib/html.js'
-import { toastError, toastProgress } from '../lib/toast.js'
 import { validateField, setupFieldBlurValidation } from './admin-validation.js'
-import { pollDeploy, setupImagePreview, handleDelete } from './admin.js'
+import { pollDeploy, setupImagePreview, handleDelete } from './admin-shared.js'
 
-// --- Quill ---
+// --- Quill (dynamically loaded) ---
 
 declare const Quill: any
 let quillInstance: any = null
+let quillLoaded = false
+
+async function loadQuill(): Promise<void> {
+  if (quillLoaded) return
+
+  const link = document.createElement('link')
+  link.rel = 'stylesheet'
+  link.href = 'https://cdn.jsdelivr.net/npm/quill@2/dist/quill.snow.css'
+  document.head.appendChild(link)
+
+  await new Promise<void>((resolve, reject) => {
+    const script = document.createElement('script')
+    script.src = 'https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js'
+    script.onload = () => resolve()
+    script.onerror = () => reject(new Error('Quill laden mislukt'))
+    document.head.appendChild(script)
+  })
+
+  quillLoaded = true
+}
 
 // --- Render ---
 
@@ -95,14 +115,14 @@ export function renderBlogItems(): void {
 // --- Helpers ---
 
 function categoryEmoji(category: string): string {
-  const map: Record<string, string> = { Voeding: '🥗', Educatie: '📚', Lifestyle: '✨' }
-  return map[category] ?? '📖'
+  return BLOG_CATEGORY_EMOJIS[category as BlogCategory] ?? '📖'
 }
 
 // --- Setup ---
 
-export function setupBlog(): void {
-  // Initialize Quill editor
+export async function setupBlog(): Promise<void> {
+  // Load and initialize Quill editor
+  await loadQuill()
   quillInstance = new Quill('#blog-editor', {
     theme: 'snow',
     modules: {
@@ -135,7 +155,7 @@ export function setupBlog(): void {
       return
     }
     const btn = (e.target as HTMLElement).closest('.admin-item-delete') as HTMLElement | null
-    if (btn) handleDelete(Number(btn.dataset.id), 'blog')
+    if (btn) handleDelete(Number(btn.dataset.id), 'blog', renderBlogItems)
   })
 
   // Blur validation
@@ -192,7 +212,7 @@ function cancelBlogEdit(): void {
 
 async function handleBlogSubmit(): Promise<void> {
   const title = (document.getElementById('blog-title') as HTMLInputElement)?.value.trim()
-  const category = (document.getElementById('blog-category') as HTMLSelectElement)?.value
+  const category = (document.getElementById('blog-category') as HTMLSelectElement)?.value as BlogCategory
   const shortDescription = (document.getElementById('blog-short-description') as HTMLTextAreaElement)?.value.trim()
   const readTime = (document.getElementById('blog-readtime') as HTMLInputElement)?.value.trim()
   const content = quillInstance ? quillInstance.root.innerHTML : ''
@@ -210,19 +230,9 @@ async function handleBlogSubmit(): Promise<void> {
 
   // Compress image before enqueuing
   let compressed: { base64: string } | null = null
-  let compressToast: ReturnType<typeof toastProgress> | null = null
   try {
-    if (file) {
-      compressToast = toastProgress('Foto verkleinen...')
-      compressed = await compressImage(file)
-      compressToast.dismiss()
-    }
-  } catch (err) {
-    compressToast?.dismiss()
-    const msg = err instanceof Error ? err.message : 'Foto verkleinen mislukt'
-    toastError(msg)
-    return
-  }
+    if (file) compressed = await compressWithToast(file)
+  } catch { return }
 
   // Optimistic UI update
   const now = new Date()

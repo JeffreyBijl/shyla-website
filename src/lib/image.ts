@@ -84,6 +84,21 @@ function blobToBase64(blob: Blob): Promise<string> {
   })
 }
 
+export async function compressWithToast(file: File): Promise<{ base64: string }> {
+  const { toastProgress, toastError } = await import('./toast.js')
+  const toast = toastProgress('Foto verkleinen...')
+  try {
+    const result = await compressImage(file)
+    toast.dismiss()
+    return result
+  } catch (err) {
+    toast.dismiss()
+    const msg = err instanceof Error ? err.message : 'Foto verkleinen mislukt'
+    toastError(msg)
+    throw err
+  }
+}
+
 export function slugify(title: string): string {
   return title
     .toLowerCase()

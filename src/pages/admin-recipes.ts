@@ -2,11 +2,10 @@ import type { Recipe, RecipeCategory } from '../data/types.js'
 import {
   readModifyWrite, uploadImage, CONFIG,
 } from '../lib/github.js'
-import { compressImage, slugify } from '../lib/image.js'
+import { compressWithToast, slugify } from '../lib/image.js'
 import { escapeHtml } from '../lib/html.js'
-import { toastError, toastProgress } from '../lib/toast.js'
 import { adminState } from './admin-state.js'
-import { pollDeploy, setupImagePreview, handleDelete } from './admin.js'
+import { pollDeploy, setupImagePreview, handleDelete } from './admin-shared.js'
 import { validateField, validateFileField, setupFieldBlurValidation } from './admin-validation.js'
 
 // --- Render ---
@@ -264,19 +263,9 @@ async function handleRecipeSubmit(): Promise<void> {
 
   // Compress image before enqueuing (CPU work, fast)
   let compressed: { base64: string } | null = null
-  let compressToast: ReturnType<typeof toastProgress> | null = null
   try {
-    if (file) {
-      compressToast = toastProgress('Foto verkleinen...')
-      compressed = await compressImage(file)
-      compressToast.dismiss()
-    }
-  } catch (err) {
-    compressToast?.dismiss()
-    const msg = err instanceof Error ? err.message : 'Foto verkleinen mislukt'
-    toastError(msg)
-    return
-  }
+    if (file) compressed = await compressWithToast(file)
+  } catch { return }
 
   // Optimistic UI update
   if (isEditing && editId !== null) {
@@ -437,7 +426,7 @@ export function setupRecipes(): void {
       return
     }
     const btn = (e.target as HTMLElement).closest('.admin-item-delete') as HTMLElement | null
-    if (btn) handleDelete(Number(btn.dataset.id), 'recipe')
+    if (btn) handleDelete(Number(btn.dataset.id), 'recipe', renderRecipeItems)
   })
 
   // Blur validation for title

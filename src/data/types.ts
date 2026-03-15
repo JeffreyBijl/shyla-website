@@ -28,12 +28,20 @@ export interface Recipe {
   nutrition: Nutrition
 }
 
+export type BlogCategory = 'Voeding' | 'Educatie' | 'Lifestyle'
+
+export const BLOG_CATEGORY_EMOJIS: Record<BlogCategory, string> = {
+  Voeding: '🥗',
+  Educatie: '📚',
+  Lifestyle: '✨',
+}
+
 export interface BlogPost {
   id: number
   title: string
   slug: string
   date: string
-  category: string
+  category: BlogCategory
   image: string | null
   shortDescription: string
   readTime: string
