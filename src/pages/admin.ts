@@ -466,19 +466,13 @@ function setupDashboard(): void {
 }
 
 function setupQueueToasts(): void {
-  let currentToast: ReturnType<typeof toastProgress> | null = null
   let errorHandled = false
 
   operationQueue.setStatusCallback((status) => {
-    if (status.total === 0 && !status.error) {
-      currentToast?.dismiss()
-      currentToast = null
-      return
-    }
+    if (status.total === 0 && !status.error) return
 
     if (status.error) {
-      currentToast?.dismiss()
-      currentToast = toastError(`Fout: ${status.error}`, [
+      toastError(`Fout: ${status.error}`, 'queue', [
         { label: 'Opnieuw', onClick: () => operationQueue.retry() },
         { label: 'Annuleren', onClick: () => { operationQueue.clear(); loadData() } },
       ])
@@ -487,16 +481,10 @@ function setupQueueToasts(): void {
         loadData()
       }
     } else if (status.completed === status.total && status.total > 0) {
-      currentToast?.dismiss()
-      currentToast = null
-      toastSuccess('Alle acties verwerkt!')
+      toastSuccess('Alle acties verwerkt!', 'queue')
     } else {
       errorHandled = false
-      if (!currentToast) {
-        currentToast = toastProgress(`Verwerken: ${status.completed + 1} van ${status.total} — ${status.current}`)
-      } else {
-        currentToast.update(`Verwerken: ${status.completed + 1} van ${status.total} — ${status.current}`)
-      }
+      toastProgress(`Verwerken: ${status.completed + 1} van ${status.total} — ${status.current}`, 'queue')
     }
   })
 }
@@ -855,8 +843,6 @@ async function handleDelete(id: number, type: 'recipe' | 'blog'): Promise<void> 
     renderBlogItems()
   }
 
-  toastSuccess(`"${item.title}" wordt verwijderd...`, 2000)
-
   // Enqueue the actual GitHub operation
   operationQueue.enqueue({
     label: `Verwijder: ${item.title}`,
@@ -888,33 +874,26 @@ async function handleDelete(id: number, type: 'recipe' | 'blog'): Promise<void> 
 
 // --- Deploy polling ---
 
-let deployToast: ReturnType<typeof toastProgress> | null = null
-
 function pollDeploy(): void {
   if (stopCurrentPolling) stopCurrentPolling()
 
-  deployToast?.dismiss()
-  deployToast = toastProgress('Website wordt bijgewerkt...')
+  toastProgress('Website wordt bijgewerkt...', 'deploy')
 
   stopCurrentPolling = startDeployPolling((status) => {
     switch (status) {
       case 'queued':
-        deployToast?.update('Website wordt bijgewerkt — in de wachtrij...')
+        toastProgress('Website wordt bijgewerkt — in de wachtrij...', 'deploy')
         break
       case 'in_progress':
-        deployToast?.update('Website wordt bijgewerkt — publiceren...')
+        toastProgress('Website wordt bijgewerkt — publiceren...', 'deploy')
         break
       case 'completed':
-        deployToast?.dismiss()
-        deployToast = null
         stopCurrentPolling = null
-        toastSuccess('Website is live!')
+        toastSuccess('Website is live!', 'deploy')
         break
       case 'failed':
-        deployToast?.dismiss()
-        deployToast = null
         stopCurrentPolling = null
-        toastError('Publicatie mislukt')
+        toastError('Publicatie mislukt', 'deploy')
         break
     }
   })
