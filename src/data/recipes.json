@@ -170,5 +170,32 @@
       "carbs": 100,
       "fat": 25
     }
+  },
+  {
+    "id": 10,
+    "title": "Test",
+    "slug": "test",
+    "category": "ontbijt",
+    "image": "images/recipes/test-1773563631722.jpg",
+    "emoji": "",
+    "time": "10",
+    "calories": "320",
+    "description": "bla bla",
+    "servings": "1",
+    "ingredients": [
+      {
+        "amount": "1",
+        "name": "suiker"
+      }
+    ],
+    "steps": [
+      "voeg toe"
+    ],
+    "nutrition": {
+      "kcal": 10,
+      "protein": 10,
+      "carbs": 10,
+      "fat": 10
+    }
   }
 ]
