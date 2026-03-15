@@ -31,9 +31,11 @@ export interface Recipe {
 export interface BlogPost {
   id: number
   title: string
+  slug: string
   date: string
   category: string
   image: string | null
-  excerpt: string
+  shortDescription: string
   readTime: string
+  content: string
 }

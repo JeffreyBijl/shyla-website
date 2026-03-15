@@ -2,38 +2,57 @@
   {
     "id": 1,
     "title": "5 tips voor een gezond ontbijt dat je de hele ochtend volhoudt",
+    "slug": "5-tips-voor-een-gezond-ontbijt-dat-je-de-hele-ochtend-volhoudt",
     "date": "15 februari 2026",
     "category": "Voeding",
     "image": null,
-    "excerpt": "Een goed ontbijt is de basis van een productieve dag. Ontdek welke voedingsstoffen je niet mag overslaan en hoe je ze makkelijk in je ochtend verwerkt.",
-    "readTime": "4 min"
+    "shortDescription": "Een goed ontbijt is de basis van een productieve dag. Ontdek welke voedingsstoffen je niet mag overslaan en hoe je ze makkelijk in je ochtend verwerkt.",
+    "readTime": "4 min",
+    "content": ""
   },
   {
     "id": 2,
     "title": "Waarom proteïne zo belangrijk is voor vrouwen",
+    "slug": "waarom-proteine-zo-belangrijk-is-voor-vrouwen",
     "date": "8 februari 2026",
     "category": "Educatie",
     "image": null,
-    "excerpt": "Proteïne is meer dan spierherstel. Leer hoe het je hormoonbalans, huid en energieniveau ondersteunt — en hoeveel je eigenlijk nodig hebt.",
-    "readTime": "6 min"
+    "shortDescription": "Proteïne is meer dan spierherstel. Leer hoe het je hormoonbalans, huid en energieniveau ondersteunt — en hoeveel je eigenlijk nodig hebt.",
+    "readTime": "6 min",
+    "content": ""
   },
   {
     "id": 3,
     "title": "Meal prep in 1 uur: zo plan je een hele week voor",
+    "slug": "meal-prep-in-1-uur-zo-plan-je-een-hele-week-voor",
     "date": "1 februari 2026",
     "category": "Lifestyle",
     "image": null,
-    "excerpt": "Met de juiste aanpak kun je in één uur alle maaltijden voor de week voorbereiden. Mijn stap-voor-stap methode voor beginners.",
-    "readTime": "5 min"
+    "shortDescription": "Met de juiste aanpak kun je in één uur alle maaltijden voor de week voorbereiden. Mijn stap-voor-stap methode voor beginners.",
+    "readTime": "5 min",
+    "content": ""
+  },
+  {
+    "id": 4,
+    "title": "De waarheid over \"gezonde\" snacks uit de supermarkt",
+    "slug": "de-waarheid-over-gezonde-snacks-uit-de-supermarkt",
+    "date": "22 januari 2026",
+    "category": "Voeding",
+    "image": null,
+    "shortDescription": "Veel producten met een gezond imago bevatten verrassend veel suiker of additieven. Ik leer je hoe je een etiket leest als een pro.",
+    "readTime": "7 min",
+    "content": ""
   },
   {
     "id": 5,
     "title": "Soms zit het mee...",
+    "slug": "soms-zit-het-mee",
     "date": "13 maart 2026",
     "category": "Educatie",
     "image": "images/blog/soms-zit-het-mee-1773439899362.jpg",
-    "excerpt": "Soms zit het mee en soms zit het tegen",
-    "readTime": "1 min"
+    "shortDescription": "Soms zit het mee en soms zit het tegen",
+    "readTime": "1 min",
+    "content": ""
   },
   {
     "id": 7,
