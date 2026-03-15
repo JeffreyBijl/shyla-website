@@ -32,6 +32,15 @@ export function toast(opts: ToastOptions): ToastHandle {
       existing.textSpan.textContent = opts.message
       // Update type if changed
       existing.el.className = `toast toast--${opts.type} toast--visible`
+      // Add/remove spinner based on type
+      const oldSpinner = existing.el.querySelector('.toast-spinner')
+      if (opts.type === 'progress' && !oldSpinner) {
+        const spinner = document.createElement('span')
+        spinner.className = 'toast-spinner'
+        existing.el.insertBefore(spinner, existing.el.firstChild)
+      } else if (opts.type !== 'progress' && oldSpinner) {
+        oldSpinner.remove()
+      }
       // Rebuild actions if provided
       const oldActions = existing.el.querySelector('.toast-actions')
       if (oldActions) oldActions.remove()

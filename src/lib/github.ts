@@ -97,7 +97,7 @@ export async function readFile<T>(path: string, noCache = false): Promise<{ cont
 
 // --- Write file to repo ---
 
-export async function writeFile(
+async function writeFile(
   path: string,
   content: string,
   message: string,
