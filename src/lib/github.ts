@@ -53,7 +53,9 @@ async function apiRequest<T>(url: string, options?: RequestInit): Promise<T> {
     throw new Error('Token heeft niet de juiste rechten. Zorg voor "repo" scope.')
   }
   if (res.status === 409) {
-    throw new Error('Data is ondertussen gewijzigd. Ververs de pagina en probeer opnieuw.')
+    const err = new Error('Data is ondertussen gewijzigd. Ververs de pagina en probeer opnieuw.')
+    ;(err as any).status = 409
+    throw err
   }
   if (!res.ok) {
     throw new Error(`GitHub API fout (${res.status})`)
@@ -108,6 +110,36 @@ export async function writeFile(
       branch: CONFIG.BRANCH,
     }),
   })
+}
+
+// --- Read-modify-write with 409 retry ---
+
+export async function readModifyWrite<T>(
+  path: string,
+  modify: (data: T) => T,
+  message: string,
+): Promise<T> {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const latest = await readFile<T>(path)
+    const updated = modify(latest.content)
+    try {
+      await writeFile(
+        path,
+        JSON.stringify(updated, null, 2),
+        message,
+        latest.sha
+      )
+      return updated
+    } catch (err) {
+      const is409 = err instanceof Error && (err as any).status === 409
+      if (is409 && attempt < 2) {
+        await new Promise(r => setTimeout(r, 1000 * (attempt + 1)))
+        continue
+      }
+      throw err
+    }
+  }
+  throw new Error('Schrijven mislukt na meerdere pogingen')
 }
 
 // --- Upload image ---

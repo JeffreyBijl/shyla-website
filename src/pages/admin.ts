@@ -1,7 +1,7 @@
 import type { Recipe, BlogPost, RecipeCategory } from '../data/types.js'
 import {
   getToken, saveToken, clearToken, validateToken,
-  readFile, writeFile, uploadImage, deleteFile,
+  readFile, readModifyWrite, uploadImage, deleteFile,
   startDeployPolling, CONFIG,
 } from '../lib/github.js'
 import { compressImage, slugify } from '../lib/image.js'
@@ -59,12 +59,6 @@ function renderDashboard(): string {
           <span id="deploy-banner-text">Website wordt bijgewerkt...</span>
         </div>
 
-        <div class="admin-queue-status" id="queue-status">
-          <div class="admin-queue-status-text" id="queue-status-text"></div>
-          <button class="btn btn-sm btn-outline" id="queue-retry" style="display:none;">Opnieuw proberen</button>
-          <button class="btn btn-sm btn-outline" id="queue-clear" style="display:none;">Annuleren</button>
-        </div>
-
         <div class="admin-tabs">
           <button class="admin-tab admin-tab--active" data-tab="recipes">Recepten</button>
           <button class="admin-tab" data-tab="blog">Blog</button>
@@ -79,6 +73,11 @@ function renderDashboard(): string {
             <span id="progress-text-recipes"></span>
           </div>
           <div class="admin-items-list" id="recipes-list">
+            <div class="admin-queue-status" id="queue-status">
+              <div class="admin-queue-status-text" id="queue-status-text"></div>
+              <button class="btn btn-sm btn-outline" id="queue-retry" style="display:none;">Opnieuw proberen</button>
+              <button class="btn btn-sm btn-outline" id="queue-clear" style="display:none;">Annuleren</button>
+            </div>
             <h3>Bestaande recepten</h3>
             <div id="recipes-items"></div>
           </div>
@@ -706,53 +705,49 @@ async function handleRecipeSubmit(): Promise<void> {
         imagePath = uploadedPath.replace(/^public\//, '')
       }
 
-      const latest = await readFile<Recipe[]>(CONFIG.RECIPES_PATH)
-
-      if (isEditing && editId !== null) {
-        const index = latest.content.findIndex(r => r.id === editId)
-        if (index === -1) throw new Error('Recept niet gevonden')
-        const existing = latest.content[index]
-        latest.content[index] = {
-          ...existing,
-          title,
-          slug: slugify(title),
-          category,
-          image: imagePath ?? existing.image,
-          time,
-          calories,
-          description,
-          servings,
-          ingredients,
-          steps,
-          nutrition: { kcal, protein, carbs, fat },
-        }
-      } else {
-        const newId = latest.content.length > 0 ? Math.max(...latest.content.map(r => r.id)) + 1 : 1
-        latest.content.push({
-          id: newId,
-          title,
-          slug: slugify(title),
-          category,
-          image: imagePath!,
-          emoji: '',
-          time,
-          calories,
-          description,
-          servings,
-          ingredients,
-          steps,
-          nutrition: { kcal, protein, carbs, fat },
-        })
-      }
-
-      await writeFile(
+      recipes = await readModifyWrite<Recipe[]>(
         CONFIG.RECIPES_PATH,
-        JSON.stringify(latest.content, null, 2),
+        (data) => {
+          if (isEditing && editId !== null) {
+            const index = data.findIndex(r => r.id === editId)
+            if (index === -1) throw new Error('Recept niet gevonden')
+            const existing = data[index]
+            data[index] = {
+              ...existing,
+              title,
+              slug: slugify(title),
+              category,
+              image: imagePath ?? existing.image,
+              time,
+              calories,
+              description,
+              servings,
+              ingredients,
+              steps,
+              nutrition: { kcal, protein, carbs, fat },
+            }
+          } else {
+            const newId = data.length > 0 ? Math.max(...data.map(r => r.id)) + 1 : 1
+            data.push({
+              id: newId,
+              title,
+              slug: slugify(title),
+              category,
+              image: imagePath!,
+              emoji: '',
+              time,
+              calories,
+              description,
+              servings,
+              ingredients,
+              steps,
+              nutrition: { kcal, protein, carbs, fat },
+            })
+          }
+          return data
+        },
         commitMsg,
-        latest.sha
       )
-
-      recipes = latest.content
       renderRecipeItems()
       showFeedback(feedback, isEditing ? 'Recept bijgewerkt!' : 'Recept opgeslagen!', 'success')
       pollDeploy('deploy-status-recipes')
@@ -825,28 +820,23 @@ async function handleBlogSubmit(): Promise<void> {
         imagePath = await uploadImage(CONFIG.BLOG_IMAGES_DIR, filename, compressed.base64)
       }
 
-      const latest = await readFile<BlogPost[]>(CONFIG.BLOG_PATH)
-      const freshId = latest.content.length > 0 ? Math.max(...latest.content.map(p => p.id)) + 1 : 1
-
-      const newPost: BlogPost = {
-        id: freshId,
-        title,
-        date: dateStr,
-        category,
-        image: imagePath?.replace(/^public\//, '') ?? null,
-        excerpt,
-        readTime,
-      }
-
-      latest.content.push(newPost)
-      await writeFile(
+      blogPosts = await readModifyWrite<BlogPost[]>(
         CONFIG.BLOG_PATH,
-        JSON.stringify(latest.content, null, 2),
+        (data) => {
+          const freshId = data.length > 0 ? Math.max(...data.map(p => p.id)) + 1 : 1
+          data.push({
+            id: freshId,
+            title,
+            date: dateStr,
+            category,
+            image: imagePath?.replace(/^public\//, '') ?? null,
+            excerpt,
+            readTime,
+          })
+          return data
+        },
         `Nieuwe blogpost: ${title}`,
-        latest.sha
       )
-
-      blogPosts = latest.content
       renderBlogItems()
       showFeedback(feedback, 'Blogpost opgeslagen!', 'success')
       pollDeploy('deploy-status-blog')
@@ -931,27 +921,18 @@ async function handleDelete(id: number, type: 'recipe' | 'blog'): Promise<void> 
     label: `Verwijder: ${item.title}`,
     execute: async () => {
       // Update data file first (remove reference), then delete image
-      // This way, if image deletion fails, we have an orphan file instead of a broken reference
       if (type === 'recipe') {
-        const latest = await readFile<Recipe[]>(CONFIG.RECIPES_PATH)
-        const updated = latest.content.filter(r => r.id !== id)
-        await writeFile(
+        recipes = await readModifyWrite<Recipe[]>(
           CONFIG.RECIPES_PATH,
-          JSON.stringify(updated, null, 2),
+          data => data.filter(r => r.id !== id),
           `Verwijder recept: ${item.title}`,
-          latest.sha
         )
-        recipes = updated
       } else {
-        const latest = await readFile<BlogPost[]>(CONFIG.BLOG_PATH)
-        const updated = latest.content.filter(p => p.id !== id)
-        await writeFile(
+        blogPosts = await readModifyWrite<BlogPost[]>(
           CONFIG.BLOG_PATH,
-          JSON.stringify(updated, null, 2),
+          data => data.filter(p => p.id !== id),
           `Verwijder blogpost: ${item.title}`,
-          latest.sha
         )
-        blogPosts = updated
       }
 
       // Delete image file after data is updated (fire-and-forget, non-critical)
