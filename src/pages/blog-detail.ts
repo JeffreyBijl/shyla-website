@@ -1,6 +1,6 @@
 import blogData from '../data/blog.json'
 import type { BlogPost } from '../data/types.js'
-import { escapeHtml } from '../lib/html.js'
+import { escapeHtml } from '../utils.js'
 
 const blogPosts: BlogPost[] = blogData as BlogPost[]
 

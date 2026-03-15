@@ -1,12 +1,12 @@
 import type { Recipe, RecipeCategory } from '../data/types.js'
 import {
   readModifyWrite, uploadImage, CONFIG,
-} from '../lib/github.js'
-import { compressWithToast, slugify } from '../lib/image.js'
-import { escapeHtml } from '../lib/html.js'
-import { adminState } from './admin-state.js'
-import { pollDeploy, setupImagePreview, handleDelete } from './admin-shared.js'
-import { validateField, validateFileField, setupFieldBlurValidation } from './admin-validation.js'
+} from './github.js'
+import { compressWithToast, slugify } from './image.js'
+import { escapeHtml } from '../utils.js'
+import { adminState } from './state.js'
+import { pollDeploy, setupImagePreview, handleDelete } from './shared.js'
+import { validateField, validateFileField, setupFieldBlurValidation } from './validation.js'
 
 // --- Render ---
 

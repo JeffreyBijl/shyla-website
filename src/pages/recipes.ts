@@ -1,6 +1,6 @@
 import recipesData from '../data/recipes.json'
 import type { Recipe, RecipeCategory } from '../data/types.js'
-import { escapeHtml } from '../lib/html.js'
+import { escapeHtml } from '../utils.js'
 
 const recipes: Recipe[] = recipesData as Recipe[]
 

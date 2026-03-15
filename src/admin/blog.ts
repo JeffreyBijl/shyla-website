@@ -1,11 +1,11 @@
 import type { BlogPost, BlogCategory } from '../data/types.js'
 import { BLOG_CATEGORY_EMOJIS } from '../data/types.js'
-import { adminState } from './admin-state.js'
-import { readModifyWrite, uploadImage, CONFIG } from '../lib/github.js'
-import { compressWithToast, slugify } from '../lib/image.js'
-import { escapeHtml } from '../lib/html.js'
-import { validateField, setupFieldBlurValidation } from './admin-validation.js'
-import { pollDeploy, setupImagePreview, handleDelete } from './admin-shared.js'
+import { adminState } from './state.js'
+import { readModifyWrite, uploadImage, CONFIG } from './github.js'
+import { compressWithToast, slugify } from './image.js'
+import { escapeHtml } from '../utils.js'
+import { validateField, setupFieldBlurValidation } from './validation.js'
+import { pollDeploy, setupImagePreview, handleDelete } from './shared.js'
 
 // --- Quill (dynamically loaded) ---
 

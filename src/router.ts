@@ -5,7 +5,7 @@ import { renderRecipeDetail, setupRecipeDetail } from './pages/recipe-detail.js'
 import { renderBlog }                      from './pages/blog.js'
 import { renderBlogDetail, setupBlogDetail } from './pages/blog-detail.js'
 import { renderContact, setupContact }     from './pages/contact.js'
-import { renderAdmin, setupAdmin }         from './pages/admin.js'
+import { renderAdmin, setupAdmin }         from './admin/page.js'
 
 type PageSetup = () => void
 

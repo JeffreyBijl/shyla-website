@@ -1,10 +1,10 @@
 import type { Recipe, BlogPost } from '../data/types.js'
 import {
   readModifyWrite, deleteFile, startDeployPolling, CONFIG,
-} from '../lib/github.js'
-import { escapeHtml } from '../lib/html.js'
-import { toastSuccess, toastError, toastProgress } from '../lib/toast.js'
-import { adminState } from './admin-state.js'
+} from './github.js'
+import { escapeHtml } from '../utils.js'
+import { toastSuccess, toastError, toastProgress } from '../components/toast.js'
+import { adminState } from './state.js'
 
 // --- Image preview ---
 

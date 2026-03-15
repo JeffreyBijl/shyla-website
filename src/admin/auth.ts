@@ -1,7 +1,7 @@
 import {
-  saveToken, clearToken, validateToken,
-} from '../lib/github.js'
-import { toastError } from '../lib/toast.js'
+  saveToken, validateToken,
+} from './github.js'
+import { toastError } from '../components/toast.js'
 
 export function renderTokenForm(): string {
   return `
@@ -45,9 +45,4 @@ export function setupTokenForm(onLogin: () => void): void {
       ;(submit as HTMLButtonElement).disabled = false
     }
   })
-}
-
-export function handleLogout(onLogout: () => void): void {
-  clearToken()
-  onLogout()
 }

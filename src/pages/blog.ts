@@ -1,7 +1,7 @@
 import blogData from '../data/blog.json'
 import type { BlogPost, BlogCategory } from '../data/types.js'
 import { BLOG_CATEGORY_EMOJIS } from '../data/types.js'
-import { escapeHtml } from '../lib/html.js'
+import { escapeHtml } from '../utils.js'
 
 const blogPosts: BlogPost[] = blogData as BlogPost[]
 

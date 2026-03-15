@@ -1,5 +1,5 @@
 import type { Recipe, BlogPost } from '../data/types.js'
-import { OperationQueue } from '../lib/queue.js'
+import { OperationQueue } from './queue.js'
 
 export const adminState = {
   recipes: [] as Recipe[],

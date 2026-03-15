@@ -1255,6 +1255,10 @@ p { color: var(--color-gray-light); line-height: 1.75; }
   margin-bottom: 1rem;
 }
 
+.admin-token-card .form-group {
+  margin-bottom: 1rem;
+}
+
 .admin-token-warning {
   font-size: 0.85rem;
   color: var(--color-gray-light);

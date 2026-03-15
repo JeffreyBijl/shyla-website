@@ -1,10 +1,10 @@
 import type { Recipe, BlogPost } from '../data/types.js'
-import { getToken, readFile, CONFIG } from '../lib/github.js'
-import { toastSuccess, toastError, toastProgress } from '../lib/toast.js'
-import { adminState } from './admin-state.js'
-import { renderTokenForm, setupTokenForm, handleLogout } from './admin-auth.js'
-import { renderRecipeForm, renderRecipeItems, setupRecipes } from './admin-recipes.js'
-import { renderBlogForm, renderBlogItems, setupBlog } from './admin-blog.js'
+import { getToken, readFile, CONFIG } from './github.js'
+import { toastSuccess, toastError, toastProgress } from '../components/toast.js'
+import { adminState } from './state.js'
+import { renderTokenForm, setupTokenForm } from './auth.js'
+import { renderRecipeForm, renderRecipeItems, setupRecipes } from './recipes.js'
+import { renderBlogForm, renderBlogItems, setupBlog } from './blog.js'
 
 // --- Render ---
 export function renderAdmin(): string {
@@ -19,8 +19,6 @@ function renderDashboard(): string {
       <div class="container">
         <div class="admin-header">
           <h1>Admin — fit.foodbyshyla</h1>
-          <button class="btn btn-outline" id="admin-refresh" style="margin-top:0.5rem;">Ververs data</button>
-          <button class="btn" id="admin-logout" style="margin-top:0.5rem;margin-left:0.5rem;color:var(--color-gray-light);">Uitloggen</button>
         </div>
 
         <div class="admin-tabs">
@@ -75,24 +73,6 @@ function setupDashboard(): void {
       tab.classList.add('admin-tab--active')
       document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('admin-tab-content--active'))
       document.getElementById(`tab-${target}`)?.classList.add('admin-tab-content--active')
-    })
-  })
-
-  // Refresh
-  document.getElementById('admin-refresh')?.addEventListener('click', () => loadData())
-
-  // Logout
-  document.getElementById('admin-logout')?.addEventListener('click', () => {
-    handleLogout(() => {
-      const app = document.getElementById('app')
-      if (app) {
-        app.innerHTML = `<div class="page-enter">${renderTokenForm()}</div>`
-        setupTokenForm(() => {
-          app.innerHTML = `<div class="page-enter">${renderDashboard()}</div>`
-          loadData()
-          setupDashboard()
-        })
-      }
     })
   })
 
