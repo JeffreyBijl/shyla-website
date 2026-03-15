@@ -43,7 +43,7 @@ function blogCard(post: BlogPost, index: number): string {
           </span>
         </div>
         <h3 class="blog-title">${escapeHtml(post.title)}</h3>
-        <p>${escapeHtml(post.excerpt)}</p>
+        <p>${escapeHtml(post.shortDescription)}</p>
         <div class="blog-footer">
           <span class="blog-date">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -51,7 +51,7 @@ function blogCard(post: BlogPost, index: number): string {
             </svg>
             ${escapeHtml(post.date)}
           </span>
-          <a href="#" class="blog-read-btn">
+          <a href="#blog/${encodeURIComponent(post.slug)}" class="blog-read-btn">
             Lees meer
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
               <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
