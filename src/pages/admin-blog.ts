@@ -5,7 +5,6 @@ import { compressImage, slugify } from '../lib/image.js'
 import { escapeHtml } from '../lib/html.js'
 import { toastError, toastProgress } from '../lib/toast.js'
 import { validateField, setupFieldBlurValidation } from './admin-validation.js'
-// These will be available when admin.ts is rewritten (Task 8):
 import { pollDeploy, setupImagePreview, handleDelete } from './admin.js'
 
 // --- Quill ---
