@@ -1,8 +1,21 @@
-export type RecipeCategory = 'ontbijt' | 'lunch' | 'diner' | 'snack'
+export type RecipeCategory = 'ontbijt' | 'lunch' | 'diner' | 'snack' | 'dessert'
+
+export const RECIPE_UNITS = [
+  'g', 'kg', 'ml', 'dl', 'l', 'el', 'tl', 'stuk(s)',
+  'snufje', 'handje', 'scheutje', 'takje', 'teen', 'plak', 'snee',
+] as const
+
+export type RecipeUnit = typeof RECIPE_UNITS[number]
+
+export const NON_SCALABLE_UNITS: ReadonlySet<string> = new Set([
+  'snufje', 'handje', 'scheutje', 'takje', 'teen', 'plak', 'snee',
+])
 
 export interface Ingredient {
-  amount: string
+  amount: number | null
+  unit: string
   name: string
+  scalable: boolean
 }
 
 export interface Nutrition {
@@ -20,9 +33,8 @@ export interface Recipe {
   image: string | null
   emoji: string
   time: string
-  calories: string
   description: string
-  servings: string
+  servings: number
   ingredients: Ingredient[]
   steps: string[]
   nutrition: Nutrition
