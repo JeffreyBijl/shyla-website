@@ -7,66 +7,91 @@
     "image": "images/recipes/maaltijdsalade-met-kruidige-kip-1773474265025.jpg",
     "emoji": "",
     "time": "30 min",
-    "calories": "400 kcal",
     "description": "Lekkere salade met gemarineerde gebakken stukjes kip en diverse groenten zoals tomaatjes, komkommer en wortel. Een perfecte combinatie met de lichte dressing en krokante stukjes cashewnoot.",
-    "servings": "2",
+    "servings": 2,
     "ingredients": [
       {
-        "amount": "75 gr",
-        "name": "sla"
+        "amount": 75,
+        "unit": "g",
+        "name": "sla",
+        "scalable": true
       },
       {
-        "amount": "1",
-        "name": "rode ui"
+        "amount": 1,
+        "unit": "stuk(s)",
+        "name": "rode ui",
+        "scalable": true
       },
       {
-        "amount": "150 gr",
-        "name": "cherrytomaatjes"
+        "amount": 150,
+        "unit": "g",
+        "name": "cherrytomaatjes",
+        "scalable": true
       },
       {
-        "amount": "0.5",
-        "name": "komkommer"
+        "amount": 0.5,
+        "unit": "stuk(s)",
+        "name": "komkommer",
+        "scalable": true
       },
       {
-        "amount": "1 handje",
-        "name": "cashewnoten"
+        "amount": 1,
+        "unit": "handje",
+        "name": "cashewnoten",
+        "scalable": false
       },
       {
-        "amount": "100 gr",
-        "name": "wortel"
+        "amount": 100,
+        "unit": "g",
+        "name": "wortel",
+        "scalable": true
       },
       {
-        "amount": "180 gr",
-        "name": "stukjes kip"
+        "amount": 180,
+        "unit": "g",
+        "name": "stukjes kip",
+        "scalable": true
       },
       {
-        "amount": "0.5",
-        "name": "eetlepel tomatenpuree"
+        "amount": 0.5,
+        "unit": "el",
+        "name": "tomatenpuree",
+        "scalable": true
       },
       {
-        "amount": "1 snuf",
-        "name": "paprikapoeder"
+        "amount": 1,
+        "unit": "snufje",
+        "name": "paprikapoeder",
+        "scalable": false
       },
       {
-        "amount": "1 teen",
-        "name": "knoflook"
+        "amount": 1,
+        "unit": "teen",
+        "name": "knoflook",
+        "scalable": false
       },
       {
-        "amount": "1 eetlepel",
-        "name": "sojasaus"
+        "amount": 1,
+        "unit": "el",
+        "name": "sojasaus",
+        "scalable": true
       },
       {
-        "amount": "2 eetlepels",
-        "name": "olie"
+        "amount": 2,
+        "unit": "el",
+        "name": "olie",
+        "scalable": true
       },
       {
-        "amount": "1 snufje",
-        "name": "chilipeper (optioneel)"
+        "amount": 1,
+        "unit": "snufje",
+        "name": "chilipeper (optioneel)",
+        "scalable": false
       }
     ],
     "steps": [
       "Pers de knoflook uit en meng met de tomatenpuree, paprikapoeder, sojasaus, olie (en eventueel chilipeper als je van pittig houdt) in een kom. Voeg de stukjes kip toe en zet zo lang opzij. Je kunt ook al een paar uur van tevoren de kip marineren.",
-      "Snijd de rode ui in ringetjes en bak deze in een pan lichtjes aan. Je kunt ook de rode ui rauw door de salade doen maar daar ben ik zelf niet zo’n fan van.",
+      "Snijd de rode ui in ringetjes en bak deze in een pan lichtjes aan. Je kunt ook de rode ui rauw door de salade doen maar daar ben ik zelf niet zo'n fan van.",
       "Snijd de komkommer door de lengte doormidden, schraap een beetje van het waterige deel weg met een lepeltje en snijd de rest in halve maantjes.",
       "Halveer de cherrytomaatjes. Snijd de wortel(s) in dunne plakjes. Snijd de avocado doormidden, verwijder de pit en schil en snijd in blokjes. Je kunt deze eventueel een beetje besprenkelen met citroensap tegen het verkleuren. Doe de sla, tomaatjes, komkommer, avocado en rode ui in een kom."
     ],
@@ -85,64 +110,87 @@
     "image": "images/recipes/gezonde-lasagne-met-spinazie-1773532389495.jpg",
     "emoji": "",
     "time": "45 min",
-    "calories": "500 kcal",
     "description": "Deze gezonde(re) en light versie op de bekende lasagne bevat geen bechamelsaus maar een lichte saus met Huttenkase en extra veel groenten. Lekker licht en voedzaam dus.",
-    "servings": "2 personen",
+    "servings": 2,
     "ingredients": [
       {
-        "amount": "6",
-        "name": "volkoren lasagnebladen"
+        "amount": 6,
+        "unit": "stuk(s)",
+        "name": "volkoren lasagnebladen",
+        "scalable": true
       },
       {
-        "amount": "200 gr",
-        "name": "hüttenkäse"
+        "amount": 200,
+        "unit": "g",
+        "name": "hüttenkäse",
+        "scalable": true
       },
       {
-        "amount": "400 ml",
-        "name": "tomatenblokjes (Heinz)"
+        "amount": 400,
+        "unit": "ml",
+        "name": "tomatenblokjes (Heinz)",
+        "scalable": true
       },
       {
-        "amount": "1 thee lepel",
-        "name": "Italiaanse kruiden"
+        "amount": 1,
+        "unit": "tl",
+        "name": "Italiaanse kruiden",
+        "scalable": true
       },
       {
-        "amount": "snuf",
-        "name": "peper en zout"
+        "amount": null,
+        "unit": "snufje",
+        "name": "peper en zout",
+        "scalable": false
       },
       {
-        "amount": "125 gr",
-        "name": "champignons"
+        "amount": 125,
+        "unit": "g",
+        "name": "champignons",
+        "scalable": true
       },
       {
-        "amount": "200 gr",
-        "name": "spinazie"
+        "amount": 200,
+        "unit": "g",
+        "name": "spinazie",
+        "scalable": true
       },
       {
-        "amount": "0.5",
-        "name": "paprika"
+        "amount": 0.5,
+        "unit": "stuk(s)",
+        "name": "paprika",
+        "scalable": true
       },
       {
-        "amount": "handje",
-        "name": "verse basilicum"
+        "amount": null,
+        "unit": "handje",
+        "name": "verse basilicum",
+        "scalable": false
       },
       {
-        "amount": "0.5",
-        "name": "ui"
+        "amount": 0.5,
+        "unit": "stuk(s)",
+        "name": "ui",
+        "scalable": true
       },
       {
-        "amount": "1",
-        "name": "teen knoflook"
+        "amount": 1,
+        "unit": "teen",
+        "name": "knoflook",
+        "scalable": false
       },
       {
-        "amount": "0.5 handje",
-        "name": "30+ kaas (Beemster)"
+        "amount": 0.5,
+        "unit": "handje",
+        "name": "30+ kaas (Beemster)",
+        "scalable": false
       }
     ],
     "steps": [
       "Snipper de ui en knoflook. Snijd de champignons in plakjes.",
       "Fruit de ui en knoflook aan in een pan met een klein beetje olie of boter. Voeg de champignons toe.",
       "Snijd de paprika in kleine blokjes en bak ook mee. Voeg dan de tomatenblokjes toe en breng op smaak met peper, zout en Italiaanse kruiden. Voeg ook wat verse basilicum toe in stukjes.",
-      "Laat dit mengsel ca. 20 minuutjes pruttelen. Roer af en toe door."
+      "Laat dit mengsel ca. 20 minuutjes pruttelen. Roer af en toe door."
     ],
     "nutrition": {
       "kcal": 500,
