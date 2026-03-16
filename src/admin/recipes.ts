@@ -1,5 +1,5 @@
 import type { Recipe, RecipeCategory, Ingredient } from '../data/types.js'
-import { RECIPE_UNITS, NON_SCALABLE_UNITS } from '../data/types.js'
+import { RECIPE_UNITS } from '../data/types.js'
 import {
   readModifyWrite, uploadImage, CONFIG,
 } from './github.js'
@@ -124,13 +124,8 @@ export function renderRecipeItems(): void {
 
 // --- Dynamic row helpers ---
 
-function addIngredientRow(
-  container: HTMLElement,
-  amount: number | null = null,
-  unit = '',
-  name = '',
-  scalable = true,
-): void {
+function addIngredientRow(container: HTMLElement, data?: Ingredient): void {
+  const { amount = null, unit = '', name = '' } = data ?? {}
   const row = document.createElement('div')
   row.className = 'admin-ingredient-row'
 
@@ -147,12 +142,6 @@ function addIngredientRow(
     <input type="text" placeholder="Ingredient" value="${escapeHtml(name)}" class="ingredient-name-input">
     <button type="button" class="admin-row-remove" title="Verwijderen">×</button>
   `
-
-  const select = row.querySelector('.ingredient-unit-select') as HTMLSelectElement
-  select.addEventListener('change', () => {
-    row.dataset.scalable = String(!NON_SCALABLE_UNITS.has(select.value))
-  })
-  row.dataset.scalable = String(scalable)
 
   row.querySelector('.admin-row-remove')?.addEventListener('click', () => row.remove())
   container.appendChild(row)
@@ -207,7 +196,7 @@ function populateRecipeForm(recipe: Recipe): void {
   const ingredientsList = document.getElementById('recipe-ingredients-list')
   if (ingredientsList) {
     ingredientsList.innerHTML = ''
-    recipe.ingredients.forEach(ing => addIngredientRow(ingredientsList, ing.amount, ing.unit, ing.name, ing.scalable))
+    recipe.ingredients.forEach(ing => addIngredientRow(ingredientsList, ing))
   }
 
   // Fill steps
@@ -252,8 +241,7 @@ async function handleRecipeSubmit(): Promise<void> {
     const name = (row.querySelector('.ingredient-name-input') as HTMLInputElement)?.value.trim()
     if (name) {
       const amount = amountStr ? Number(amountStr) : null
-      const scalable = row instanceof HTMLElement ? row.dataset.scalable !== 'false' : true
-      ingredients.push({ amount, unit, name, scalable })
+      ingredients.push({ amount, unit, name })
     }
   })
 

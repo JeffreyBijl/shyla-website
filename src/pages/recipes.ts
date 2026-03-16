@@ -1,5 +1,6 @@
 import recipesData from '../data/recipes.json'
 import type { Recipe, RecipeCategory } from '../data/types.js'
+import { RECIPE_CATEGORY_EMOJIS } from '../data/types.js'
 import { escapeHtml } from '../utils.js'
 
 const recipes: Recipe[] = recipesData as Recipe[]
@@ -44,7 +45,7 @@ export function renderRecipes(): string {
 
   const filterHTML = categories.map(cat => `
     <button class="filter-btn ${cat === 'alle' ? 'filter-btn--active' : ''}" data-filter="${cat}">
-      ${cat === 'ontbijt' ? '☀️' : cat === 'lunch' ? '🥗' : cat === 'diner' ? '🍽️' : cat === 'snack' ? '🍎' : cat === 'dessert' ? '🍰' : '✨'}
+      ${RECIPE_CATEGORY_EMOJIS[cat]}
       ${cat.charAt(0).toUpperCase() + cat.slice(1)}
     </button>
   `).join('')

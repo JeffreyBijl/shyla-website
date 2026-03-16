@@ -1,5 +1,6 @@
 import recipesData from '../data/recipes.json'
 import type { Recipe } from '../data/types.js'
+import { UNIT_PLURALS } from '../data/types.js'
 import { escapeHtml } from '../utils.js'
 
 const recipes: Recipe[] = recipesData as Recipe[]
@@ -11,17 +12,6 @@ function formatAmount(amount: number): string {
   if (Number.isInteger(amount)) return String(amount)
   const rounded = Math.round(amount * 10) / 10
   return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1).replace('.', ',')
-}
-
-const UNIT_PLURALS: Record<string, string> = {
-  snufje: 'snufjes',
-  handje: 'handjes',
-  scheutje: 'scheutjes',
-  takje: 'takjes',
-  teen: 'tenen',
-  plak: 'plakken',
-  snee: 'sneetjes',
-  'stuk(s)': 'stuk(s)',
 }
 
 function pluralizeUnit(unit: string, amount: number | null): string {

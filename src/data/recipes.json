@@ -13,80 +13,67 @@
       {
         "amount": 75,
         "unit": "g",
-        "name": "sla",
-        "scalable": true
+        "name": "sla"
       },
       {
         "amount": 1,
         "unit": "stuk(s)",
-        "name": "rode ui",
-        "scalable": true
+        "name": "rode ui"
       },
       {
         "amount": 150,
         "unit": "g",
-        "name": "cherrytomaatjes",
-        "scalable": true
+        "name": "cherrytomaatjes"
       },
       {
         "amount": 0.5,
         "unit": "stuk(s)",
-        "name": "komkommer",
-        "scalable": true
+        "name": "komkommer"
       },
       {
         "amount": 1,
         "unit": "handje",
-        "name": "cashewnoten",
-        "scalable": false
+        "name": "cashewnoten"
       },
       {
         "amount": 100,
         "unit": "g",
-        "name": "wortel",
-        "scalable": true
+        "name": "wortel"
       },
       {
         "amount": 180,
         "unit": "g",
-        "name": "stukjes kip",
-        "scalable": true
+        "name": "stukjes kip"
       },
       {
         "amount": 0.5,
         "unit": "el",
-        "name": "tomatenpuree",
-        "scalable": true
+        "name": "tomatenpuree"
       },
       {
         "amount": 1,
         "unit": "snufje",
-        "name": "paprikapoeder",
-        "scalable": false
+        "name": "paprikapoeder"
       },
       {
         "amount": 1,
         "unit": "teen",
-        "name": "knoflook",
-        "scalable": false
+        "name": "knoflook"
       },
       {
         "amount": 1,
         "unit": "el",
-        "name": "sojasaus",
-        "scalable": true
+        "name": "sojasaus"
       },
       {
         "amount": 2,
         "unit": "el",
-        "name": "olie",
-        "scalable": true
+        "name": "olie"
       },
       {
         "amount": 1,
         "unit": "snufje",
-        "name": "chilipeper (optioneel)",
-        "scalable": false
+        "name": "chilipeper (optioneel)"
       }
     ],
     "steps": [
@@ -116,74 +103,62 @@
       {
         "amount": 6,
         "unit": "stuk(s)",
-        "name": "volkoren lasagnebladen",
-        "scalable": true
+        "name": "volkoren lasagnebladen"
       },
       {
         "amount": 200,
         "unit": "g",
-        "name": "hüttenkäse",
-        "scalable": true
+        "name": "hüttenkäse"
       },
       {
         "amount": 400,
         "unit": "ml",
-        "name": "tomatenblokjes (Heinz)",
-        "scalable": true
+        "name": "tomatenblokjes (Heinz)"
       },
       {
         "amount": 1,
         "unit": "tl",
-        "name": "Italiaanse kruiden",
-        "scalable": true
+        "name": "Italiaanse kruiden"
       },
       {
         "amount": null,
         "unit": "snufje",
-        "name": "peper en zout",
-        "scalable": false
+        "name": "peper en zout"
       },
       {
         "amount": 125,
         "unit": "g",
-        "name": "champignons",
-        "scalable": true
+        "name": "champignons"
       },
       {
         "amount": 200,
         "unit": "g",
-        "name": "spinazie",
-        "scalable": true
+        "name": "spinazie"
       },
       {
         "amount": 0.5,
         "unit": "stuk(s)",
-        "name": "paprika",
-        "scalable": true
+        "name": "paprika"
       },
       {
         "amount": null,
         "unit": "handje",
-        "name": "verse basilicum",
-        "scalable": false
+        "name": "verse basilicum"
       },
       {
         "amount": 0.5,
         "unit": "stuk(s)",
-        "name": "ui",
-        "scalable": true
+        "name": "ui"
       },
       {
         "amount": 1,
         "unit": "teen",
-        "name": "knoflook",
-        "scalable": false
+        "name": "knoflook"
       },
       {
         "amount": 0.5,
         "unit": "handje",
-        "name": "30+ kaas (Beemster)",
-        "scalable": false
+        "name": "30+ kaas (Beemster)"
       }
     ],
     "steps": [
