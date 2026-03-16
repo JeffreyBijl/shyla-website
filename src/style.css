@@ -133,10 +133,22 @@ p { color: var(--color-gray-light); line-height: 1.75; }
   overflow: hidden;
   box-shadow: var(--shadow-sm);
   transition: transform var(--transition), box-shadow var(--transition);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 .card:hover {
   transform: translateY(-6px);
   box-shadow: var(--shadow-lg);
+}
+.recipe-body,
+.blog-body { display: flex; flex-direction: column; flex: 1; }
+.recipe-body p,
+.blog-body p {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* ── Grid ────────────────────────────────────────────── */
@@ -737,6 +749,7 @@ p { color: var(--color-gray-light); line-height: 1.75; }
   gap: 1.25rem;
   padding-top: 1rem;
   border-top: 1px solid var(--color-border);
+  margin-top: auto;
 }
 .recipe-meta-item {
   display: inline-flex;
@@ -749,7 +762,7 @@ p { color: var(--color-gray-light); line-height: 1.75; }
 
 /* ── Recipe card link ───────────────────────────────── */
 .recipe-card-link {
-  display: block;
+  display: flex;
   text-decoration: none;
   color: inherit;
   border-radius: var(--radius-md);
@@ -1015,13 +1028,14 @@ p { color: var(--color-gray-light); line-height: 1.75; }
   line-height: 1.45;
   color: var(--color-gray);
 }
-.blog-body p { font-size: 0.875rem; margin-bottom: 1.25rem; line-height: 1.7; }
+.blog-body p { font-size: 0.875rem; margin-bottom: 1.25rem; }
 .blog-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding-top: 1rem;
   border-top: 1px solid var(--color-border);
+  margin-top: auto;
 }
 .blog-date {
   display: inline-flex;
