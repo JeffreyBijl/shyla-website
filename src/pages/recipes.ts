@@ -30,7 +30,7 @@ function recipeCard(recipe: Recipe): string {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
               </svg>
-              ${escapeHtml(recipe.calories)}
+              ${recipe.nutrition.kcal} kcal
             </span>
           </div>
         </div>
@@ -40,11 +40,11 @@ function recipeCard(recipe: Recipe): string {
 }
 
 export function renderRecipes(): string {
-  const categories: Array<'alle' | RecipeCategory> = ['alle', 'ontbijt', 'lunch', 'diner', 'snack']
+  const categories: Array<'alle' | RecipeCategory> = ['alle', 'ontbijt', 'lunch', 'diner', 'snack', 'dessert']
 
   const filterHTML = categories.map(cat => `
     <button class="filter-btn ${cat === 'alle' ? 'filter-btn--active' : ''}" data-filter="${cat}">
-      ${cat === 'ontbijt' ? '☀️' : cat === 'lunch' ? '🥗' : cat === 'diner' ? '🍽️' : cat === 'snack' ? '🍎' : '✨'}
+      ${cat === 'ontbijt' ? '☀️' : cat === 'lunch' ? '🥗' : cat === 'diner' ? '🍽️' : cat === 'snack' ? '🍎' : cat === 'dessert' ? '🍰' : '✨'}
       ${cat.charAt(0).toUpperCase() + cat.slice(1)}
     </button>
   `).join('')
