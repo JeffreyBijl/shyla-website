@@ -13,6 +13,22 @@ function formatAmount(amount: number): string {
   return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1).replace('.', ',')
 }
 
+const UNIT_PLURALS: Record<string, string> = {
+  snufje: 'snufjes',
+  handje: 'handjes',
+  scheutje: 'scheutjes',
+  takje: 'takjes',
+  teen: 'tenen',
+  plak: 'plakken',
+  snee: 'sneetjes',
+  'stuk(s)': 'stuk(s)',
+}
+
+function pluralizeUnit(unit: string, amount: number | null): string {
+  if (!unit || amount === null || amount <= 1) return unit
+  return UNIT_PLURALS[unit] ?? unit
+}
+
 export function renderRecipeDetail(slug: string): string {
   const recipe = recipes.find(r => r.slug === slug)
 
@@ -48,8 +64,9 @@ export function renderRecipeDetail(slug: string): string {
       <ul>
         ${recipe.ingredients.map(ing => {
           const amountStr = ing.amount !== null ? formatAmount(ing.amount) : ''
-          const unitStr = ing.unit ? ` ${ing.unit}` : ''
-          return `<li data-original-amount="${ing.amount ?? ''}" data-scalable="${ing.scalable}" data-unit="${escapeHtml(ing.unit)}">
+          const unit = pluralizeUnit(ing.unit, ing.amount)
+          const unitStr = unit ? ` ${unit}` : ''
+          return `<li data-original-amount="${ing.amount ?? ''}" data-unit="${escapeHtml(ing.unit)}">
             <span class="ingredient-amount">${amountStr}${unitStr}</span> ${escapeHtml(ing.name)}
           </li>`
         }).join('')}
@@ -145,18 +162,16 @@ export function setupRecipeDetail(): void {
 
     document.querySelectorAll('.recipe-detail-ingredients li').forEach(li => {
       const el = li as HTMLElement
-      const scalable = el.dataset.scalable === 'true'
       const originalAmount = el.dataset.originalAmount
       const unit = el.dataset.unit || ''
       const amountSpan = el.querySelector('.ingredient-amount')
 
       if (!amountSpan || !originalAmount) return
 
-      if (scalable) {
-        const scaled = (Number(originalAmount) / originalServings) * newServings
-        const unitStr = unit ? ` ${unit}` : ''
-        amountSpan.textContent = `${formatAmount(scaled)}${unitStr}`
-      }
+      const scaled = (Number(originalAmount) / originalServings) * newServings
+      const plural = pluralizeUnit(unit, scaled)
+      const unitStr = plural ? ` ${plural}` : ''
+      amountSpan.textContent = `${formatAmount(scaled)}${unitStr}`
     })
   }
 
