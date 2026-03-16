@@ -1,4 +1,5 @@
-import type { Recipe, RecipeCategory } from '../data/types.js'
+import type { Recipe, RecipeCategory, Ingredient } from '../data/types.js'
+import { RECIPE_UNITS, NON_SCALABLE_UNITS } from '../data/types.js'
 import {
   readModifyWrite, uploadImage, CONFIG,
 } from './github.js'
@@ -36,6 +37,7 @@ export function renderRecipeForm(): string {
           <option value="lunch">Lunch</option>
           <option value="diner">Diner</option>
           <option value="snack">Snack</option>
+          <option value="dessert">Dessert</option>
         </select>
       </div>
       <div class="form-group">
@@ -43,16 +45,12 @@ export function renderRecipeForm(): string {
         <input type="text" id="recipe-time" placeholder="bijv. 10 min">
       </div>
       <div class="form-group">
-        <label for="recipe-calories">Calorieën</label>
-        <input type="text" id="recipe-calories" placeholder="bijv. 320 kcal">
-      </div>
-      <div class="form-group">
         <label for="recipe-description">Beschrijving</label>
         <textarea id="recipe-description" placeholder="Korte beschrijving (1-2 zinnen)"></textarea>
       </div>
       <div class="form-group">
-        <label for="recipe-servings">Porties</label>
-        <input type="text" id="recipe-servings" placeholder="bijv. 4 personen">
+        <label for="recipe-servings">Porties (personen)</label>
+        <input type="number" min="1" id="recipe-servings" placeholder="bijv. 4">
       </div>
       <div class="form-group">
         <label>Ingrediënten</label>
@@ -126,14 +124,36 @@ export function renderRecipeItems(): void {
 
 // --- Dynamic row helpers ---
 
-function addIngredientRow(container: HTMLElement, amount = '', name = ''): void {
+function addIngredientRow(
+  container: HTMLElement,
+  amount: number | null = null,
+  unit = '',
+  name = '',
+  scalable = true,
+): void {
   const row = document.createElement('div')
   row.className = 'admin-ingredient-row'
+
+  const unitOptions = RECIPE_UNITS.map(u =>
+    `<option value="${u}" ${u === unit ? 'selected' : ''}>${u}</option>`
+  ).join('')
+
   row.innerHTML = `
-    <input type="text" placeholder="Hoeveelheid" value="${escapeHtml(amount)}" class="ingredient-amount-input">
+    <input type="number" step="any" placeholder="Aantal" value="${amount !== null ? amount : ''}" class="ingredient-amount-input">
+    <select class="ingredient-unit-select">
+      <option value="">—</option>
+      ${unitOptions}
+    </select>
     <input type="text" placeholder="Ingredient" value="${escapeHtml(name)}" class="ingredient-name-input">
     <button type="button" class="admin-row-remove" title="Verwijderen">×</button>
   `
+
+  const select = row.querySelector('.ingredient-unit-select') as HTMLSelectElement
+  select.addEventListener('change', () => {
+    row.dataset.scalable = String(!NON_SCALABLE_UNITS.has(select.value))
+  })
+  row.dataset.scalable = String(scalable)
+
   row.querySelector('.admin-row-remove')?.addEventListener('click', () => row.remove())
   container.appendChild(row)
 }
@@ -170,9 +190,8 @@ function populateRecipeForm(recipe: Recipe): void {
   ;(document.getElementById('recipe-title') as HTMLInputElement).value = recipe.title
   ;(document.getElementById('recipe-category') as HTMLSelectElement).value = recipe.category
   ;(document.getElementById('recipe-time') as HTMLInputElement).value = recipe.time
-  ;(document.getElementById('recipe-calories') as HTMLInputElement).value = recipe.calories
   ;(document.getElementById('recipe-description') as HTMLTextAreaElement).value = recipe.description
-  ;(document.getElementById('recipe-servings') as HTMLInputElement).value = recipe.servings
+  ;(document.getElementById('recipe-servings') as HTMLInputElement).value = String(recipe.servings)
 
   // Show existing image preview
   if (recipe.image) {
@@ -188,7 +207,7 @@ function populateRecipeForm(recipe: Recipe): void {
   const ingredientsList = document.getElementById('recipe-ingredients-list')
   if (ingredientsList) {
     ingredientsList.innerHTML = ''
-    recipe.ingredients.forEach(ing => addIngredientRow(ingredientsList, ing.amount, ing.name))
+    recipe.ingredients.forEach(ing => addIngredientRow(ingredientsList, ing.amount, ing.unit, ing.name, ing.scalable))
   }
 
   // Fill steps
@@ -220,18 +239,22 @@ async function handleRecipeSubmit(): Promise<void> {
   const title = (document.getElementById('recipe-title') as HTMLInputElement)?.value.trim()
   const category = (document.getElementById('recipe-category') as HTMLSelectElement)?.value as RecipeCategory
   const time = (document.getElementById('recipe-time') as HTMLInputElement)?.value.trim()
-  const calories = (document.getElementById('recipe-calories') as HTMLInputElement)?.value.trim()
   const description = (document.getElementById('recipe-description') as HTMLTextAreaElement)?.value.trim()
   const imageInput = document.getElementById('recipe-image') as HTMLInputElement
   const file = imageInput?.files?.[0]
-  const servings = (document.getElementById('recipe-servings') as HTMLInputElement)?.value.trim()
+  const servings = Number((document.getElementById('recipe-servings') as HTMLInputElement)?.value) || 1
 
   const ingredientRows = document.querySelectorAll('.admin-ingredient-row')
-  const ingredients: Array<{ amount: string; name: string }> = []
+  const ingredients: Ingredient[] = []
   ingredientRows.forEach(row => {
-    const amount = (row.querySelector('.ingredient-amount-input') as HTMLInputElement)?.value.trim()
+    const amountStr = (row.querySelector('.ingredient-amount-input') as HTMLInputElement)?.value.trim()
+    const unit = (row.querySelector('.ingredient-unit-select') as HTMLSelectElement)?.value
     const name = (row.querySelector('.ingredient-name-input') as HTMLInputElement)?.value.trim()
-    if (amount || name) ingredients.push({ amount, name })
+    if (name) {
+      const amount = amountStr ? Number(amountStr) : null
+      const scalable = row instanceof HTMLElement ? row.dataset.scalable !== 'false' : true
+      ingredients.push({ amount, unit, name, scalable })
+    }
   })
 
   const stepRows = document.querySelectorAll('.admin-step-row textarea')
@@ -278,7 +301,6 @@ async function handleRecipeSubmit(): Promise<void> {
         slug: slugify(title),
         category,
         time,
-        calories,
         description,
         servings,
         ingredients,
@@ -296,7 +318,6 @@ async function handleRecipeSubmit(): Promise<void> {
       image: '',
       emoji: '',
       time,
-      calories,
       description,
       servings,
       ingredients,
@@ -336,7 +357,6 @@ async function handleRecipeSubmit(): Promise<void> {
               category,
               image: imagePath ?? existing.image,
               time,
-              calories,
               description,
               servings,
               ingredients,
@@ -353,7 +373,6 @@ async function handleRecipeSubmit(): Promise<void> {
               image: imagePath!,
               emoji: '',
               time,
-              calories,
               description,
               servings,
               ingredients,
@@ -376,7 +395,6 @@ async function handleRecipeSubmit(): Promise<void> {
 export function clearRecipeForm(): void {
   ;(document.getElementById('recipe-title') as HTMLInputElement).value = ''
   ;(document.getElementById('recipe-time') as HTMLInputElement).value = ''
-  ;(document.getElementById('recipe-calories') as HTMLInputElement).value = ''
   ;(document.getElementById('recipe-description') as HTMLTextAreaElement).value = ''
   ;(document.getElementById('recipe-image') as HTMLInputElement).value = ''
   document.getElementById('recipe-preview')?.classList.remove('has-image')
