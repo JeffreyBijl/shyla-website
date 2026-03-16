@@ -173,5 +173,32 @@
       "carbs": 100,
       "fat": 25
     }
+  },
+  {
+    "id": 10,
+    "title": "lekkert",
+    "slug": "lekkert",
+    "category": "diner",
+    "image": "images/recipes/lekkert-1773695066906.jpg",
+    "emoji": "",
+    "time": "10",
+    "description": "bla bla",
+    "servings": 1,
+    "ingredients": [
+      {
+        "amount": null,
+        "unit": "stuk(s)",
+        "name": "tomaat"
+      }
+    ],
+    "steps": [
+      "doe het in de pan"
+    ],
+    "nutrition": {
+      "kcal": 10,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0
+    }
   }
 ]
