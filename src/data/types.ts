@@ -1,7 +1,33 @@
-export type RecipeCategory = 'ontbijt' | 'lunch' | 'diner' | 'snack'
+export type RecipeCategory = 'ontbijt' | 'lunch' | 'diner' | 'snack' | 'dessert'
+
+export const RECIPE_CATEGORY_EMOJIS: Record<RecipeCategory | 'alle', string> = {
+  alle: '✨',
+  ontbijt: '☀️',
+  lunch: '🥗',
+  diner: '🍽️',
+  snack: '🍎',
+  dessert: '🍰',
+}
+
+export const RECIPE_UNITS = [
+  'g', 'kg', 'ml', 'dl', 'l', 'el', 'tl', 'stuk(s)',
+  'snufje', 'handje', 'scheutje', 'takje', 'teen', 'plak', 'snee',
+] as const
+
+export const UNIT_PLURALS: Readonly<Record<string, string>> = {
+  snufje: 'snufjes',
+  handje: 'handjes',
+  scheutje: 'scheutjes',
+  takje: 'takjes',
+  teen: 'tenen',
+  plak: 'plakken',
+  snee: 'sneetjes',
+  'stuk(s)': 'stuk(s)',
+}
 
 export interface Ingredient {
-  amount: string
+  amount: number | null
+  unit: string
   name: string
 }
 
@@ -20,9 +46,8 @@ export interface Recipe {
   image: string | null
   emoji: string
   time: string
-  calories: string
   description: string
-  servings: string
+  servings: number
   ingredients: Ingredient[]
   steps: string[]
   nutrition: Nutrition

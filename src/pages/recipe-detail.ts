@@ -1,8 +1,23 @@
 import recipesData from '../data/recipes.json'
 import type { Recipe } from '../data/types.js'
+import { UNIT_PLURALS } from '../data/types.js'
 import { escapeHtml } from '../utils.js'
 
 const recipes: Recipe[] = recipesData as Recipe[]
+
+function formatAmount(amount: number): string {
+  if (amount === 0.25) return '¼'
+  if (amount === 0.5) return '½'
+  if (amount === 0.75) return '¾'
+  if (Number.isInteger(amount)) return String(amount)
+  const rounded = Math.round(amount * 10) / 10
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1).replace('.', ',')
+}
+
+function pluralizeUnit(unit: string, amount: number | null): string {
+  if (!unit || amount === null || amount <= 1) return unit
+  return UNIT_PLURALS[unit] ?? unit
+}
 
 export function renderRecipeDetail(slug: string): string {
   const recipe = recipes.find(r => r.slug === slug)
@@ -29,14 +44,24 @@ export function renderRecipeDetail(slug: string): string {
 
   const ingredientsHTML = recipe.ingredients.length > 0
     ? `<div class="recipe-detail-ingredients">
-        <h2>Ingrediënten</h2>
-        ${recipe.servings ? `<p class="recipe-detail-servings">${escapeHtml(recipe.servings)}</p>` : ''}
-        <ul>
-          ${recipe.ingredients.map(ing =>
-            `<li><span class="ingredient-amount">${escapeHtml(ing.amount)}</span> ${escapeHtml(ing.name)}</li>`
-          ).join('')}
-        </ul>
-      </div>`
+      <h2>Ingrediënten</h2>
+      <div class="servings-switcher">
+        <button class="servings-btn servings-decrease" aria-label="Minder personen">−</button>
+        <span class="servings-count" data-original="${recipe.servings}">${recipe.servings}</span>
+        <span class="servings-label">personen</span>
+        <button class="servings-btn servings-increase" aria-label="Meer personen">+</button>
+      </div>
+      <ul>
+        ${recipe.ingredients.map(ing => {
+          const amountStr = ing.amount !== null ? formatAmount(ing.amount) : ''
+          const unit = pluralizeUnit(ing.unit, ing.amount)
+          const unitStr = unit ? ` ${unit}` : ''
+          return `<li data-original-amount="${ing.amount ?? ''}" data-unit="${escapeHtml(ing.unit)}">
+            <span class="ingredient-amount">${amountStr}${unitStr}</span> ${escapeHtml(ing.name)}
+          </li>`
+        }).join('')}
+      </ul>
+    </div>`
     : ''
 
   const stepsHTML = recipe.steps.length > 0
@@ -90,18 +115,12 @@ export function renderRecipeDetail(slug: string): string {
               </svg>
               ${escapeHtml(recipe.time)}
             </span>
-            <span class="recipe-meta-item">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-              </svg>
-              ${escapeHtml(recipe.calories)}
-            </span>
             ${recipe.servings ? `
               <span class="recipe-meta-item">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                   <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
                 </svg>
-                ${escapeHtml(recipe.servings)}
+                ${recipe.servings} personen
               </span>
             ` : ''}
           </div>
@@ -120,5 +139,39 @@ export function renderRecipeDetail(slug: string): string {
 }
 
 export function setupRecipeDetail(): void {
-  // No interactive elements needed for now
+  const decreaseBtn = document.querySelector('.servings-decrease')
+  const increaseBtn = document.querySelector('.servings-increase')
+  const countEl = document.querySelector('.servings-count')
+
+  if (!decreaseBtn || !increaseBtn || !countEl) return
+
+  const originalServings = Number(countEl.getAttribute('data-original'))
+
+  function updateIngredients(newServings: number): void {
+    countEl!.textContent = String(newServings)
+
+    document.querySelectorAll('.recipe-detail-ingredients li').forEach(li => {
+      const el = li as HTMLElement
+      const originalAmount = el.dataset.originalAmount
+      const unit = el.dataset.unit || ''
+      const amountSpan = el.querySelector('.ingredient-amount')
+
+      if (!amountSpan || !originalAmount) return
+
+      const scaled = (Number(originalAmount) / originalServings) * newServings
+      const plural = pluralizeUnit(unit, scaled)
+      const unitStr = plural ? ` ${plural}` : ''
+      amountSpan.textContent = `${formatAmount(scaled)}${unitStr}`
+    })
+  }
+
+  decreaseBtn.addEventListener('click', () => {
+    const current = Number(countEl.textContent)
+    if (current > 1) updateIngredients(current - 1)
+  })
+
+  increaseBtn.addEventListener('click', () => {
+    const current = Number(countEl.textContent)
+    if (current < 20) updateIngredients(current + 1)
+  })
 }
