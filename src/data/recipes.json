@@ -173,5 +173,24 @@
       "carbs": 100,
       "fat": 25
     }
+  },
+  {
+    "id": 10,
+    "title": "test",
+    "slug": "test",
+    "category": "ontbijt",
+    "image": "images/recipes/test-1774080913962.jpg",
+    "emoji": "",
+    "time": "",
+    "description": "",
+    "servings": 1,
+    "ingredients": [],
+    "steps": [],
+    "nutrition": {
+      "kcal": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0
+    }
   }
 ]
