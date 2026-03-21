@@ -11,8 +11,7 @@ export const useAuthStore = defineStore('auth', () => {
   function initAuth() {
     isAuthenticated.value = !!getToken()
     if (isAuthenticated.value) {
-      loadAllData()
-      useQueueStore().setupToasts()
+      onAuthenticated()
     }
   }
 
@@ -21,15 +20,21 @@ export const useAuthStore = defineStore('auth', () => {
     if (valid) {
       saveToken(token)
       isAuthenticated.value = true
-      loadAllData()
-      useQueueStore().setupToasts()
+      onAuthenticated()
     }
     return valid
   }
 
-  function loadAllData() {
-    useRecipeStore().loadData()
-    useBlogStore().loadData()
+  function onAuthenticated() {
+    loadAllData()
+    useQueueStore().setupToasts()
+  }
+
+  async function loadAllData() {
+    await Promise.all([
+      useRecipeStore().loadData(),
+      useBlogStore().loadData(),
+    ])
   }
 
   return { isAuthenticated, initAuth, login, loadAllData }

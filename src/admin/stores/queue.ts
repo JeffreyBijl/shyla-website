@@ -8,8 +8,17 @@ import { useBlogStore } from './blog'
 export const useQueueStore = defineStore('queue', () => {
   const operationQueue = new OperationQueue()
   let stopCurrentPolling: (() => void) | null = null
+  let toastsInitialized = false
+
+  function reloadAll() {
+    useRecipeStore().loadData()
+    useBlogStore().loadData()
+  }
 
   function setupToasts() {
+    if (toastsInitialized) return
+    toastsInitialized = true
+
     let errorHandled = false
 
     operationQueue.setStatusCallback((status) => {
@@ -18,16 +27,11 @@ export const useQueueStore = defineStore('queue', () => {
       if (status.error) {
         toastError(`Fout: ${status.error}`, 'queue', [
           { label: 'Opnieuw', onClick: () => operationQueue.retry() },
-          { label: 'Annuleren', onClick: () => {
-            operationQueue.clear()
-            useRecipeStore().loadData()
-            useBlogStore().loadData()
-          }},
+          { label: 'Annuleren', onClick: () => { operationQueue.clear(); reloadAll() } },
         ])
         if (!errorHandled) {
           errorHandled = true
-          useRecipeStore().loadData()
-          useBlogStore().loadData()
+          reloadAll()
         }
       } else if (status.completed === status.total && status.total > 0) {
         toastSuccess('Alle acties verwerkt!', 'queue')
