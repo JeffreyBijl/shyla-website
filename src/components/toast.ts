@@ -153,8 +153,8 @@ export function toastSuccess(message: string, id?: string, duration = 4000): Toa
   return toast({ message, type: 'success', id, duration })
 }
 
-export function toastError(message: string, id?: string, actions?: ToastOptions['actions']): ToastHandle {
-  return toast({ message, type: 'error', id, actions })
+export function toastError(message: string, id?: string, actions?: ToastOptions['actions'], duration = 0): ToastHandle {
+  return toast({ message, type: 'error', id, actions, duration })
 }
 
 export function toastProgress(message: string, id?: string): ToastHandle {

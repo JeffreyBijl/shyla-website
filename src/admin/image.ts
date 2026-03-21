@@ -7,19 +7,14 @@ export interface CompressedImage {
 
 const MAX_DIMENSION = 1200
 const MIN_WIDTH = 400
-const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 MB
 const JPEG_QUALITY = 0.80
 
 export async function compressImage(file: File): Promise<CompressedImage> {
-  if (file.size > MAX_FILE_SIZE) {
-    throw new Error('Bestand is te groot (maximaal 10 MB)')
-  }
-
   const bitmap = await loadImage(file)
   let { width, height } = bitmap
 
   if (width < MIN_WIDTH) {
-    throw new Error('Afbeelding is te klein (minimaal 400px breed)')
+    throw new Error(`Afbeelding heeft een ongeldig formaat. Breedte moet tussen ${MIN_WIDTH}px en ${MAX_DIMENSION}px zijn.`)
   }
 
   if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
@@ -94,7 +89,7 @@ export async function compressWithToast(file: File): Promise<{ base64: string }>
   } catch (err) {
     toast.dismiss()
     const msg = err instanceof Error ? err.message : 'Foto verkleinen mislukt'
-    toastError(msg)
+    toastError(msg, undefined, undefined, 6000)
     throw err
   }
 }
