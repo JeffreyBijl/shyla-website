@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { setActivePinia, createPinia } from 'pinia'
 import RecipeForm from '../components/RecipeForm.vue'
-import { useAdminStore } from '../stores/admin'
+import { useRecipeStore } from '../stores/recipe'
 
 vi.mock('../github', () => ({
   getToken: vi.fn(() => 'ghp_test'),
@@ -43,7 +43,7 @@ describe('RecipeForm', () => {
   })
 
   it('shows Bijwerken button when editing', async () => {
-    const store = useAdminStore()
+    const store = useRecipeStore()
     store.recipes = [{
       id: 1, title: 'Test', slug: 'test', category: 'ontbijt',
       image: null, emoji: '', time: '10 min', description: 'Desc',
@@ -59,7 +59,7 @@ describe('RecipeForm', () => {
   })
 
   it('populates form fields when editing', async () => {
-    const store = useAdminStore()
+    const store = useRecipeStore()
     store.recipes = [{
       id: 1, title: 'Overnight Oats', slug: 'overnight-oats', category: 'ontbijt',
       image: null, emoji: '', time: '10 min', description: 'Lekker ontbijt',
@@ -77,7 +77,7 @@ describe('RecipeForm', () => {
   })
 
   it('clears form on cancel', async () => {
-    const store = useAdminStore()
+    const store = useRecipeStore()
     store.recipes = [{
       id: 1, title: 'Test', slug: 'test', category: 'ontbijt',
       image: null, emoji: '', time: '10 min', description: 'Desc',

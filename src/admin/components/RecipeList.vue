@@ -1,29 +1,33 @@
 <script setup lang="ts">
-import { useAdminStore } from '../stores/admin'
+import { useRecipeStore } from '../stores/recipe'
+import { useQueueStore } from '../stores/queue'
+import { useUIStore } from '../stores/ui'
 import { readModifyWrite, deleteFile, CONFIG } from '../github'
 import type { Recipe } from '../../data/types'
 
-const store = useAdminStore()
+const recipeStore = useRecipeStore()
+const queueStore = useQueueStore()
+const ui = useUIStore()
 const baseUrl = import.meta.env.BASE_URL
 
 function editRecipe(id: number) {
-  store.editingRecipeId = id
+  recipeStore.editingRecipeId = id
   document.querySelector('.admin-form')?.scrollIntoView({ behavior: 'smooth' })
 }
 
 async function deleteRecipe(id: number) {
-  const recipe = store.recipes.find(r => r.id === id)
+  const recipe = recipeStore.recipes.find(r => r.id === id)
   if (!recipe) return
 
-  const confirmed = await store.showDeleteConfirm(recipe.title)
+  const confirmed = await ui.showDeleteConfirm(recipe.title)
   if (!confirmed) return
 
-  store.recipes = store.recipes.filter(r => r.id !== id)
+  recipeStore.recipes = recipeStore.recipes.filter(r => r.id !== id)
 
-  store.operationQueue.enqueue({
+  queueStore.operationQueue.enqueue({
     label: `Verwijder: ${recipe.title}`,
     execute: async () => {
-      store.recipes = await readModifyWrite<Recipe[]>(
+      recipeStore.recipes = await readModifyWrite<Recipe[]>(
         CONFIG.RECIPES_PATH,
         data => data.filter(r => r.id !== id),
         `Verwijder recept: ${recipe.title}`,
@@ -33,7 +37,7 @@ async function deleteRecipe(id: number) {
         await deleteFile(`public/${recipe.image}`, `Verwijder afbeelding: ${recipe.title}`).catch(() => {})
       }
 
-      store.pollDeploy()
+      queueStore.pollDeploy()
     },
   })
 }
@@ -41,7 +45,7 @@ async function deleteRecipe(id: number) {
 
 <template>
   <div id="recipes-items">
-    <div v-for="r in store.recipes" :key="r.id" class="admin-item" :data-id="r.id">
+    <div v-for="r in recipeStore.recipes" :key="r.id" class="admin-item" :data-id="r.id">
       <div class="admin-item-thumbnail">
         <img
           v-if="r.image"

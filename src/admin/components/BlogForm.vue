@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, reactive, watch, computed, onMounted } from 'vue'
 import type { BlogPost, BlogCategory } from '../../data/types'
-import { useAdminStore } from '../stores/admin'
+import { useBlogStore } from '../stores/blog'
+import { useQueueStore } from '../stores/queue'
 import { readModifyWrite, uploadImage, CONFIG } from '../github'
 import { compressWithToast, slugify } from '../image'
 import { useValidation } from '../composables/useValidation'
@@ -9,7 +10,8 @@ import ImageUpload from './ImageUpload.vue'
 
 declare const Quill: any
 
-const store = useAdminStore()
+const blogStore = useBlogStore()
+const queueStore = useQueueStore()
 const imageUpload = ref<InstanceType<typeof ImageUpload>>()
 const selectedFile = ref<File | null>(null)
 const editorRef = ref<HTMLElement>()
@@ -27,10 +29,10 @@ const defaults = {
 const form = reactive({ ...defaults })
 const { validateRequired, clearError, hasError } = useValidation()
 
-const isEditing = computed(() => store.editingBlogId !== null)
+const isEditing = computed(() => blogStore.editingBlogId !== null)
 const editingPost = computed(() =>
-  store.editingBlogId !== null
-    ? store.blogPosts.find(p => p.id === store.editingBlogId) ?? null
+  blogStore.editingBlogId !== null
+    ? blogStore.blogPosts.find(p => p.id === blogStore.editingBlogId) ?? null
     : null
 )
 
@@ -76,7 +78,7 @@ onMounted(async () => {
   })
 })
 
-watch(() => store.editingBlogId, () => {
+watch(() => blogStore.editingBlogId, () => {
   const post = editingPost.value
   if (!post) return
   populateForm(post)
@@ -103,7 +105,7 @@ function clearForm() {
 }
 
 function cancelEdit() {
-  store.editingBlogId = null
+  blogStore.editingBlogId = null
   clearForm()
 }
 
@@ -122,7 +124,7 @@ async function handleSubmit() {
   const keywords = keywordsRaw ? keywordsRaw.split(',').map(k => k.trim()).filter(Boolean) : undefined
   const dateModified = new Date().toISOString().split('T')[0]
 
-  const editId = store.editingBlogId
+  const editId = blogStore.editingBlogId
   const wasEditing = isEditing.value
 
   // Compress image before enqueuing
@@ -133,10 +135,10 @@ async function handleSubmit() {
 
   // Optimistic UI update
   if (wasEditing) {
-    const index = store.blogPosts.findIndex(p => p.id === editId)
+    const index = blogStore.blogPosts.findIndex(p => p.id === editId)
     if (index !== -1) {
-      const existing = store.blogPosts[index]
-      store.blogPosts[index] = {
+      const existing = blogStore.blogPosts[index]
+      blogStore.blogPosts[index] = {
         ...existing,
         title,
         slug,
@@ -149,8 +151,8 @@ async function handleSubmit() {
       }
     }
   } else {
-    const newId = store.blogPosts.length > 0 ? Math.max(...store.blogPosts.map(p => p.id)) + 1 : 1
-    store.blogPosts.push({
+    const newId = blogStore.blogPosts.length > 0 ? Math.max(...blogStore.blogPosts.map(p => p.id)) + 1 : 1
+    blogStore.blogPosts.push({
       id: newId,
       title,
       slug,
@@ -169,7 +171,7 @@ async function handleSubmit() {
 
   const commitMsg = wasEditing ? `Blog bijgewerkt: ${title}` : `Nieuwe blogpost: ${title}`
 
-  store.operationQueue.enqueue({
+  queueStore.operationQueue.enqueue({
     label: commitMsg,
     execute: async () => {
       let imagePath: string | null = null
@@ -179,7 +181,7 @@ async function handleSubmit() {
         imagePath = await uploadImage(CONFIG.BLOG_IMAGES_DIR, filename, compressed.base64)
       }
 
-      store.blogPosts = await readModifyWrite<BlogPost[]>(
+      blogStore.blogPosts = await readModifyWrite<BlogPost[]>(
         CONFIG.BLOG_PATH,
         (data) => {
           if (wasEditing) {
@@ -218,7 +220,7 @@ async function handleSubmit() {
         },
         commitMsg,
       )
-      store.pollDeploy()
+      queueStore.pollDeploy()
     },
   })
 }

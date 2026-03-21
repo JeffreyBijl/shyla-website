@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue'
-import { useAdminStore } from '../stores/admin'
+import { useUIStore } from '../stores/ui'
 
-const store = useAdminStore()
+const ui = useUIStore()
 
 function onConfirm() {
-  store.resolveDeleteModal(true)
+  ui.resolveDeleteModal(true)
 }
 
 function onCancel() {
-  store.resolveDeleteModal(false)
+  ui.resolveDeleteModal(false)
 }
 
 function onOverlayClick(e: Event) {
@@ -19,7 +19,7 @@ function onOverlayClick(e: Event) {
 }
 
 function onKeydown(e: KeyboardEvent) {
-  if (e.key === 'Escape' && store.deleteModal.visible) {
+  if (e.key === 'Escape' && ui.deleteModal.visible) {
     onCancel()
   }
 }
@@ -30,7 +30,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 
 <template>
   <Teleport to="body">
-    <div v-if="store.deleteModal.visible" class="admin-modal-overlay visible" @click="onOverlayClick">
+    <div v-if="ui.deleteModal.visible" class="admin-modal-overlay visible" @click="onOverlayClick">
       <div class="admin-modal">
         <div class="admin-modal-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -39,7 +39,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
         </div>
         <h3 class="admin-modal-title">Verwijderen</h3>
         <p class="admin-modal-text">
-          Weet je zeker dat je "{{ store.deleteModal.title }}" wilt verwijderen? Dit kan niet ongedaan worden gemaakt.
+          Weet je zeker dat je "{{ ui.deleteModal.title }}" wilt verwijderen? Dit kan niet ongedaan worden gemaakt.
         </p>
         <div class="admin-modal-actions">
           <button class="btn btn-outline" @click="onCancel">

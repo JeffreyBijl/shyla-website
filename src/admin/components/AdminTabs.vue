@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import { useAdminStore } from '../stores/admin'
+import { useUIStore } from '../stores/ui'
 
-const store = useAdminStore()
+const ui = useUIStore()
 </script>
 
 <template>
   <div class="admin-tabs">
     <button
       class="admin-tab"
-      :class="{ 'admin-tab--active': store.activeTab === 'recipes' }"
-      @click="store.activeTab = 'recipes'"
+      :class="{ 'admin-tab--active': ui.activeTab === 'recipes' }"
+      @click="ui.activeTab = 'recipes'"
     >
       Recepten
     </button>
     <button
       class="admin-tab"
-      :class="{ 'admin-tab--active': store.activeTab === 'blog' }"
-      @click="store.activeTab = 'blog'"
+      :class="{ 'admin-tab--active': ui.activeTab === 'blog' }"
+      @click="ui.activeTab = 'blog'"
     >
       Blog
     </button>

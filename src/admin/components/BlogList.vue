@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { useAdminStore } from '../stores/admin'
+import { useBlogStore } from '../stores/blog'
+import { useQueueStore } from '../stores/queue'
+import { useUIStore } from '../stores/ui'
 import { readModifyWrite, deleteFile, CONFIG } from '../github'
 import type { BlogPost, BlogCategory } from '../../data/types'
 import { BLOG_CATEGORY_EMOJIS } from '../../data/types'
 
-const store = useAdminStore()
+const blogStore = useBlogStore()
+const queueStore = useQueueStore()
+const ui = useUIStore()
 const baseUrl = import.meta.env.BASE_URL
 
 function categoryEmoji(category: string): string {
@@ -12,23 +16,23 @@ function categoryEmoji(category: string): string {
 }
 
 function editPost(id: number) {
-  store.editingBlogId = id
+  blogStore.editingBlogId = id
   document.querySelector('#tab-blog .admin-form')?.scrollIntoView({ behavior: 'smooth' })
 }
 
 async function deletePost(id: number) {
-  const post = store.blogPosts.find(p => p.id === id)
+  const post = blogStore.blogPosts.find(p => p.id === id)
   if (!post) return
 
-  const confirmed = await store.showDeleteConfirm(post.title)
+  const confirmed = await ui.showDeleteConfirm(post.title)
   if (!confirmed) return
 
-  store.blogPosts = store.blogPosts.filter(p => p.id !== id)
+  blogStore.blogPosts = blogStore.blogPosts.filter(p => p.id !== id)
 
-  store.operationQueue.enqueue({
+  queueStore.operationQueue.enqueue({
     label: `Verwijder: ${post.title}`,
     execute: async () => {
-      store.blogPosts = await readModifyWrite<BlogPost[]>(
+      blogStore.blogPosts = await readModifyWrite<BlogPost[]>(
         CONFIG.BLOG_PATH,
         data => data.filter(p => p.id !== id),
         `Verwijder blogpost: ${post.title}`,
@@ -38,7 +42,7 @@ async function deletePost(id: number) {
         await deleteFile(`public/${post.image}`, `Verwijder afbeelding: ${post.title}`).catch(() => {})
       }
 
-      store.pollDeploy()
+      queueStore.pollDeploy()
     },
   })
 }
@@ -46,7 +50,7 @@ async function deletePost(id: number) {
 
 <template>
   <div id="blog-items">
-    <div v-for="p in store.blogPosts" :key="p.id" class="admin-item" :data-id="p.id">
+    <div v-for="p in blogStore.blogPosts" :key="p.id" class="admin-item" :data-id="p.id">
       <div class="admin-item-thumbnail">
         <img
           v-if="p.image"

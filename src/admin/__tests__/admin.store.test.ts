@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import { useAdminStore } from '../stores/admin'
+import { useAuthStore } from '../stores/auth'
+import { useRecipeStore } from '../stores/recipe'
+import { useBlogStore } from '../stores/blog'
+import { useUIStore } from '../stores/ui'
 
 vi.mock('../github', () => ({
   getToken: vi.fn(() => null),
@@ -25,7 +28,7 @@ vi.mock('../../components/toast', () => ({
 import { getToken, saveToken, validateToken, readFile } from '../github'
 import { toastError } from '../../components/toast'
 
-describe('useAdminStore', () => {
+describe('auth store', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     vi.clearAllMocks()
@@ -34,19 +37,19 @@ describe('useAdminStore', () => {
   describe('initAuth', () => {
     it('sets isAuthenticated=false when no token', () => {
       vi.mocked(getToken).mockReturnValue(null)
-      const store = useAdminStore()
-      store.initAuth()
-      expect(store.isAuthenticated).toBe(false)
+      const auth = useAuthStore()
+      auth.initAuth()
+      expect(auth.isAuthenticated).toBe(false)
     })
 
     it('sets isAuthenticated=true and loads data when token exists', async () => {
       vi.mocked(getToken).mockReturnValue('ghp_test123')
       vi.mocked(readFile).mockResolvedValue({ content: [], sha: 'abc' })
 
-      const store = useAdminStore()
-      store.initAuth()
+      const auth = useAuthStore()
+      auth.initAuth()
 
-      expect(store.isAuthenticated).toBe(true)
+      expect(auth.isAuthenticated).toBe(true)
       expect(readFile).toHaveBeenCalledTimes(2)
     })
   })
@@ -54,10 +57,10 @@ describe('useAdminStore', () => {
   describe('login', () => {
     it('returns false for invalid token', async () => {
       vi.mocked(validateToken).mockResolvedValue(false)
-      const store = useAdminStore()
-      const result = await store.login('bad-token')
+      const auth = useAuthStore()
+      const result = await auth.login('bad-token')
       expect(result).toBe(false)
-      expect(store.isAuthenticated).toBe(false)
+      expect(auth.isAuthenticated).toBe(false)
       expect(saveToken).not.toHaveBeenCalled()
     })
 
@@ -65,61 +68,84 @@ describe('useAdminStore', () => {
       vi.mocked(validateToken).mockResolvedValue(true)
       vi.mocked(readFile).mockResolvedValue({ content: [], sha: 'abc' })
 
-      const store = useAdminStore()
-      const result = await store.login('ghp_valid')
+      const auth = useAuthStore()
+      const result = await auth.login('ghp_valid')
 
       expect(result).toBe(true)
-      expect(store.isAuthenticated).toBe(true)
+      expect(auth.isAuthenticated).toBe(true)
       expect(saveToken).toHaveBeenCalledWith('ghp_valid')
     })
   })
+})
 
-  describe('loadData', () => {
-    it('populates recipes and blogPosts', async () => {
-      const mockRecipes = [{ id: 1, title: 'Test Recept' }]
-      const mockBlogs = [{ id: 1, title: 'Test Blog' }]
+describe('recipe store', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    vi.clearAllMocks()
+  })
 
-      vi.mocked(readFile)
-        .mockResolvedValueOnce({ content: mockRecipes, sha: 'r1' })
-        .mockResolvedValueOnce({ content: mockBlogs, sha: 'b1' })
+  it('loadData populates recipes', async () => {
+    const mockRecipes = [{ id: 1, title: 'Test Recept' }]
+    vi.mocked(readFile).mockResolvedValue({ content: mockRecipes, sha: 'r1' })
 
-      const store = useAdminStore()
-      await store.loadData()
+    const store = useRecipeStore()
+    await store.loadData()
 
-      expect(store.recipes).toEqual(mockRecipes)
-      expect(store.blogPosts).toEqual(mockBlogs)
-    })
+    expect(store.recipes).toEqual(mockRecipes)
+  })
 
-    it('shows toast on error', async () => {
-      vi.mocked(readFile).mockRejectedValue(new Error('Network fail'))
+  it('shows toast on error', async () => {
+    vi.mocked(readFile).mockRejectedValue(new Error('Network fail'))
 
-      const store = useAdminStore()
-      await store.loadData()
+    const store = useRecipeStore()
+    await store.loadData()
 
-      expect(toastError).toHaveBeenCalledWith('Network fail')
-    })
+    expect(toastError).toHaveBeenCalledWith('Network fail')
+  })
+})
+
+describe('blog store', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    vi.clearAllMocks()
+  })
+
+  it('loadData populates blogPosts', async () => {
+    const mockBlogs = [{ id: 1, title: 'Test Blog' }]
+    vi.mocked(readFile).mockResolvedValue({ content: mockBlogs, sha: 'b1' })
+
+    const store = useBlogStore()
+    await store.loadData()
+
+    expect(store.blogPosts).toEqual(mockBlogs)
+  })
+})
+
+describe('UI store', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
   })
 
   describe('deleteModal', () => {
     it('resolves with true on confirm', async () => {
-      const store = useAdminStore()
-      const promise = store.showDeleteConfirm('Test item')
+      const ui = useUIStore()
+      const promise = ui.showDeleteConfirm('Test item')
 
-      expect(store.deleteModal.visible).toBe(true)
-      expect(store.deleteModal.title).toBe('Test item')
+      expect(ui.deleteModal.visible).toBe(true)
+      expect(ui.deleteModal.title).toBe('Test item')
 
-      store.resolveDeleteModal(true)
+      ui.resolveDeleteModal(true)
 
       const result = await promise
       expect(result).toBe(true)
-      expect(store.deleteModal.visible).toBe(false)
+      expect(ui.deleteModal.visible).toBe(false)
     })
 
     it('resolves with false on cancel', async () => {
-      const store = useAdminStore()
-      const promise = store.showDeleteConfirm('Test item')
+      const ui = useUIStore()
+      const promise = ui.showDeleteConfirm('Test item')
 
-      store.resolveDeleteModal(false)
+      ui.resolveDeleteModal(false)
 
       const result = await promise
       expect(result).toBe(false)

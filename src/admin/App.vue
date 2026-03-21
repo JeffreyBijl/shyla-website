@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { useAdminStore } from './stores/admin'
+import { useAuthStore } from './stores/auth'
+import { useUIStore } from './stores/ui'
 import LoginForm from './components/LoginForm.vue'
 import AdminTabs from './components/AdminTabs.vue'
 import RecipeForm from './components/RecipeForm.vue'
@@ -9,15 +10,16 @@ import BlogForm from './components/BlogForm.vue'
 import BlogList from './components/BlogList.vue'
 import DeleteModal from './components/DeleteModal.vue'
 
-const store = useAdminStore()
+const auth = useAuthStore()
+const ui = useUIStore()
 
 onMounted(() => {
-  store.initAuth()
+  auth.initAuth()
 })
 </script>
 
 <template>
-  <div v-if="!store.isAuthenticated">
+  <div v-if="!auth.isAuthenticated">
     <LoginForm />
   </div>
   <div v-else class="page-enter">
@@ -29,7 +31,7 @@ onMounted(() => {
 
         <AdminTabs />
 
-        <div class="admin-tab-content" :class="{ 'admin-tab-content--active': store.activeTab === 'recipes' }" id="tab-recipes">
+        <div class="admin-tab-content" :class="{ 'admin-tab-content--active': ui.activeTab === 'recipes' }" id="tab-recipes">
           <RecipeForm />
           <div class="admin-items-list" id="recipes-list">
             <h3>Bestaande recepten</h3>
@@ -37,7 +39,7 @@ onMounted(() => {
           </div>
         </div>
 
-        <div v-if="store.activeTab === 'blog'" class="admin-tab-content admin-tab-content--active" id="tab-blog">
+        <div v-if="ui.activeTab === 'blog'" class="admin-tab-content admin-tab-content--active" id="tab-blog">
           <BlogForm />
           <div class="admin-items-list" id="blog-list">
             <h3>Bestaande blogposts</h3>

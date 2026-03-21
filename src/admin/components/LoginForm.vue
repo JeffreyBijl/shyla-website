@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useAdminStore } from '../stores/admin'
+import { useAuthStore } from '../stores/auth'
 import { toastError } from '../../components/toast'
 
-const store = useAdminStore()
+const auth = useAuthStore()
 const token = ref('')
 const loading = ref(false)
 
@@ -13,7 +13,7 @@ async function handleLogin() {
     return
   }
   loading.value = true
-  const valid = await store.login(token.value.trim())
+  const valid = await auth.login(token.value.trim())
   if (!valid) {
     toastError('Token is ongeldig. Controleer of het correct is en "repo" scope heeft.')
   }

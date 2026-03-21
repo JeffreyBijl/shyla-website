@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { setActivePinia, createPinia } from 'pinia'
 import BlogForm from '../components/BlogForm.vue'
-import { useAdminStore } from '../stores/admin'
+import { useBlogStore } from '../stores/blog'
 
 vi.mock('../github', () => ({
   getToken: vi.fn(() => 'ghp_test'),
@@ -52,7 +52,7 @@ describe('BlogForm', () => {
   })
 
   it('shows Bijwerken button when editing', async () => {
-    const store = useAdminStore()
+    const store = useBlogStore()
     store.blogPosts = [{
       id: 1, title: 'Test Blog', slug: 'test-blog', date: '2026-01-01',
       category: 'Voeding', image: null, shortDescription: 'Kort',
@@ -67,7 +67,7 @@ describe('BlogForm', () => {
   })
 
   it('populates form fields when editing', async () => {
-    const store = useAdminStore()
+    const store = useBlogStore()
     store.blogPosts = [{
       id: 1, title: 'Gezond Eten', slug: 'gezond-eten', date: '2026-03-01',
       category: 'Voeding', image: null, shortDescription: 'Tips over eten',
@@ -96,7 +96,7 @@ describe('BlogForm', () => {
   })
 
   it('clears form on cancel', async () => {
-    const store = useAdminStore()
+    const store = useBlogStore()
     store.blogPosts = [{
       id: 1, title: 'Test', slug: 'test', date: '2026-01-01',
       category: 'Voeding', image: null, shortDescription: 'Kort',
@@ -116,7 +116,7 @@ describe('BlogForm', () => {
   })
 
   it('adds optimistic blog post to store on submit', async () => {
-    const store = useAdminStore()
+    const store = useBlogStore()
     const wrapper = mount(BlogForm)
     await wrapper.vm.$nextTick()
 

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount, VueWrapper } from '@vue/test-utils'
 import { setActivePinia, createPinia } from 'pinia'
 import DeleteModal from '../components/DeleteModal.vue'
-import { useAdminStore } from '../stores/admin'
+import { useUIStore } from '../stores/ui'
 
 vi.mock('../github', () => ({
   getToken: vi.fn(() => null),
@@ -44,7 +44,7 @@ describe('DeleteModal', () => {
   })
 
   it('renders modal with title when visible', async () => {
-    const store = useAdminStore()
+    const store = useUIStore()
     store.deleteModal = { visible: true, title: 'Test Recept', resolve: vi.fn() }
 
     wrapper = mount(DeleteModal)
@@ -56,7 +56,7 @@ describe('DeleteModal', () => {
   })
 
   it('calls resolve(true) on confirm click', async () => {
-    const store = useAdminStore()
+    const store = useUIStore()
     const resolveFn = vi.fn()
     store.deleteModal = { visible: true, title: 'Test', resolve: resolveFn }
 
@@ -70,7 +70,7 @@ describe('DeleteModal', () => {
   })
 
   it('calls resolve(false) on cancel click', async () => {
-    const store = useAdminStore()
+    const store = useUIStore()
     const resolveFn = vi.fn()
     store.deleteModal = { visible: true, title: 'Test', resolve: resolveFn }
 
@@ -84,7 +84,7 @@ describe('DeleteModal', () => {
   })
 
   it('closes on Escape key', async () => {
-    const store = useAdminStore()
+    const store = useUIStore()
     const resolveFn = vi.fn()
     store.deleteModal = { visible: true, title: 'Test', resolve: resolveFn }
 

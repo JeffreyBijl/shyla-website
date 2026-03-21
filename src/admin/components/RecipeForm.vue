@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, reactive, watch, computed } from 'vue'
 import type { Recipe, RecipeCategory, Ingredient } from '../../data/types'
-import { useAdminStore } from '../stores/admin'
+import { useRecipeStore } from '../stores/recipe'
+import { useQueueStore } from '../stores/queue'
 import { readModifyWrite, uploadImage, CONFIG } from '../github'
 import { compressWithToast, slugify } from '../image'
 import { useValidation } from '../composables/useValidation'
@@ -9,7 +10,8 @@ import IngredientRow from './IngredientRow.vue'
 import StepRow from './StepRow.vue'
 import ImageUpload from './ImageUpload.vue'
 
-const store = useAdminStore()
+const recipeStore = useRecipeStore()
+const queueStore = useQueueStore()
 const imageUpload = ref<InstanceType<typeof ImageUpload>>()
 const selectedFile = ref<File | null>(null)
 
@@ -34,10 +36,10 @@ const steps = ref<string[]>([])
 
 const { validateRequired, clearError, hasError } = useValidation()
 
-const isEditing = computed(() => store.editingRecipeId !== null)
+const isEditing = computed(() => recipeStore.editingRecipeId !== null)
 const editingRecipe = computed(() =>
-  store.editingRecipeId !== null
-    ? store.recipes.find(r => r.id === store.editingRecipeId) ?? null
+  recipeStore.editingRecipeId !== null
+    ? recipeStore.recipes.find(r => r.id === recipeStore.editingRecipeId) ?? null
     : null
 )
 
@@ -47,7 +49,7 @@ const formTitle = computed(() =>
     : 'Nieuw recept toevoegen'
 )
 
-watch(() => store.editingRecipeId, () => {
+watch(() => recipeStore.editingRecipeId, () => {
   const recipe = editingRecipe.value
   if (!recipe) return
   populateForm(recipe)
@@ -80,7 +82,7 @@ function clearForm() {
 }
 
 function cancelEdit() {
-  store.editingRecipeId = null
+  recipeStore.editingRecipeId = null
   clearForm()
 }
 
@@ -129,7 +131,7 @@ async function handleSubmit() {
   const validIngredients = ingredients.value.filter(i => i.name.trim())
   const validSteps = steps.value.filter(s => s.trim())
 
-  const editId = store.editingRecipeId
+  const editId = recipeStore.editingRecipeId
   const wasEditing = isEditing.value
   const slug = slugify(title)
 
@@ -141,10 +143,10 @@ async function handleSubmit() {
 
   // Optimistic UI update
   if (wasEditing) {
-    const index = store.recipes.findIndex(r => r.id === editId)
+    const index = recipeStore.recipes.findIndex(r => r.id === editId)
     if (index !== -1) {
-      const existing = store.recipes[index]
-      store.recipes[index] = {
+      const existing = recipeStore.recipes[index]
+      recipeStore.recipes[index] = {
         ...existing,
         title,
         slug,
@@ -161,8 +163,8 @@ async function handleSubmit() {
       }
     }
   } else {
-    const newId = store.recipes.length > 0 ? Math.max(...store.recipes.map(r => r.id)) + 1 : 1
-    store.recipes.push({
+    const newId = recipeStore.recipes.length > 0 ? Math.max(...recipeStore.recipes.map(r => r.id)) + 1 : 1
+    recipeStore.recipes.push({
       id: newId,
       title,
       slug,
@@ -186,7 +188,7 @@ async function handleSubmit() {
 
   const commitMsg = wasEditing ? `Recept bijgewerkt: ${title}` : `Nieuw recept: ${title}`
 
-  store.operationQueue.enqueue({
+  queueStore.operationQueue.enqueue({
     label: commitMsg,
     execute: async () => {
       let imagePath: string | undefined
@@ -197,7 +199,7 @@ async function handleSubmit() {
         imagePath = uploadedPath.replace(/^public\//, '')
       }
 
-      store.recipes = await readModifyWrite<Recipe[]>(
+      recipeStore.recipes = await readModifyWrite<Recipe[]>(
         CONFIG.RECIPES_PATH,
         (data) => {
           if (wasEditing) {
@@ -245,7 +247,7 @@ async function handleSubmit() {
         },
         commitMsg,
       )
-      store.pollDeploy()
+      queueStore.pollDeploy()
     },
   })
 }
