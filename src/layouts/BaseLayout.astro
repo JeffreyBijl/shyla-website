@@ -1,0 +1,70 @@
+---
+import SEOHead from '../components/SEOHead.astro'
+import SchemaOrg from '../components/SchemaOrg.astro'
+import Header from '../components/Header.astro'
+import Footer from '../components/Footer.astro'
+import '../styles/global.css'
+
+interface Props {
+  title: string
+  description: string
+  image?: string
+  type?: 'website' | 'article'
+  publishedDate?: string
+  noindex?: boolean
+  extraSchemas?: Record<string, unknown>[]
+}
+
+const { title, description, image, type, publishedDate, noindex, extraSchemas = [] } = Astro.props
+const base = import.meta.env.BASE_URL
+
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'fit.foodbyshyla',
+  url: new URL(base, Astro.site).href,
+  description: 'Gezonde recepten en voedingstips door voedingscoach Shyla',
+  inLanguage: 'nl',
+  author: {
+    '@type': 'Person',
+    name: 'Shyla',
+    jobTitle: 'Voedingscoach',
+    url: new URL(base + 'over-mij', Astro.site).href,
+  },
+}
+---
+
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/jpeg" href={`${base}logo.jpeg`} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <SEOHead
+      title={title}
+      description={description}
+      image={image}
+      type={type}
+      publishedDate={publishedDate}
+      noindex={noindex}
+    />
+    <SchemaOrg schema={[websiteSchema, ...extraSchemas]} />
+  </head>
+  <body>
+    <div id="root">
+      <header id="site-header">
+        <Header />
+      </header>
+      <main id="app">
+        <slot />
+      </main>
+      <Footer />
+    </div>
+  </body>
+</html>

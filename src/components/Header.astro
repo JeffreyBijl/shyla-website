@@ -1,0 +1,73 @@
+---
+const base = import.meta.env.BASE_URL
+const currentPath = Astro.url.pathname
+
+const links = [
+  { href: base, label: 'Home' },
+  { href: `${base}over-mij`, label: 'Over mij' },
+  { href: `${base}recepten`, label: 'Recepten' },
+  { href: `${base}blog`, label: 'Blog' },
+  { href: `${base}contact`, label: 'Contact' },
+]
+
+function isActive(href: string): boolean {
+  if (href === base) {
+    return currentPath === base || currentPath === base.replace(/\/$/, '')
+  }
+  return currentPath.startsWith(href)
+}
+---
+
+<nav class="header-nav" id="header-nav">
+  <div class="container header-inner">
+    <a href={base} class="header-logo" aria-label="fit.foodbyshyla home">
+      <img src={`${base}logo.jpeg`} alt="fit.foodbyshyla logo" class="header-logo-img" />
+    </a>
+    <ul class="header-links" id="header-links" role="list">
+      {links.map((link) => (
+        <li>
+          <a
+            href={link.href}
+            class:list={[
+              'header-link',
+              { 'header-link--active': isActive(link.href) },
+              { 'btn btn-primary header-cta': link.label === 'Contact' },
+            ]}
+          >
+            {link.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Menu openen" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<script>
+  const nav = document.getElementById('header-nav')
+  const hamburger = document.getElementById('hamburger')
+  const links = document.getElementById('header-links')
+
+  // Sticky shadow on scroll
+  window.addEventListener('scroll', () => {
+    nav?.classList.toggle('header-scrolled', window.scrollY > 10)
+  })
+
+  // Hamburger toggle
+  hamburger?.addEventListener('click', () => {
+    const isOpen = links?.classList.toggle('header-links--open')
+    hamburger.setAttribute('aria-expanded', String(isOpen))
+    hamburger.classList.toggle('hamburger--open', isOpen ?? false)
+  })
+
+  // Close menu on link click
+  links?.querySelectorAll('.header-link').forEach((link) => {
+    link.addEventListener('click', () => {
+      links.classList.remove('header-links--open')
+      hamburger?.classList.remove('hamburger--open')
+      hamburger?.setAttribute('aria-expanded', 'false')
+    })
+  })
+</script>
