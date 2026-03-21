@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import Breadcrumb from '../../components/Breadcrumb.astro'
+import RecipeCard from '../../components/RecipeCard.astro'
+import type { Recipe, RecipeCategory } from '../../data/types.ts'
+import { RECIPE_CATEGORY_EMOJIS } from '../../data/types.ts'
+import recipesData from '../../data/recipes.json'
+
+const recipes = recipesData as Recipe[]
+
+const categories: Array<'alle' | RecipeCategory> = ['alle', 'ontbijt', 'lunch', 'diner', 'snack', 'dessert']
+---
+
+<BaseLayout
+  title="Gezonde Recepten"
+  description="Heerlijke en voedzame recepten voor ontbijt, lunch, diner en snacks. Makkelijk, gezond en lekker."
+>
+  <Breadcrumb items={[{ name: 'Home', href: '' }, { name: 'Recepten' }]} />
+
+  <section class="section recipes-section">
+    <div class="container">
+      <div class="section-title">
+        <span class="section-label">Voeding</span>
+        <h1>Heerlijke <em class="text-pink">recepten</em></h1>
+        <p>Voedzaam, lekker en klaar in een handomdraai</p>
+      </div>
+      <div class="filter-bar">
+        {categories.map(cat => (
+          <button
+            class={`filter-btn ${cat === 'alle' ? 'filter-btn--active' : ''}`}
+            data-filter={cat}
+          >
+            {RECIPE_CATEGORY_EMOJIS[cat]}
+            {cat.charAt(0).toUpperCase() + cat.slice(1)}
+          </button>
+        ))}
+      </div>
+      <div class="grid-3 recipes-grid" id="recipes-grid">
+        {recipes.map(recipe => (
+          <RecipeCard recipe={recipe} />
+        ))}
+      </div>
+      <div class="recipes-empty" id="recipes-empty" hidden>
+        <span>😔</span>
+        <p>Geen recepten gevonden in deze categorie.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const grid = document.getElementById('recipes-grid')
+  const empty = document.getElementById('recipes-empty')
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn')
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter!
+
+      buttons.forEach(b => b.classList.remove('filter-btn--active'))
+      btn.classList.add('filter-btn--active')
+
+      let visibleCount = 0
+      grid?.querySelectorAll<HTMLElement>('.recipe-card-link').forEach(link => {
+        const show = filter === 'alle' || link.dataset.category === filter
+        link.style.display = show ? '' : 'none'
+        if (show) visibleCount++
+      })
+
+      if (empty) empty.hidden = visibleCount > 0
+    })
+  })
+</script>

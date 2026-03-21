@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import Breadcrumb from '../../components/Breadcrumb.astro'
+import BlogCard from '../../components/BlogCard.astro'
+import blogData from '../../data/blog.json'
+import type { BlogPost } from '../../data/types.ts'
+
+const base = import.meta.env.BASE_URL
+const blogPosts: BlogPost[] = blogData as BlogPost[]
+---
+
+<BaseLayout
+  title="Blog over Voeding & Gezondheid"
+  description="Artikelen over voeding, leefstijl en gezond leven door voedingscoach Shyla."
+>
+  <Breadcrumb items={[{ name: 'Home', href: '' }, { name: 'Blog' }]} />
+
+  <section class="section blog-section">
+    <div class="container">
+      <div class="section-title">
+        <span class="section-label">Inspiratie</span>
+        <h1>Van de <em class="text-pink">blog</em></h1>
+        <p>Tips, kennis en verhalen over voeding en leefstijl</p>
+      </div>
+      <div class="grid-3 blog-grid">
+        {blogPosts.map((post, i) => (
+          <BlogCard post={post} index={i} />
+        ))}
+      </div>
+      <div class="blog-cta">
+        <p>Meer artikelen komen binnenkort!</p>
+        <a href={`${base}contact`} class="btn btn-outline">Schrijf je in voor updates</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

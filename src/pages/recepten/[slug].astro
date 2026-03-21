@@ -1,0 +1,224 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import Breadcrumb from '../../components/Breadcrumb.astro'
+import RelatedContent from '../../components/RelatedContent.astro'
+import type { Recipe } from '../../data/types.ts'
+import { UNIT_PLURALS } from '../../data/types.ts'
+import { buildRecipeSchema } from '../../utils/seo.ts'
+import recipesData from '../../data/recipes.json'
+
+export function getStaticPaths() {
+  const recipes = recipesData as Recipe[]
+  return recipes.map(recipe => ({
+    params: { slug: recipe.slug },
+    props: { recipe },
+  }))
+}
+
+interface Props {
+  recipe: Recipe
+}
+
+const { recipe } = Astro.props
+const base = import.meta.env.BASE_URL
+
+function formatAmount(amount: number): string {
+  if (amount === 0.25) return '\u00BC'
+  if (amount === 0.5) return '\u00BD'
+  if (amount === 0.75) return '\u00BE'
+  if (Number.isInteger(amount)) return String(amount)
+  const rounded = Math.round(amount * 10) / 10
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1).replace('.', ',')
+}
+
+function pluralizeUnit(unit: string, amount: number | null): string {
+  if (!unit || amount === null || amount <= 1) return unit
+  return UNIT_PLURALS[unit] ?? unit
+}
+
+const pageUrl = new URL(`${base}recepten/${recipe.slug}`, Astro.site).href
+const siteUrl = Astro.site?.href ?? ''
+const recipeSchema = buildRecipeSchema(recipe, pageUrl, siteUrl, base)
+
+const hasDetailContent = recipe.ingredients.length > 0 || recipe.steps.length > 0
+const hasNutrition = recipe.nutrition && recipe.nutrition.kcal > 0
+---
+
+<BaseLayout
+  title={`${recipe.title} — Recept`}
+  description={`${recipe.description} Bekijk het volledige recept met ingrediënten en bereidingswijze.`}
+  image={recipe.image ? `${base}${recipe.image}` : undefined}
+  extraSchemas={[recipeSchema]}
+>
+  <Breadcrumb items={[
+    { name: 'Home', href: '' },
+    { name: 'Recepten', href: 'recepten' },
+    { name: recipe.title },
+  ]} />
+
+  <section class="section recipe-detail-section">
+    <div class="container">
+      <a href={`${base}recepten`} class="recipe-detail-back">&larr; Terug naar recepten</a>
+
+      {recipe.image ? (
+        <div class="recipe-detail-hero">
+          <img src={`${base}${recipe.image}`} alt={recipe.title} />
+        </div>
+      ) : (
+        <div class="recipe-detail-hero recipe-detail-hero--fallback">
+          <span class="recipe-detail-emoji">{recipe.emoji}</span>
+        </div>
+      )}
+
+      <div class="recipe-detail-header">
+        <span class="badge badge-pink">{recipe.category}</span>
+        <h1>{recipe.title}</h1>
+        <div class="recipe-detail-meta">
+          <span class="recipe-meta-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+            </svg>
+            {recipe.time}
+          </span>
+          {recipe.servings && (
+            <span class="recipe-meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 00-3-3.87" /><path d="M16 3.13a4 4 0 010 7.75" />
+              </svg>
+              {recipe.servings} personen
+            </span>
+          )}
+        </div>
+        <p class="recipe-detail-description">{recipe.description}</p>
+      </div>
+
+      {hasDetailContent && (
+        <div class="recipe-detail-content">
+          {recipe.ingredients.length > 0 && (
+            <div class="recipe-detail-ingredients">
+              <h2>Ingredi&euml;nten</h2>
+              <div class="servings-switcher">
+                <button class="servings-btn servings-decrease" aria-label="Minder personen">&minus;</button>
+                <span class="servings-count" data-original={String(recipe.servings)}>{recipe.servings}</span>
+                <span class="servings-label">personen</span>
+                <button class="servings-btn servings-increase" aria-label="Meer personen">+</button>
+              </div>
+              <ul>
+                {recipe.ingredients.map(ing => {
+                  const amountStr = ing.amount !== null ? formatAmount(ing.amount) : ''
+                  const unit = pluralizeUnit(ing.unit, ing.amount)
+                  const unitStr = unit ? ` ${unit}` : ''
+                  return (
+                    <li data-original-amount={ing.amount !== null ? String(ing.amount) : ''} data-unit={ing.unit}>
+                      <span class="ingredient-amount">{amountStr}{unitStr}</span> {ing.name}
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          )}
+
+          {recipe.steps.length > 0 && (
+            <div class="recipe-detail-steps">
+              <h2>Bereiding</h2>
+              <ol>
+                {recipe.steps.map(step => (
+                  <li>{step}</li>
+                ))}
+              </ol>
+            </div>
+          )}
+        </div>
+      )}
+
+      {hasNutrition && (
+        <div class="recipe-detail-nutrition">
+          <h2>Voedingswaarde</h2>
+          <div class="nutrition-grid">
+            <div class="nutrition-item">
+              <span class="nutrition-value">{recipe.nutrition.kcal}</span>
+              <span class="nutrition-label">kcal</span>
+            </div>
+            <div class="nutrition-item">
+              <span class="nutrition-value">{recipe.nutrition.protein}g</span>
+              <span class="nutrition-label">eiwit</span>
+            </div>
+            <div class="nutrition-item">
+              <span class="nutrition-value">{recipe.nutrition.carbs}g</span>
+              <span class="nutrition-label">koolhydraten</span>
+            </div>
+            <div class="nutrition-item">
+              <span class="nutrition-value">{recipe.nutrition.fat}g</span>
+              <span class="nutrition-label">vet</span>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <RelatedContent type="recipe" currentSlug={recipe.slug} currentCategory={recipe.category} />
+</BaseLayout>
+
+<script>
+  const UNIT_PLURALS: Readonly<Record<string, string>> = {
+    snufje: 'snufjes',
+    handje: 'handjes',
+    scheutje: 'scheutjes',
+    takje: 'takjes',
+    teen: 'tenen',
+    plak: 'plakken',
+    snee: 'sneetjes',
+    'stuk(s)': 'stuk(s)',
+  }
+
+  function formatAmount(amount: number): string {
+    if (amount === 0.25) return '\u00BC'
+    if (amount === 0.5) return '\u00BD'
+    if (amount === 0.75) return '\u00BE'
+    if (Number.isInteger(amount)) return String(amount)
+    const rounded = Math.round(amount * 10) / 10
+    return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1).replace('.', ',')
+  }
+
+  function pluralizeUnit(unit: string, amount: number): string {
+    if (!unit || amount <= 1) return unit
+    return UNIT_PLURALS[unit] ?? unit
+  }
+
+  const decreaseBtn = document.querySelector('.servings-decrease')
+  const increaseBtn = document.querySelector('.servings-increase')
+  const countEl = document.querySelector('.servings-count')
+
+  if (decreaseBtn && increaseBtn && countEl) {
+    const originalServings = Number(countEl.getAttribute('data-original'))
+
+    function updateIngredients(newServings: number): void {
+      countEl!.textContent = String(newServings)
+
+      document.querySelectorAll('.recipe-detail-ingredients li').forEach(li => {
+        const el = li as HTMLElement
+        const originalAmount = el.dataset.originalAmount
+        const unit = el.dataset.unit || ''
+        const amountSpan = el.querySelector('.ingredient-amount')
+
+        if (!amountSpan || !originalAmount) return
+
+        const scaled = (Number(originalAmount) / originalServings) * newServings
+        const plural = pluralizeUnit(unit, scaled)
+        const unitStr = plural ? ` ${plural}` : ''
+        amountSpan.textContent = `${formatAmount(scaled)}${unitStr}`
+      })
+    }
+
+    decreaseBtn.addEventListener('click', () => {
+      const current = Number(countEl.textContent)
+      if (current > 1) updateIngredients(current - 1)
+    })
+
+    increaseBtn.addEventListener('click', () => {
+      const current = Number(countEl.textContent)
+      if (current < 20) updateIngredients(current + 1)
+    })
+  }
+</script>

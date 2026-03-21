@@ -1,0 +1,60 @@
+---
+import type { Recipe, BlogPost } from '../data/types.ts'
+import recipesData from '../data/recipes.json'
+import blogData from '../data/blog.json'
+
+interface Props {
+  type: 'recipe' | 'blog'
+  currentSlug: string
+  currentCategory: string
+}
+
+const { type, currentSlug, currentCategory } = Astro.props
+const base = import.meta.env.BASE_URL
+const recipes = recipesData as Recipe[]
+const blogPosts = blogData as BlogPost[]
+
+let items: Array<{ title: string; href: string; description: string }> = []
+
+if (type === 'recipe') {
+  const related = blogPosts.filter(p => p.slug !== currentSlug).slice(0, 3)
+  items = related.map(p => ({
+    title: p.title,
+    href: `${base}blog/${p.slug}`,
+    description: p.shortDescription,
+  }))
+} else {
+  const sorted = [...recipes].sort((a, b) => {
+    const categoryMap: Record<string, string[]> = {
+      Voeding: ['ontbijt', 'lunch', 'diner', 'snack', 'dessert'],
+      Educatie: ['ontbijt', 'lunch', 'diner'],
+      Lifestyle: ['ontbijt', 'snack', 'dessert'],
+    }
+    const preferred = categoryMap[currentCategory] ?? []
+    const aMatch = preferred.includes(a.category) ? 1 : 0
+    const bMatch = preferred.includes(b.category) ? 1 : 0
+    return bMatch - aMatch
+  })
+  items = sorted.slice(0, 3).map(r => ({
+    title: r.title,
+    href: `${base}recepten/${r.slug}`,
+    description: r.description,
+  }))
+}
+---
+
+{items.length > 0 && (
+  <section class="section related-content">
+    <div class="container">
+      <h2>{type === 'recipe' ? 'Gerelateerde artikelen' : 'Misschien vind je deze recepten ook lekker'}</h2>
+      <div class="grid-3">
+        {items.map(item => (
+          <a href={item.href} class="card" style="display: block; padding: 1.5rem; text-decoration: none;">
+            <h3 style="margin-bottom: 0.5rem;">{item.title}</h3>
+            <p>{item.description}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
