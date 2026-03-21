@@ -1,11 +1,6 @@
-import '../styles/global.css'
-import { renderAdmin, setupAdmin } from './page.js'
+import type { App } from 'vue'
+import { createPinia } from 'pinia'
 
-function init(): void {
-  const app = document.getElementById('admin-app')
-  if (!app) return
-  app.innerHTML = renderAdmin()
-  setupAdmin()
+export default (app: App) => {
+  app.use(createPinia())
 }
-
-init()

@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config'
 import sitemap from '@astrojs/sitemap'
+import vue from '@astrojs/vue'
 
 export default defineConfig({
   site: 'https://jeffreybijl.github.io',
@@ -8,5 +9,6 @@ export default defineConfig({
     sitemap({
       filter: (page) => !page.includes('admin-shyla'),
     }),
+    vue({ appEntrypoint: '/src/admin/main' }),
   ],
 })
