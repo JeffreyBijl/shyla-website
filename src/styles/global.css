@@ -64,7 +64,7 @@ p { color: var(--color-gray-light); line-height: 1.75; }
 }
 
 .section {
-  padding: 5rem 0;
+  padding: 2rem 0;
 }
 
 .section-title {
@@ -1260,7 +1260,7 @@ p { color: var(--color-gray-light); line-height: 1.75; }
 
 @media (max-width: 600px) {
   .grid-3, .grid-2 { grid-template-columns: 1fr; }
-  .section { padding: 3rem 0; }
+  .section { padding: 1.5rem 0; }
   .recipe-image-wrap { height: 180px; }
   .blog-card-visual { height: 160px; }
 }
@@ -1876,9 +1876,6 @@ p { color: var(--color-gray-light); line-height: 1.75; }
   margin: 0 auto;
 }
 
-.breadcrumb + .section {
-  padding-top: 2rem;
-}
 
 .breadcrumb ol {
   display: flex;
