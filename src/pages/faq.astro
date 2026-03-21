@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import Breadcrumb from '../components/Breadcrumb.astro'
+import SchemaOrg from '../components/SchemaOrg.astro'
+
+const faqs = [
+  { question: 'Wat doet een voedingscoach?', answer: 'Een voedingscoach helpt je om gezondere eetgewoonten te ontwikkelen op een manier die past bij jouw leefstijl. Geen strenge diëten, maar duurzame verandering.' },
+  { question: 'Wat kost een traject?', answer: 'Dit bespreken we tijdens een gratis kennismakingsgesprek. Neem gerust contact op!' },
+  { question: 'Werken we online of op locatie?', answer: 'Beide is mogelijk. Ik werk veel online via video, maar kom ook bij jou in de buurt.' },
+  { question: 'Hoe lang duurt een traject?', answer: 'Een standaard traject duurt 3 maanden, maar dit is volledig aanpasbaar aan jouw situatie.' },
+]
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map(f => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: { '@type': 'Answer', text: f.answer },
+  })),
+}
+---
+
+<BaseLayout
+  title="Veelgestelde Vragen"
+  description="Antwoorden op veelgestelde vragen over voeding, gezond eten en samenwerking met voedingscoach Shyla."
+  extraSchemas={[faqSchema]}
+>
+  <Breadcrumb items={[{ name: 'Home', href: '' }, { name: 'Veelgestelde vragen' }]} />
+  <section class="section">
+    <div class="container">
+      <div class="section-title">
+        <span class="section-label">FAQ</span>
+        <h1>Veelgestelde <em class="text-pink">vragen</em></h1>
+        <p>Antwoorden op de meest gestelde vragen</p>
+      </div>
+      <div class="faq-list">
+        {faqs.map(faq => (
+          <details class="faq-item">
+            <summary>{faq.question}</summary>
+            <p>{faq.answer}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

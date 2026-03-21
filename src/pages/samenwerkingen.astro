@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import Breadcrumb from '../components/Breadcrumb.astro'
+---
+
+<BaseLayout
+  title="Samenwerkingen — fit.foodbyshyla"
+  description="Informatie over samenwerkingen met voedingscoach Shyla."
+>
+  <Breadcrumb items={[{ name: 'Home', href: '' }, { name: 'Samenwerkingen' }]} />
+  <section class="section">
+    <div class="container">
+      <div class="section-title">
+        <span class="section-label">Partners</span>
+        <h1>Samen<em class="text-pink">werkingen</em></h1>
+        <p>Samen bereiken we meer</p>
+      </div>
+      <p>
+        Ik werk graag samen met merken en bedrijven die passen bij mijn visie op
+        gezond en lekker eten. Heb je een leuk voorstel? Neem dan gerust contact
+        met mij op!
+      </p>
+    </div>
+  </section>
+</BaseLayout>

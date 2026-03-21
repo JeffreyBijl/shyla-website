@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+const base = import.meta.env.BASE_URL
+---
+<BaseLayout title="Pagina niet gevonden" description="Deze pagina bestaat niet." noindex={true}>
+  <section class="section">
+    <div class="container" style="text-align: center; padding: 4rem 0;">
+      <h1>Pagina niet gevonden</h1>
+      <p>Deze pagina bestaat niet of is verplaatst.</p>
+      <a href={base} class="btn btn-primary" style="margin-top: 2rem;">Terug naar home</a>
+    </div>
+  </section>
+</BaseLayout>
