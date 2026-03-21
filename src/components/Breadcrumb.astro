@@ -14,7 +14,7 @@ const base = import.meta.env.BASE_URL
 const schemaItems = items.map((item, i) => ({
   '@type': 'ListItem' as const,
   position: i + 1,
-  ...(item.href
+  ...(item.href !== undefined
     ? { name: item.name, item: new URL(base + item.href, Astro.site).href }
     : { name: item.name }),
 }))
@@ -30,7 +30,7 @@ const breadcrumbSchema = {
   <ol>
     {items.map((item, i) => (
       <li>
-        {item.href ? (
+        {item.href !== undefined ? (
           <a href={`${base}${item.href}`}>{item.name}</a>
         ) : (
           <span aria-current="page">{item.name}</span>
