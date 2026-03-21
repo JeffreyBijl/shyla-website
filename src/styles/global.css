@@ -961,7 +961,7 @@ p { color: var(--color-gray-light); line-height: 1.75; }
 }
 
 /* ── Blog section ────────────────────────────────────── */
-.blog-section { background: var(--color-white); }
+.blog-section { background: var(--color-bg); }
 .badge-purple { background: #F0EAFF; color: #7C4DFF; }
 .blog-cta {
   text-align: center;
