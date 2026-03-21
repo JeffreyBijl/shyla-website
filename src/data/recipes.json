@@ -200,5 +200,26 @@
       "carbs": 0,
       "fat": 0
     }
+  },
+  {
+    "id": 11,
+    "title": "Muscle Meat mexicano",
+    "slug": "muscle-meat-mexicano",
+    "category": "diner",
+    "image": "images/recipes/muscle-meat-mexicano-1774081369186.jpg",
+    "emoji": "",
+    "time": "10 min",
+    "description": "Lekker met veel eiwitten.",
+    "servings": 1,
+    "ingredients": [],
+    "steps": [
+      "Gooi het in de pan even 10 min laten ondooien en klaar !"
+    ],
+    "nutrition": {
+      "kcal": 500,
+      "protein": 20,
+      "carbs": 100,
+      "fat": 20
+    }
   }
 ]
