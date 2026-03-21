@@ -5,6 +5,7 @@ import RelatedContent from '../../components/RelatedContent.astro'
 import type { Recipe } from '../../data/types.ts'
 import { UNIT_PLURALS } from '../../data/types.ts'
 import { buildRecipeSchema } from '../../utils/seo.ts'
+import { formatAmount, pluralizeUnit } from '../../utils/formatting.ts'
 import recipesData from '../../data/recipes.json'
 
 export function getStaticPaths() {
@@ -22,19 +23,7 @@ interface Props {
 const { recipe } = Astro.props
 const base = import.meta.env.BASE_URL
 
-function formatAmount(amount: number): string {
-  if (amount === 0.25) return '\u00BC'
-  if (amount === 0.5) return '\u00BD'
-  if (amount === 0.75) return '\u00BE'
-  if (Number.isInteger(amount)) return String(amount)
-  const rounded = Math.round(amount * 10) / 10
-  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1).replace('.', ',')
-}
-
-function pluralizeUnit(unit: string, amount: number | null): string {
-  if (!unit || amount === null || amount <= 1) return unit
-  return UNIT_PLURALS[unit] ?? unit
-}
+const pluralize = (unit: string, amount: number | null) => pluralizeUnit(unit, amount, UNIT_PLURALS)
 
 const pageUrl = new URL(`${base}recepten/${recipe.slug}`, Astro.site).href
 const siteUrl = Astro.site?.href ?? ''
@@ -106,7 +95,7 @@ const hasNutrition = recipe.nutrition && recipe.nutrition.kcal > 0
               <ul>
                 {recipe.ingredients.map(ing => {
                   const amountStr = ing.amount !== null ? formatAmount(ing.amount) : ''
-                  const unit = pluralizeUnit(ing.unit, ing.amount)
+                  const unit = pluralize(ing.unit, ing.amount)
                   const unitStr = unit ? ` ${unit}` : ''
                   return (
                     <li data-original-amount={ing.amount !== null ? String(ing.amount) : ''} data-unit={ing.unit}>

@@ -30,12 +30,8 @@ export function buildRecipeSchema(recipe: Recipe, pageUrl: string, siteUrl: stri
       carbohydrateContent: `${recipe.nutrition.carbs}g`,
       fatContent: `${recipe.nutrition.fat}g`,
     },
-    ...((recipe as Record<string, unknown>).datePublished && {
-      datePublished: (recipe as Record<string, unknown>).datePublished,
-    }),
-    ...((recipe as Record<string, unknown>).keywords && {
-      keywords: ((recipe as Record<string, unknown>).keywords as string[]).join(', '),
-    }),
+    ...(recipe.datePublished && { datePublished: recipe.datePublished }),
+    ...(recipe.keywords && { keywords: recipe.keywords.join(', ') }),
   }
 }
 

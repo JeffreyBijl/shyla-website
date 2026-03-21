@@ -27,7 +27,12 @@ export function formatIngredient(amount: number | null, unit: string, name: stri
   return parts.join(' ')
 }
 
-function formatAmount(amount: number): string {
+export function pluralizeUnit(unit: string, amount: number | null, plurals: Readonly<Record<string, string>>): string {
+  if (!unit || amount === null || amount <= 1) return unit
+  return plurals[unit] ?? unit
+}
+
+export function formatAmount(amount: number): string {
   if (amount === 0.25) return '\u00BC'
   if (amount === 0.5) return '\u00BD'
   if (amount === 0.75) return '\u00BE'

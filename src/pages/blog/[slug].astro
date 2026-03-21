@@ -71,5 +71,5 @@ const articleSchema = buildArticleSchema(
     </div>
   </section>
 
-  <RelatedContent type="blog" />
+  <RelatedContent type="blog" currentSlug={post.slug} currentCategory={post.category} />
 </BaseLayout>

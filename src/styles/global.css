@@ -1911,8 +1911,15 @@ p { color: var(--color-gray-light); line-height: 1.75; }
   margin-bottom: 1.5rem;
 }
 
+.related-content-card {
+  display: block;
+  padding: 1.5rem;
+  text-decoration: none;
+}
+
 .related-content .card h3 {
   font-size: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .related-content .card p {

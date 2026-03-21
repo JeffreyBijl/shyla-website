@@ -49,8 +49,8 @@ if (type === 'recipe') {
       <h2>{type === 'recipe' ? 'Gerelateerde artikelen' : 'Misschien vind je deze recepten ook lekker'}</h2>
       <div class="grid-3">
         {items.map(item => (
-          <a href={item.href} class="card" style="display: block; padding: 1.5rem; text-decoration: none;">
-            <h3 style="margin-bottom: 0.5rem;">{item.title}</h3>
+          <a href={item.href} class="card related-content-card">
+            <h3>{item.title}</h3>
             <p>{item.description}</p>
           </a>
         ))}
