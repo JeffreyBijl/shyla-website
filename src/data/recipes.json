@@ -176,16 +176,24 @@
   },
   {
     "id": 10,
-    "title": "test",
-    "slug": "test",
+    "title": "test 2",
+    "slug": "test-2",
     "category": "ontbijt",
     "image": "images/recipes/test-1774081005814.jpg",
     "emoji": "",
     "time": "10",
-    "description": "test test",
+    "description": "test test test",
     "servings": 1,
-    "ingredients": [],
-    "steps": [],
+    "ingredients": [
+      {
+        "amount": 1,
+        "unit": "g",
+        "name": "aardbei"
+      }
+    ],
+    "steps": [
+      "schil de aardbei"
+    ],
     "nutrition": {
       "kcal": 0,
       "protein": 0,
