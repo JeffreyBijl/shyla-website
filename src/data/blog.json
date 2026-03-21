@@ -34,13 +34,14 @@
   },
   {
     "id": 7,
-    "title": "TEST",
-    "slug": "test",
+    "title": "TEST 222",
+    "slug": "test-222",
     "date": "2026-03-15",
     "category": "Educatie",
     "image": null,
     "shortDescription": "",
     "readTime": "",
-    "content": "<p>Dit is een <strong>test</strong></p>"
+    "content": "<p>Dit is een <strong>test</strong></p>",
+    "dateModified": "2026-03-21"
   }
 ]
