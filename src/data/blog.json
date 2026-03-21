@@ -48,5 +48,20 @@
       "compiler"
     ],
     "dateModified": "2026-03-21"
+  },
+  {
+    "id": 6,
+    "title": "test test",
+    "slug": "test-test",
+    "date": "2026-03-21",
+    "category": "Educatie",
+    "image": "images/blog/test-test-1774120543542.jpg",
+    "shortDescription": "test test test",
+    "readTime": "4",
+    "content": "<p><br></p>",
+    "keywords": [
+      "gezond eten"
+    ],
+    "dateModified": "2026-03-21"
   }
 ]
