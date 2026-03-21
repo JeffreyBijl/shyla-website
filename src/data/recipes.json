@@ -175,5 +175,33 @@
       "fat": 25
     },
     "datePublished": "2026-03-21"
+  },
+  {
+    "id": 10,
+    "title": "Test lasagna",
+    "slug": "test-lasagna",
+    "category": "diner",
+    "image": "images/recipes/test-lasagna-1774098264585.jpg",
+    "emoji": "",
+    "time": "20",
+    "description": "Lekkere lasagna",
+    "servings": 2,
+    "ingredients": [
+      {
+        "amount": null,
+        "unit": "g",
+        "name": "300"
+      }
+    ],
+    "steps": [],
+    "nutrition": {
+      "kcal": 400,
+      "protein": 25,
+      "carbs": 10,
+      "fat": 20
+    },
+    "tips": "",
+    "datePublished": "2026-03-21",
+    "dateModified": "2026-03-21"
   }
 ]
