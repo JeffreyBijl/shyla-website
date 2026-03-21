@@ -173,5 +173,35 @@
       "carbs": 100,
       "fat": 25
     }
+  },
+  {
+    "id": 10,
+    "title": "Lasagna deel 2",
+    "slug": "lasagna-deel-2",
+    "category": "diner",
+    "image": "images/recipes/lasagna-deel-2-1774081643829.jpg",
+    "emoji": "",
+    "time": "20 min",
+    "description": "jajajaja",
+    "servings": 1,
+    "ingredients": [
+      {
+        "amount": 200,
+        "unit": "kg",
+        "name": "test"
+      },
+      {
+        "amount": 1000,
+        "unit": "el",
+        "name": "test 2"
+      }
+    ],
+    "steps": [],
+    "nutrition": {
+      "kcal": 800,
+      "protein": 30,
+      "carbs": 100,
+      "fat": 25
+    }
   }
 ]
