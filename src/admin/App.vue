@@ -37,7 +37,7 @@ onMounted(() => {
           </div>
         </div>
 
-        <div v-show="store.activeTab === 'blog'" class="admin-tab-content admin-tab-content--active" id="tab-blog">
+        <div v-if="store.activeTab === 'blog'" class="admin-tab-content admin-tab-content--active" id="tab-blog">
           <BlogForm />
           <div class="admin-items-list" id="blog-list">
             <h3>Bestaande blogposts</h3>

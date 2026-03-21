@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onUnmounted } from 'vue'
 
 const props = defineProps<{
   label: string
@@ -48,6 +48,12 @@ function reset() {
   imageInfo.value = ''
   if (fileInput.value) fileInput.value.value = ''
 }
+
+onUnmounted(() => {
+  if (previewUrl.value?.startsWith('blob:')) {
+    URL.revokeObjectURL(previewUrl.value)
+  }
+})
 
 defineExpose({ reset, fileInput })
 </script>

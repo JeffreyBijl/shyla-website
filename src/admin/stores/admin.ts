@@ -12,7 +12,7 @@ export const useAdminStore = defineStore('admin', () => {
   const editingBlogId = ref<number | null>(null)
   const activeTab = ref<'recipes' | 'blog'>('recipes')
   const isAuthenticated = ref(false)
-  const stopCurrentPolling = ref<(() => void) | null>(null)
+  let stopCurrentPolling: (() => void) | null = null
   const operationQueue = new OperationQueue()
 
   const deleteModal = ref<{
@@ -92,11 +92,11 @@ export const useAdminStore = defineStore('admin', () => {
   }
 
   function pollDeploy() {
-    if (stopCurrentPolling.value) stopCurrentPolling.value()
+    if (stopCurrentPolling) stopCurrentPolling()
 
     toastProgress('Website wordt bijgewerkt...', 'deploy')
 
-    stopCurrentPolling.value = startDeployPolling((status) => {
+    stopCurrentPolling = startDeployPolling((status) => {
       switch (status) {
         case 'queued':
           toastProgress('Website wordt bijgewerkt — in de wachtrij...', 'deploy')
@@ -105,11 +105,11 @@ export const useAdminStore = defineStore('admin', () => {
           toastProgress('Website wordt bijgewerkt — publiceren...', 'deploy')
           break
         case 'completed':
-          stopCurrentPolling.value = null
+          stopCurrentPolling = null
           toastSuccess('Website is live!', 'deploy')
           break
         case 'failed':
-          stopCurrentPolling.value = null
+          stopCurrentPolling = null
           toastError('Publicatie mislukt', 'deploy')
           break
       }

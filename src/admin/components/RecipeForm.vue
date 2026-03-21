@@ -47,13 +47,8 @@ const formTitle = computed(() =>
     : 'Nieuw recept toevoegen'
 )
 
-const imageRequiredText = computed(() =>
-  isEditing.value ? '(optioneel — bestaande foto blijft behouden)' : '(verplicht)'
-)
-
-watch(() => store.editingRecipeId, (id) => {
-  if (id === null) return
-  const recipe = store.recipes.find(r => r.id === id)
+watch(() => store.editingRecipeId, () => {
+  const recipe = editingRecipe.value
   if (!recipe) return
   populateForm(recipe)
 })
@@ -136,6 +131,7 @@ async function handleSubmit() {
 
   const editId = store.editingRecipeId
   const wasEditing = isEditing.value
+  const slug = slugify(title)
 
   // Compress image before enqueuing
   let compressed: { base64: string } | null = null
@@ -144,14 +140,14 @@ async function handleSubmit() {
   } catch { return }
 
   // Optimistic UI update
-  if (wasEditing && editId !== null) {
+  if (wasEditing) {
     const index = store.recipes.findIndex(r => r.id === editId)
     if (index !== -1) {
       const existing = store.recipes[index]
       store.recipes[index] = {
         ...existing,
         title,
-        slug: slugify(title),
+        slug,
         category,
         time,
         description,
@@ -169,7 +165,7 @@ async function handleSubmit() {
     store.recipes.push({
       id: newId,
       title,
-      slug: slugify(title),
+      slug,
       category,
       image: '',
       emoji: '',
@@ -196,7 +192,7 @@ async function handleSubmit() {
       let imagePath: string | undefined
 
       if (compressed) {
-        const filename = `${slugify(title)}-${Date.now()}.jpg`
+        const filename = `${slug}-${Date.now()}.jpg`
         const uploadedPath = await uploadImage(CONFIG.RECIPE_IMAGES_DIR, filename, compressed.base64)
         imagePath = uploadedPath.replace(/^public\//, '')
       }
@@ -204,14 +200,14 @@ async function handleSubmit() {
       store.recipes = await readModifyWrite<Recipe[]>(
         CONFIG.RECIPES_PATH,
         (data) => {
-          if (wasEditing && editId !== null) {
-            const index = data.findIndex(r => r.id === editId)
+          if (wasEditing) {
+            const index = data.findIndex(r => r.id === editId!)
             if (index === -1) throw new Error('Recept niet gevonden')
             const existing = data[index]
             data[index] = {
               ...existing,
               title,
-              slug: slugify(title),
+              slug,
               category,
               image: imagePath ?? existing.image,
               time,
@@ -229,7 +225,7 @@ async function handleSubmit() {
             data.push({
               id: newId,
               title,
-              slug: slugify(title),
+              slug,
               category,
               image: imagePath!,
               emoji: '',

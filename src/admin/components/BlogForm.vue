@@ -43,10 +43,12 @@ const formTitle = computed(() =>
 async function loadQuill(): Promise<void> {
   if (typeof Quill !== 'undefined') return
 
-  const link = document.createElement('link')
-  link.rel = 'stylesheet'
-  link.href = 'https://cdn.jsdelivr.net/npm/quill@2/dist/quill.snow.css'
-  document.head.appendChild(link)
+  if (!document.querySelector('link[href*="quill"]')) {
+    const link = document.createElement('link')
+    link.rel = 'stylesheet'
+    link.href = 'https://cdn.jsdelivr.net/npm/quill@2/dist/quill.snow.css'
+    document.head.appendChild(link)
+  }
 
   await new Promise<void>((resolve, reject) => {
     const script = document.createElement('script')
@@ -74,9 +76,8 @@ onMounted(async () => {
   })
 })
 
-watch(() => store.editingBlogId, (id) => {
-  if (id === null) return
-  const post = store.blogPosts.find(p => p.id === id)
+watch(() => store.editingBlogId, () => {
+  const post = editingPost.value
   if (!post) return
   populateForm(post)
 })
@@ -131,7 +132,7 @@ async function handleSubmit() {
   } catch { return }
 
   // Optimistic UI update
-  if (wasEditing && editId !== null) {
+  if (wasEditing) {
     const index = store.blogPosts.findIndex(p => p.id === editId)
     if (index !== -1) {
       const existing = store.blogPosts[index]
@@ -174,15 +175,15 @@ async function handleSubmit() {
       let imagePath: string | null = null
 
       if (compressed) {
-        const filename = `${slugify(title)}-${Date.now()}.jpg`
+        const filename = `${slug}-${Date.now()}.jpg`
         imagePath = await uploadImage(CONFIG.BLOG_IMAGES_DIR, filename, compressed.base64)
       }
 
       store.blogPosts = await readModifyWrite<BlogPost[]>(
         CONFIG.BLOG_PATH,
         (data) => {
-          if (wasEditing && editId !== null) {
-            const index = data.findIndex(p => p.id === editId)
+          if (wasEditing) {
+            const index = data.findIndex(p => p.id === editId!)
             if (index === -1) throw new Error('Blogpost niet gevonden')
             const existing = data[index]
             data[index] = {
