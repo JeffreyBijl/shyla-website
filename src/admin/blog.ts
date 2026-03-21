@@ -70,6 +70,14 @@ export function renderBlogForm(): string {
         <input type="text" id="blog-readtime" placeholder="bijv. 4 min">
       </div>
       <div class="form-group">
+        <label for="blog-date">Datum</label>
+        <input type="date" id="blog-date" value="${new Date().toISOString().split('T')[0]}">
+      </div>
+      <div class="form-group">
+        <label for="blog-keywords">Zoektermen (SEO)</label>
+        <input type="text" id="blog-keywords" placeholder="bijv. gezond eten, voedingstips">
+      </div>
+      <div class="form-group">
         <label>Inhoud</label>
         <div id="blog-editor"></div>
       </div>
@@ -183,6 +191,8 @@ function populateBlogForm(post: BlogPost): void {
   ;(document.getElementById('blog-category') as HTMLSelectElement).value = post.category
   ;(document.getElementById('blog-short-description') as HTMLTextAreaElement).value = post.shortDescription
   ;(document.getElementById('blog-readtime') as HTMLInputElement).value = post.readTime
+  ;(document.getElementById('blog-date') as HTMLInputElement).value = post.date || new Date().toISOString().split('T')[0]
+  ;(document.getElementById('blog-keywords') as HTMLInputElement).value = post.keywords?.join(', ') || ''
 
   if (quillInstance) {
     quillInstance.root.innerHTML = post.content
@@ -234,11 +244,13 @@ async function handleBlogSubmit(): Promise<void> {
     if (file) compressed = await compressWithToast(file)
   } catch { return }
 
-  // Optimistic UI update
-  const now = new Date()
-  const months = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december']
-  const dateStr = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`
+  // SEO fields
+  const dateStr = (document.getElementById('blog-date') as HTMLInputElement)?.value || new Date().toISOString().split('T')[0]
+  const keywordsRaw = (document.getElementById('blog-keywords') as HTMLInputElement)?.value.trim()
+  const keywords = keywordsRaw ? keywordsRaw.split(',').map(k => k.trim()).filter(Boolean) : undefined
+  const dateModified = new Date().toISOString().split('T')[0]
 
+  // Optimistic UI update
   if (isEditing && editId !== null) {
     const index = adminState.blogPosts.findIndex(p => p.id === editId)
     if (index !== -1) {
@@ -251,6 +263,8 @@ async function handleBlogSubmit(): Promise<void> {
         shortDescription,
         readTime,
         content,
+        keywords,
+        dateModified,
       }
     }
     renderBlogItems()
@@ -267,6 +281,8 @@ async function handleBlogSubmit(): Promise<void> {
       shortDescription,
       readTime,
       content,
+      keywords,
+      dateModified,
     })
     renderBlogItems()
     clearBlogForm()
@@ -301,6 +317,8 @@ async function handleBlogSubmit(): Promise<void> {
               shortDescription,
               readTime,
               content,
+              keywords,
+              dateModified,
             }
           } else {
             const freshId = data.length > 0 ? Math.max(...data.map(p => p.id)) + 1 : 1
@@ -314,6 +332,8 @@ async function handleBlogSubmit(): Promise<void> {
               shortDescription,
               readTime,
               content,
+              keywords,
+              dateModified,
             })
           }
           return data
@@ -332,6 +352,8 @@ export function clearBlogForm(): void {
   ;(document.getElementById('blog-title') as HTMLInputElement).value = ''
   ;(document.getElementById('blog-short-description') as HTMLTextAreaElement).value = ''
   ;(document.getElementById('blog-readtime') as HTMLInputElement).value = ''
+  ;(document.getElementById('blog-date') as HTMLInputElement).value = new Date().toISOString().split('T')[0]
+  ;(document.getElementById('blog-keywords') as HTMLInputElement).value = ''
   ;(document.getElementById('blog-image') as HTMLInputElement).value = ''
   document.getElementById('blog-preview')?.classList.remove('has-image')
   const info = document.getElementById('blog-image-info')

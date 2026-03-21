@@ -51,7 +51,7 @@ export function setupAdmin(): void {
   const token = getToken()
   if (!token) {
     setupTokenForm(() => {
-      const app = document.getElementById('app')
+      const app = document.getElementById('admin-app')
       if (app) {
         app.innerHTML = `<div class="page-enter">${renderDashboard()}</div>`
         loadData()

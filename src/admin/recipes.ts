@@ -83,6 +83,18 @@ export function renderRecipeForm(): string {
           </div>
         </div>
       </div>
+      <div class="form-group">
+        <label for="recipe-keywords">Zoektermen (SEO)</label>
+        <input type="text" id="recipe-keywords" placeholder="bijv. gezond ontbijt, overnight oats, makkelijk recept">
+      </div>
+      <div class="form-group">
+        <label for="recipe-tips">Tips & variaties</label>
+        <textarea id="recipe-tips" placeholder="Extra tips of variaties voor dit recept..."></textarea>
+      </div>
+      <div class="form-group">
+        <label for="recipe-date-published">Publicatiedatum</label>
+        <input type="date" id="recipe-date-published" value="${new Date().toISOString().split('T')[0]}">
+      </div>
       <div class="admin-form-actions">
         <button class="btn btn-primary" id="recipe-submit">Opslaan</button>
         <button class="btn btn-outline" id="recipe-cancel-edit" style="display:none;">Annuleren</button>
@@ -212,6 +224,11 @@ function populateRecipeForm(recipe: Recipe): void {
   ;(document.getElementById('recipe-carbs') as HTMLInputElement).value = recipe.nutrition.carbs ? String(recipe.nutrition.carbs) : ''
   ;(document.getElementById('recipe-fat') as HTMLInputElement).value = recipe.nutrition.fat ? String(recipe.nutrition.fat) : ''
 
+  // Fill SEO fields
+  ;(document.getElementById('recipe-keywords') as HTMLInputElement).value = recipe.keywords?.join(', ') || ''
+  ;(document.getElementById('recipe-tips') as HTMLTextAreaElement).value = recipe.tips || ''
+  ;(document.getElementById('recipe-date-published') as HTMLInputElement).value = recipe.datePublished || new Date().toISOString().split('T')[0]
+
   // Scroll to form
   document.querySelector('.admin-form')?.scrollIntoView({ behavior: 'smooth' })
 }
@@ -257,6 +274,12 @@ async function handleRecipeSubmit(): Promise<void> {
   const carbs = Number((document.getElementById('recipe-carbs') as HTMLInputElement)?.value) || 0
   const fat = Number((document.getElementById('recipe-fat') as HTMLInputElement)?.value) || 0
 
+  const keywordsRaw = (document.getElementById('recipe-keywords') as HTMLInputElement)?.value.trim()
+  const keywords = keywordsRaw ? keywordsRaw.split(',').map(k => k.trim()).filter(Boolean) : undefined
+  const tips = (document.getElementById('recipe-tips') as HTMLTextAreaElement)?.value.trim() || ''
+  const datePublished = (document.getElementById('recipe-date-published') as HTMLInputElement)?.value || new Date().toISOString().split('T')[0]
+  const dateModified = new Date().toISOString().split('T')[0]
+
   const isEditing = adminState.editingRecipeId !== null
   const editId = adminState.editingRecipeId
 
@@ -294,6 +317,9 @@ async function handleRecipeSubmit(): Promise<void> {
         ingredients,
         steps,
         nutrition: { kcal, protein, carbs, fat },
+        keywords,
+        tips,
+        dateModified,
       }
     }
   } else {
@@ -311,6 +337,10 @@ async function handleRecipeSubmit(): Promise<void> {
       ingredients,
       steps,
       nutrition: { kcal, protein, carbs, fat },
+      keywords,
+      tips,
+      datePublished,
+      dateModified,
     })
   }
 
@@ -350,6 +380,9 @@ async function handleRecipeSubmit(): Promise<void> {
               ingredients,
               steps,
               nutrition: { kcal, protein, carbs, fat },
+              keywords,
+              tips,
+              dateModified,
             }
           } else {
             const newId = data.length > 0 ? Math.max(...data.map(r => r.id)) + 1 : 1
@@ -366,6 +399,10 @@ async function handleRecipeSubmit(): Promise<void> {
               ingredients,
               steps,
               nutrition: { kcal, protein, carbs, fat },
+              keywords,
+              tips,
+              datePublished,
+              dateModified,
             })
           }
           return data
@@ -397,6 +434,9 @@ export function clearRecipeForm(): void {
   ;(document.getElementById('recipe-protein') as HTMLInputElement).value = ''
   ;(document.getElementById('recipe-carbs') as HTMLInputElement).value = ''
   ;(document.getElementById('recipe-fat') as HTMLInputElement).value = ''
+  ;(document.getElementById('recipe-keywords') as HTMLInputElement).value = ''
+  ;(document.getElementById('recipe-tips') as HTMLTextAreaElement).value = ''
+  ;(document.getElementById('recipe-date-published') as HTMLInputElement).value = new Date().toISOString().split('T')[0]
 }
 
 // --- Setup ---
