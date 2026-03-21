@@ -33,23 +33,6 @@
     "content": ""
   },
   {
-    "id": 5,
-    "title": "Vite",
-    "slug": "vite",
-    "date": "2026-03-21",
-    "category": "Educatie",
-    "image": "images/blog/vite-1774101052622.jpg",
-    "shortDescription": "Dit is Vite",
-    "readTime": "5",
-    "content": "<p>Vite is echt heel snel</p>",
-    "keywords": [
-      "developer",
-      "builder",
-      "compiler"
-    ],
-    "dateModified": "2026-03-21"
-  },
-  {
     "id": 6,
     "title": "test test",
     "slug": "test-test",
