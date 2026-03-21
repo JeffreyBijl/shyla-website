@@ -51,6 +51,11 @@ export interface Recipe {
   ingredients: Ingredient[]
   steps: string[]
   nutrition: Nutrition
+  // SEO fields
+  datePublished?: string
+  dateModified?: string
+  keywords?: string[]
+  tips?: string
 }
 
 export type BlogCategory = 'Voeding' | 'Educatie' | 'Lifestyle'
@@ -71,4 +76,7 @@ export interface BlogPost {
   shortDescription: string
   readTime: string
   content: string
+  // SEO fields
+  dateModified?: string
+  keywords?: string[]
 }

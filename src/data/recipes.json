@@ -87,7 +87,8 @@
       "protein": 20,
       "carbs": 50,
       "fat": 25
-    }
+    },
+    "datePublished": "2026-03-21"
   },
   {
     "id": 9,
@@ -172,7 +173,8 @@
       "protein": 20,
       "carbs": 100,
       "fat": 25
-    }
+    },
+    "datePublished": "2026-03-21"
   },
   {
     "id": 10,
@@ -202,6 +204,7 @@
       "protein": 30,
       "carbs": 100,
       "fat": 25
-    }
+    },
+    "datePublished": "2026-03-21"
   }
 ]
