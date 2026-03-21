@@ -209,7 +209,9 @@ export async function getLatestDeployStatus(): Promise<DeployStatus> {
     if (run.status === 'queued') return 'queued'
     if (run.status === 'in_progress') return 'in_progress'
     if (run.status === 'completed') {
-      return run.conclusion === 'success' ? 'completed' : 'failed'
+      if (run.conclusion === 'success') return 'completed'
+      if (run.conclusion === 'cancelled') return 'in_progress' // new run replacing it
+      return 'failed'
     }
     return 'in_progress'
   } catch {
