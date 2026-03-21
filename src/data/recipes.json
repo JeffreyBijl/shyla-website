@@ -173,32 +173,5 @@
       "carbs": 100,
       "fat": 25
     }
-  },
-  {
-    "id": 10,
-    "title": "test 2",
-    "slug": "test-2",
-    "category": "ontbijt",
-    "image": "images/recipes/test-1774081005814.jpg",
-    "emoji": "",
-    "time": "10",
-    "description": "test test test",
-    "servings": 1,
-    "ingredients": [
-      {
-        "amount": 1,
-        "unit": "g",
-        "name": "aardbei"
-      }
-    ],
-    "steps": [
-      "schil de aardbei"
-    ],
-    "nutrition": {
-      "kcal": 0,
-      "protein": 0,
-      "carbs": 0,
-      "fat": 0
-    }
   }
 ]
