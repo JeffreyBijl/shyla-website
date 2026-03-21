@@ -1871,9 +1871,13 @@ p { color: var(--color-gray-light); line-height: 1.75; }
 
 /* ── Breadcrumb ─────────────────────────────────────── */
 .breadcrumb {
-  padding: 0.5rem 1.5rem 0;
+  padding: 0.25rem 1.5rem 0;
   max-width: var(--max-width);
   margin: 0 auto;
+}
+
+.breadcrumb + .section {
+  padding-top: 2rem;
 }
 
 .breadcrumb ol {
