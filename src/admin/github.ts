@@ -224,9 +224,18 @@ export function startDeployPolling(
 ): () => void {
   let stopped = false
   let timeoutId: number
+  const startedAt = Date.now()
+  const MAX_POLL_MS = 3 * 60_000 // Stop polling after 3 minutes
 
   const poll = async () => {
     if (stopped) return
+
+    if (Date.now() - startedAt > MAX_POLL_MS) {
+      stopped = true
+      onStatus('completed')
+      return
+    }
+
     const status = await getLatestDeployStatus()
     if (stopped) return
     onStatus(status)

@@ -146,7 +146,7 @@ export async function handleDelete(
       }
 
       if (item.image) {
-        deleteFile(`public/${item.image}`, `Verwijder afbeelding: ${item.title}`).catch(() => {})
+        await deleteFile(`public/${item.image}`, `Verwijder afbeelding: ${item.title}`).catch(() => {})
       }
 
       renderItems()
