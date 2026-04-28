@@ -31,20 +31,5 @@
     "shortDescription": "Veel producten met een gezond imago bevatten verrassend veel suiker of additieven. Ik leer je hoe je een etiket leest als een pro.",
     "readTime": "7 min",
     "content": ""
-  },
-  {
-    "id": 6,
-    "title": "test test",
-    "slug": "test-test",
-    "date": "2026-03-21",
-    "category": "Educatie",
-    "image": "images/blog/test-test-1774120543542.jpg",
-    "shortDescription": "test test test",
-    "readTime": "4",
-    "content": "<p><br></p>",
-    "keywords": [
-      "gezond eten"
-    ],
-    "dateModified": "2026-03-21"
   }
 ]
