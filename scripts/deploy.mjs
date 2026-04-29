@@ -56,7 +56,16 @@ try {
   const remoteExists = await sftp.exists(remotePath)
   if (!remoteExists) {
     console.error(`❌ Remote pad bestaat niet: ${remotePath}`)
-    console.error('   Controleer SFTP_REMOTE_PATH in .env.deploy')
+    try {
+      const cwd = await sftp.cwd()
+      console.error(`   SFTP cwd: ${cwd}`)
+      const rootList = await sftp.list('/')
+      console.error(`   Inhoud van /: ${rootList.map(f => (f.type === 'd' ? f.name + '/' : f.name)).join(', ')}`)
+      const homeList = await sftp.list(cwd)
+      console.error(`   Inhoud van ${cwd}: ${homeList.map(f => (f.type === 'd' ? f.name + '/' : f.name)).join(', ')}`)
+    } catch (e) {
+      console.error('   (kon directorystructuur niet ophalen:', e.message + ')')
+    }
     process.exit(1)
   }
 

@@ -84,20 +84,15 @@ const apiUrl = isProd ? `${base}api/contact.php` : ''
             </div>
           </div>
 
-          <div class="contact-faq">
+          <div class="contact-faq contact-faq--link">
             <h3>Veelgestelde vragen</h3>
-            <details class="faq-item">
-              <summary>Wat kost een traject?</summary>
-              <p>Dit bespreken we tijdens een gratis kennismakingsgesprek. Neem gerust contact op!</p>
-            </details>
-            <details class="faq-item">
-              <summary>Werken we online of op locatie?</summary>
-              <p>Beide is mogelijk. Ik werk veel online via video, maar kom ook bij jou in de buurt.</p>
-            </details>
-            <details class="faq-item">
-              <summary>Hoe lang duurt een traject?</summary>
-              <p>Een standaard traject duurt 3 maanden, maar dit is volledig aanpasbaar aan jouw situatie.</p>
-            </details>
+            <p>Antwoorden op vragen over coaching, voeding, schema's en mijn aanpak.</p>
+            <a href={`${base}faq`} class="btn btn-outline">
+              Bekijk alle vragen
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </a>
           </div>
         </aside>
       </div>
