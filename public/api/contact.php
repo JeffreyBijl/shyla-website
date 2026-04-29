@@ -57,31 +57,77 @@ if ($errors) {
     exit;
 }
 
+$method  = strtolower((string)($config['method'] ?? 'smtp'));
+$debug   = !empty($config['debug']);
+$subject_full = $subject !== ''
+    ? '[Contactformulier] ' . $subject
+    : '[Contactformulier] Nieuw bericht van ' . $name;
+$bodyText = "Nieuw contactformulier-bericht\n\n"
+    . "Naam:       $name\n"
+    . "E-mail:     $email\n"
+    . "Onderwerp:  " . ($subject !== '' ? $subject : '(geen)') . "\n\n"
+    . "Bericht:\n$message\n";
+
+if ($method === 'mail') {
+    $headers = [
+        'From: ' . ($config['from_name'] ?? 'fit.foodbyshyla') . ' <' . $config['from_address'] . '>',
+        'Reply-To: ' . $email,
+        'MIME-Version: 1.0',
+        'Content-Type: text/plain; charset=UTF-8',
+        'X-Mailer: PHP/' . phpversion(),
+    ];
+    $sent = @mail(
+        $config['to_address'],
+        '=?UTF-8?B?' . base64_encode($subject_full) . '?=',
+        $bodyText,
+        implode("\r\n", $headers)
+    );
+    if ($sent) {
+        echo json_encode(['ok' => true]);
+    } else {
+        $err = error_get_last();
+        http_response_code(500);
+        error_log('contact.php mail() error: ' . ($err['message'] ?? 'unknown'));
+        $payload = ['ok' => false, 'error' => 'Bericht kon niet worden verzonden via mail().'];
+        if ($debug && $err) $payload['debug'] = $err['message'];
+        echo json_encode($payload);
+    }
+    exit;
+}
+
 $mail = new PHPMailer(true);
+$debugOutput = '';
 try {
     $mail->isSMTP();
     $mail->Host       = $config['smtp_host'];
-    $mail->SMTPAuth   = true;
-    $mail->Username   = $config['smtp_user'];
-    $mail->Password   = $config['smtp_pass'];
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    $mail->SMTPAuth   = !empty($config['smtp_user']);
+    $mail->Username   = $config['smtp_user']  ?? '';
+    $mail->Password   = $config['smtp_pass']  ?? '';
+    $secure           = strtolower((string)($config['smtp_secure'] ?? 'tls'));
+    if ($secure === 'ssl' || $secure === 'smtps') {
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+    } elseif ($secure === 'none' || $secure === '') {
+        $mail->SMTPSecure = false;
+        $mail->SMTPAutoTLS = false;
+    } else {
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    }
     $mail->Port       = (int)($config['smtp_port'] ?? 587);
+    $mail->Timeout    = (int)($config['smtp_timeout'] ?? 10);
     $mail->CharSet    = 'UTF-8';
+
+    if ($debug) {
+        $mail->SMTPDebug = SMTP::DEBUG_CONNECTION;
+        $mail->Debugoutput = function ($str, $level) use (&$debugOutput) {
+            $debugOutput .= "[$level] $str\n";
+        };
+    }
 
     $mail->setFrom($config['from_address'], $config['from_name'] ?? 'fit.foodbyshyla');
     $mail->addAddress($config['to_address']);
     $mail->addReplyTo($email, $name);
 
-    $mail->Subject = $subject !== ''
-        ? '[Contactformulier] ' . $subject
-        : '[Contactformulier] Nieuw bericht van ' . $name;
-
-    $bodyText = "Nieuw contactformulier-bericht\n\n"
-        . "Naam:       $name\n"
-        . "E-mail:     $email\n"
-        . "Onderwerp:  " . ($subject !== '' ? $subject : '(geen)') . "\n\n"
-        . "Bericht:\n$message\n";
-
+    $mail->Subject = $subject_full;
     $mail->isHTML(false);
     $mail->Body = $bodyText;
 
@@ -90,6 +136,11 @@ try {
     echo json_encode(['ok' => true]);
 } catch (Exception $e) {
     http_response_code(500);
-    error_log('contact.php mail error: ' . $mail->ErrorInfo);
-    echo json_encode(['ok' => false, 'error' => 'Bericht kon niet worden verzonden. Probeer het later opnieuw.']);
+    error_log('contact.php SMTP error: ' . $mail->ErrorInfo);
+    $payload = ['ok' => false, 'error' => 'Bericht kon niet worden verzonden. Probeer het later opnieuw.'];
+    if ($debug) {
+        $payload['debug'] = $mail->ErrorInfo;
+        $payload['smtp_log'] = $debugOutput;
+    }
+    echo json_encode($payload);
 }
