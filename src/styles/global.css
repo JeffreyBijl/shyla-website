@@ -1165,6 +1165,17 @@ p { color: var(--color-gray-light); line-height: 1.75; }
   line-height: 1.5;
 }
 .form-feedback--success { background: #E8F5E4; color: #2E7D23; border: 1px solid #c3e6b5; }
+.form-feedback--error   { background: #FDECEC; color: #B12A2A; border: 1px solid #f4c2c2; }
+.form-feedback--info    { background: #FDE8EF; color: #B23A5A; border: 1px solid #f4c2d4; }
+
+.honeypot {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
 
 /* ── Contact aside ───────────────────────────────────── */
 .contact-info-card { padding: 1.75rem; border: 1px solid var(--color-border); }

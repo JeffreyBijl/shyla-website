@@ -3,6 +3,8 @@ import BaseLayout from '../layouts/BaseLayout.astro'
 import Breadcrumb from '../components/Breadcrumb.astro'
 
 const base = import.meta.env.BASE_URL
+const isProd = process.env.DEPLOY_TARGET === 'production'
+const apiUrl = isProd ? `${base}api/contact.php` : ''
 ---
 
 <BaseLayout
@@ -22,7 +24,7 @@ const base = import.meta.env.BASE_URL
       <div class="contact-grid">
         <!-- Form -->
         <div class="contact-form-wrap">
-          <form class="contact-form" id="contact-form" novalidate>
+          <form class="contact-form" id="contact-form" novalidate data-api-url={apiUrl}>
             <div class="form-row">
               <div class="form-group">
                 <label for="name">Naam</label>
@@ -40,6 +42,10 @@ const base = import.meta.env.BASE_URL
             <div class="form-group">
               <label for="message">Bericht</label>
               <textarea id="message" name="message" rows="6" placeholder="Schrijf hier je bericht..." required></textarea>
+            </div>
+            <div class="honeypot" aria-hidden="true">
+              <label for="website">Website (laat dit veld leeg)</label>
+              <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
             </div>
             <button type="submit" class="btn btn-primary contact-submit">
               Verstuur bericht
@@ -112,29 +118,51 @@ const base = import.meta.env.BASE_URL
   const form = document.getElementById('contact-form') as HTMLFormElement | null
   const feedback = document.getElementById('form-feedback')
   const submitBtn = form?.querySelector<HTMLButtonElement>('.contact-submit')
+  const apiUrl = form?.dataset.apiUrl ?? ''
 
-  form?.addEventListener('submit', (e) => {
+  function showFeedback(message: string, kind: 'success' | 'error' | 'info') {
+    if (!feedback) return
+    feedback.textContent = message
+    feedback.hidden = false
+    feedback.className = `form-feedback form-feedback--${kind}`
+  }
+
+  form?.addEventListener('submit', async (e) => {
     e.preventDefault()
+    if (!form || !submitBtn) return
 
-    const data = {
-      name:    (form.elements.namedItem('name')    as HTMLInputElement).value,
-      email:   (form.elements.namedItem('email')   as HTMLInputElement).value,
-      subject: (form.elements.namedItem('subject') as HTMLInputElement).value,
-      message: (form.elements.namedItem('message') as HTMLTextAreaElement).value,
+    if (!apiUrl) {
+      showFeedback(
+        'Dit is de testversie van de website. Het contactformulier werkt alleen op de live website (fitfoodbyshyla.nl).',
+        'info'
+      )
+      return
     }
 
-    console.log('Contactformulier ontvangen:', data)
+    const originalLabel = submitBtn.innerHTML
+    submitBtn.disabled = true
+    submitBtn.textContent = 'Versturen...'
+    feedback && (feedback.hidden = true)
 
-    // Show success
-    if (feedback) {
-      feedback.textContent = 'Bedankt voor je bericht! Ik neem zo snel mogelijk contact met je op.'
-      feedback.hidden = false
-      feedback.className = 'form-feedback form-feedback--success'
+    try {
+      const formData = new FormData(form)
+      const res = await fetch(apiUrl, { method: 'POST', body: formData })
+      const data = await res.json().catch(() => ({ ok: false, error: 'Onverwachte serverrespons.' }))
+
+      if (res.ok && data.ok) {
+        showFeedback('Bedankt voor je bericht! Ik neem zo snel mogelijk contact met je op.', 'success')
+        submitBtn.textContent = 'Verstuurd!'
+        form.reset()
+      } else {
+        const msg = data.error || 'Er ging iets mis. Probeer het later opnieuw.'
+        showFeedback(msg, 'error')
+        submitBtn.disabled = false
+        submitBtn.innerHTML = originalLabel
+      }
+    } catch (err) {
+      showFeedback('Geen verbinding met de server. Probeer het later opnieuw.', 'error')
+      submitBtn.disabled = false
+      submitBtn.innerHTML = originalLabel
     }
-    if (submitBtn) {
-      submitBtn.textContent = 'Verstuurd!'
-      submitBtn.disabled = true
-    }
-    form.reset()
   })
 </script>

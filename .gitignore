@@ -32,3 +32,4 @@ dist-ssr
 # Secrets
 token.txt
 .astro
+public/api/config.php
