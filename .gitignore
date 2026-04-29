@@ -33,3 +33,4 @@ dist-ssr
 token.txt
 .astro
 public/api/config.php
+.env.deploy
