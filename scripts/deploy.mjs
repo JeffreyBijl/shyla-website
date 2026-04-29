@@ -60,6 +60,16 @@ try {
     process.exit(1)
   }
 
+  // Eénmalige cleanup: oude leftover-bestanden weghalen die niet meer in de build zitten
+  const obsolete = ['vite.svg']
+  for (const name of obsolete) {
+    const full = `${remotePath}/${name}`
+    if (await sftp.exists(full)) {
+      await sftp.delete(full)
+      console.log(`  ✓ verwijderd: ${name}`)
+    }
+  }
+
   console.log(`→ Uploaden ${localPath} → ${remotePath}`)
   await sftp.uploadDir(localPath, remotePath)
 

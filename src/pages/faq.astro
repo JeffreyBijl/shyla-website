@@ -2,10 +2,46 @@
 import BaseLayout from '../layouts/BaseLayout.astro'
 import Breadcrumb from '../components/Breadcrumb.astro'
 const faqs = [
-  { question: 'Wat doet een voedingscoach?', answer: 'Een voedingscoach helpt je om gezondere eetgewoonten te ontwikkelen op een manier die past bij jouw leefstijl. Geen strenge diëten, maar duurzame verandering.' },
-  { question: 'Wat kost een traject?', answer: 'Dit bespreken we tijdens een gratis kennismakingsgesprek. Neem gerust contact op!' },
-  { question: 'Werken we online of op locatie?', answer: 'Beide is mogelijk. Ik werk veel online via video, maar kom ook bij jou in de buurt.' },
-  { question: 'Hoe lang duurt een traject?', answer: 'Een standaard traject duurt 3 maanden, maar dit is volledig aanpasbaar aan jouw situatie.' },
+  {
+    question: 'Moet ik een streng dieet volgen?',
+    answer: 'Nee. Ik geloof niet in strenge diëten of vaste regels. Je gaat juist leren eten op een manier die bij jou past, met ruimte voor dingen die je lekker vindt. Het doel is dat je dit volhoudt voor de lange termijn.',
+  },
+  {
+    question: 'Krijg ik een maaltijdschema?',
+    answer: 'In de basis werk ik niet met standaard maaltijdschema’s, omdat ik geloof dat die vaak niet duurzaam zijn.\n\nWel kijk ik altijd naar jouw persoonlijke behoefte. Heb jij juist behoefte aan meer structuur en houvast, dan kunnen we (tijdelijk) werken met een maaltijdschema. Voor iedereen werkt iets anders, en daar speel ik op in.\n\nDaarnaast krijg je inzicht in jouw calorieën en macro’s, zodat je vrijheid hebt in wat je eet, zonder de grip te verliezen.',
+  },
+  {
+    question: 'Helpt dit ook als ik last heb van emotie-eten of binge-eating?',
+    answer: 'Ja, juist. Dit is een belangrijk onderdeel van mijn coaching. We gaan samen kijken waar het vandaan komt en hoe je deze patronen stap voor stap doorbreekt, zonder schuldgevoel of extreme regels.',
+  },
+  {
+    question: 'Is jouw coaching alleen voor afvallen?',
+    answer: 'Nee. Je kunt bij mij terecht als je wilt afvallen, aankomen of gewoon een betere relatie met voeding wilt ontwikkelen. Het gaat uiteindelijk om balans en een lifestyle die bij jou past.',
+  },
+  {
+    question: 'Hoe ziet de begeleiding eruit?',
+    answer: 'Je krijgt 1-op-1 coaching met wekelijkse check-ins, toegang tot mijn app, persoonlijke begeleiding en elke 2 weken een call. Tussendoor kun je altijd contact met mij opnemen als je vragen hebt of ergens tegenaan loopt.',
+  },
+  {
+    question: 'Moet ik sporten?',
+    answer: 'Sporten is geen verplichting, maar het kan wel een mooie toevoeging zijn. Ik help je met workouts die passen bij jouw niveau en leven, maar we kijken vooral naar wat voor jou haalbaar en leuk is.',
+  },
+  {
+    question: 'Hoe snel zie ik resultaat?',
+    answer: 'Dat verschilt per persoon. We richten ons niet op snelle oplossingen, maar op blijvende verandering. Juist daardoor zul je merken dat resultaten niet alleen komen, maar ook blijven.',
+  },
+  {
+    question: 'Wat als ik het een keer “niet goed” doe?',
+    answer: 'Dat hoort erbij. Er bestaat geen perfect. Juist die momenten zijn waardevol, want daar leren we van. Je hoeft het niet alleen op te lossen, ik help je weer terug in balans te komen zonder schuldgevoel.',
+  },
+  {
+    question: 'Is het geschikt als ik een druk leven heb?',
+    answer: 'Ja. Juist dan. We bouwen een aanpak die past in jouw leven, niet andersom. Geen ingewikkelde schema’s, maar iets wat jij echt kunt volhouden.',
+  },
+  {
+    question: 'Hoe weet ik of dit bij mij past?',
+    answer: 'We starten altijd met een intake. Tijdens dit gesprek kijken we of er een klik is, want dat is ontzettend belangrijk. Als jij je niet op je gemak voelt of niet eerlijk durft te zijn, gaat de coaching niet werken.\n\nZijn we allebei enthousiast na de intake, dan kijken we samen welk plan het beste bij jou past en wat jij nodig hebt.\n\nDat kan een maand zijn, meerdere maanden of zelfs een jaar. Alles is maatwerk en kan ook altijd verlengd worden. We stemmen samen af wat het beste aansluit bij jouw doelen en jouw leven.',
+  },
 ]
 
 const faqSchema = {
@@ -36,7 +72,7 @@ const faqSchema = {
         {faqs.map(faq => (
           <details class="faq-item">
             <summary>{faq.question}</summary>
-            <p>{faq.answer}</p>
+            {faq.answer.split('\n\n').map(p => <p>{p}</p>)}
           </details>
         ))}
       </div>
