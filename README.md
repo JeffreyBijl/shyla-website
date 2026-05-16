@@ -57,8 +57,8 @@ src/
 
 public/
 ├── logo.jpeg                # Logo
-├── shyla.JPG                # Profielfoto
 └── images/
+    ├── shyla/               # Foto's van Shyla (hero, over-mij, contact, og, sfeer)
     ├── recipes/             # Receptfoto's (via admin geüpload)
     └── blog/                # Blogfoto's (via admin geüpload)
 ```

@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import Breadcrumb from '../components/Breadcrumb.astro'
+
+const base = import.meta.env.BASE_URL
+---
+
+<BaseLayout
+  title="Plan een afspraak"
+  description="Plan direct een kennismakingsgesprek of intake met voedingscoach Shyla via mijn agenda."
+>
+  <Breadcrumb items={[{ name: 'Home', href: '' }, { name: 'Afspraak' }]} />
+
+  <section class="section afspraak-section">
+    <div class="container">
+      <div class="afspraak-grid">
+        <aside class="afspraak-aside">
+          <div class="afspraak-aside-image-wrap">
+            <img src={`${base}images/shyla/sfeer-43.jpg`} alt="Shyla, voedingscoach" class="afspraak-aside-image" />
+          </div>
+          <div class="afspraak-aside-card">
+            <h3>Liever eerst even kletsen?</h3>
+            <p>Heb je vragen voor je een afspraak inplant? Stuur me gerust een bericht.</p>
+            <a href={`${base}contact`} class="btn btn-outline">Stel een vraag</a>
+          </div>
+        </aside>
+
+        <div class="afspraak-content">
+          <div class="section-title afspraak-intro">
+            <span class="section-label">Aan de slag</span>
+            <h1>Plan je <em class="text-pink">afspraak</em></h1>
+            <p>Kies een moment dat jou uitkomt. We starten met een gratis kennismaking, daarna kijken we samen wat er bij jou past.</p>
+          </div>
+
+          <div class="afspraak-widget-card card">
+            <vg-guest-booking widget-key="6a00e55518088a6692e1a9c6" club-id="100302" lang="nl" source=""></vg-guest-booking>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script is:inline src="https://static.virtuagym.com/vg-guest-booking-widget/dist/js/app.js"></script>
+</BaseLayout>
+</content>
+</invoke>

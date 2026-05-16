@@ -543,12 +543,25 @@ p { color: var(--color-gray-light); line-height: 1.75; }
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 1fr 1.3fr;
-  gap: 5rem;
+  grid-template-columns: 1fr 1.1fr;
+  grid-template-areas:
+    "photo     verhaal"
+    "betekenen verhaal"
+    "betekenen foto2"
+    "motto     motto"
+    "values    values"
+    "cta       cta";
+  gap: 3rem 5rem;
   align-items: start;
   margin-top: 3rem;
 }
-.about-image-wrap { position: relative; }
+.about-image-wrap       { grid-area: photo; position: relative; }
+.about-block--verhaal   { grid-area: verhaal; }
+.about-block--betekenen { grid-area: betekenen; }
+.about-inline-image     { grid-area: foto2; margin: -6rem 0 0; align-self: start; }
+.about-block--motto     { grid-area: motto; }
+.about-values           { grid-area: values; }
+.about-cta-row          { grid-area: cta; }
 .about-image-decoration {
   position: absolute;
   inset: -12px;
@@ -670,6 +683,18 @@ p { color: var(--color-gray-light); line-height: 1.75; }
   background: var(--color-pink);
 }
 
+.about-inline-image {
+  margin: 2rem 0 2.5rem;
+  position: relative;
+}
+.about-inline-image img {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  border-radius: 28% 72% 65% 35% / 30% 35% 65% 70%;
+  box-shadow: var(--shadow-lg);
+  display: block;
+}
 .about-block--motto {
   padding: 1.5rem 1.75rem;
   background: var(--color-pink-light);
@@ -753,6 +778,24 @@ p { color: var(--color-gray-light); line-height: 1.75; }
 
 /* ── Recipes section ─────────────────────────────────── */
 .recipes-section { background: var(--color-bg); }
+.recipes-intro {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+.recipes-intro-text { text-align: left; margin: 0; max-width: none; }
+.recipes-intro-text h1,
+.recipes-intro-text p { text-align: left; }
+.recipes-intro-image-wrap { position: relative; max-width: 280px; margin-left: auto; }
+.recipes-intro-image {
+  width: 100%;
+  aspect-ratio: 4/5;
+  object-fit: cover;
+  border-radius: 28% 72% 65% 35% / 30% 35% 65% 70%;
+  box-shadow: var(--shadow-lg);
+}
 .recipes-empty {
   text-align: center;
   padding: 4rem 0;
@@ -1024,7 +1067,7 @@ p { color: var(--color-gray-light); line-height: 1.75; }
 .blog-card { border: 1px solid var(--color-border); }
 .blog-card-visual {
   position: relative;
-  height: 180px;
+  aspect-ratio: 3/4;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1181,17 +1224,21 @@ p { color: var(--color-gray-light); line-height: 1.75; }
 .contact-info-card { padding: 1.75rem; border: 1px solid var(--color-border); }
 .contact-info-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
   border-bottom: 1px solid var(--color-border);
+  text-align: center;
 }
 .contact-info-avatar {
-  width: 52px; height: 52px;
-  border-radius: 50%;
+  width: 100%;
+  max-width: 220px;
+  aspect-ratio: 3/4;
   overflow: hidden;
-  border: 2px solid var(--color-pink-light);
+  border-radius: 28% 72% 65% 35% / 30% 35% 65% 70%;
+  box-shadow: var(--shadow-md);
   flex-shrink: 0;
 }
 .contact-info-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
@@ -1215,7 +1262,70 @@ p { color: var(--color-gray-light); line-height: 1.75; }
 .contact-social-link strong { display: block; font-size: 0.875rem; font-weight: 600; }
 .contact-social-link span   { display: block; font-size: 0.75rem; opacity: 0.85; margin-top: 0.1rem; }
 
+/* ── Afspraak ────────────────────────────────────────── */
+.afspraak-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 3rem;
+  margin-top: 3rem;
+  align-items: start;
+}
+.afspraak-aside { position: sticky; top: 6rem; display: flex; flex-direction: column; gap: 1.5rem; }
+.afspraak-aside-image-wrap { position: relative; }
+.afspraak-aside-image {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 28% 72% 65% 35% / 30% 35% 65% 70%;
+  box-shadow: var(--shadow-lg);
+}
+.afspraak-aside-card {
+  background: var(--color-pink-light);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+}
+.afspraak-aside-card h3 {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  color: var(--color-gray);
+  margin-bottom: 0.5rem;
+}
+.afspraak-aside-card p { font-size: 0.875rem; color: var(--color-gray-light); margin-bottom: 1rem; }
+.afspraak-intro { text-align: left; margin: 0 0 2rem; max-width: none; }
+.afspraak-intro h1, .afspraak-intro p { text-align: left; }
+.afspraak-widget-card { padding: 1.5rem; min-height: 400px; }
+
 /* ── FAQ ─────────────────────────────────────────────── */
+.faq-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 3rem;
+  margin-top: 3rem;
+  align-items: start;
+}
+.faq-aside { position: sticky; top: 6rem; display: flex; flex-direction: column; gap: 1.5rem; }
+.faq-aside-image-wrap { position: relative; }
+.faq-aside-image {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 28% 72% 65% 35% / 30% 35% 65% 70%;
+  box-shadow: var(--shadow-lg);
+}
+.faq-aside-card {
+  background: var(--color-pink-light);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+}
+.faq-aside-card h3 {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  color: var(--color-gray);
+  margin-bottom: 0.5rem;
+}
+.faq-aside-card p { font-size: 0.875rem; color: var(--color-gray-light); margin-bottom: 1rem; }
 .contact-faq { margin-top: 1.5rem; }
 .contact-faq h3 { font-size: 1rem; margin-bottom: 0.75rem; color: var(--color-gray); font-family: var(--font-heading); }
 .contact-faq--link p { font-size: 0.9rem; margin-bottom: 1rem; }
@@ -1310,11 +1420,36 @@ p { color: var(--color-gray-light); line-height: 1.75; }
   .hero-subtitle { margin: 0 auto 2rem; }
   .hero-stats { margin: 0 auto; }
 
-  .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+  .about-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas: none;
+    gap: 3rem;
+  }
+  .about-image-wrap,
+  .about-block--verhaal,
+  .about-block--betekenen,
+  .about-inline-image,
+  .about-block--motto,
+  .about-values,
+  .about-cta-row { grid-area: auto; }
+  .about-inline-image { margin: 2rem 0 2.5rem; }
   .about-image { aspect-ratio: 4/3; }
   .about-image-badge { left: 0.5rem; }
   .about-image-stat  { right: 0.5rem; }
   .about-cta-row { flex-direction: column; }
+
+  .faq-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .faq-aside { position: static; max-width: 320px; margin: 0 auto; }
+
+  .afspraak-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .afspraak-aside { position: static; max-width: 320px; margin: 0 auto; }
+  .afspraak-intro, .afspraak-intro h1, .afspraak-intro p { text-align: center; }
+
+  .recipes-intro { grid-template-columns: 1fr; gap: 2rem; text-align: center; }
+  .recipes-intro-text { text-align: center; }
+  .recipes-intro-text h1,
+  .recipes-intro-text p { text-align: center; }
+  .recipes-intro-image-wrap { max-width: 300px; margin: 0 auto; }
 
   .footer-top { flex-direction: column; text-align: center; }
   .footer-nav ul { flex-wrap: wrap; justify-content: center; }
@@ -1340,7 +1475,6 @@ p { color: var(--color-gray-light); line-height: 1.75; }
   .grid-3, .grid-2 { grid-template-columns: 1fr; }
   .section { padding: 1.5rem 0; }
   .recipe-image-wrap { height: 180px; }
-  .blog-card-visual { height: 160px; }
 }
 
 @media (max-width: 480px) {

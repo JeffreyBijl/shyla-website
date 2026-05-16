@@ -6,6 +6,7 @@ import type { Recipe, RecipeCategory } from '../../data/types.ts'
 import { RECIPE_CATEGORY_EMOJIS } from '../../data/types.ts'
 import recipesData from '../../data/recipes.json'
 
+const base = import.meta.env.BASE_URL
 const recipes = recipesData as Recipe[]
 
 const categories: Array<'alle' | RecipeCategory> = ['alle', 'ontbijt', 'lunch', 'diner', 'snack', 'dessert']
@@ -19,10 +20,15 @@ const categories: Array<'alle' | RecipeCategory> = ['alle', 'ontbijt', 'lunch', 
 
   <section class="section recipes-section">
     <div class="container">
-      <div class="section-title">
-        <span class="section-label">Voeding</span>
-        <h1>Heerlijke <em class="text-pink">recepten</em></h1>
-        <p>Voedzaam, lekker en klaar in een handomdraai</p>
+      <div class="recipes-intro">
+        <div class="section-title recipes-intro-text">
+          <span class="section-label">Voeding</span>
+          <h1>Heerlijke <em class="text-pink">recepten</em></h1>
+          <p>Voedzaam, lekker en klaar in een handomdraai. Recepten waar ik zelf van geniet — makkelijk te maken en passend in een gebalanceerde leefstijl.</p>
+        </div>
+        <div class="recipes-intro-image-wrap">
+          <img src={`${base}images/shyla/sfeer-14.jpg`} alt="Shyla maakt een ontbijtbowl" class="recipes-intro-image" />
+        </div>
       </div>
       <div class="filter-bar">
         {categories.map(cat => (

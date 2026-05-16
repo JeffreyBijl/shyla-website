@@ -9,6 +9,7 @@ const links = [
   { href: `${base}blog`, label: 'Blog' },
   { href: `${base}faq`, label: 'FAQ' },
   { href: `${base}contact`, label: 'Contact' },
+  { href: `${base}afspraak`, label: 'Plan afspraak' },
 ]
 
 function isActive(href: string): boolean {
@@ -32,7 +33,7 @@ function isActive(href: string): boolean {
             class:list={[
               'header-link',
               { 'header-link--active': isActive(link.href) },
-              { 'btn btn-primary header-cta': link.label === 'Contact' },
+              { 'btn btn-primary header-cta': link.label === 'Plan afspraak' },
             ]}
           >
             {link.label}
