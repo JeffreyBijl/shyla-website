@@ -53,7 +53,7 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { min-height: 100%; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
 body {
   font-family: var(--font-body);
   background: var(--bg);
@@ -61,6 +61,7 @@ body {
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 #root {
   min-height: 100vh;
@@ -121,8 +122,8 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
   margin: 0 auto;
   padding: 0 var(--gutter);
 }
-.section { padding: clamp(72px, 9vw, 128px) 0; }
-.section--tight { padding: clamp(56px, 7vw, 96px) 0; }
+.section { padding: clamp(40px, 5vw, 80px) 0; }
+.section--tight { padding: clamp(32px, 4vw, 64px) 0; }
 
 /* ── Buttons ── */
 .btn {
@@ -165,15 +166,12 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
 /* ── Nav (Header) ── */
 .nav {
   position: sticky; top: 0; z-index: 50;
-  background: color-mix(in oklab, var(--bg) 86%, transparent);
-  backdrop-filter: saturate(140%) blur(12px);
-  -webkit-backdrop-filter: saturate(140%) blur(12px);
+  background: var(--bg);
   border-bottom: 1px solid transparent;
   transition: border-color var(--t), background var(--t);
 }
 .nav.scrolled {
   border-color: var(--line);
-  background: color-mix(in oklab, var(--bg) 96%, transparent);
 }
 .nav-inner {
   display: flex; align-items: center; justify-content: space-between;
@@ -188,7 +186,7 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
   display: block;
   object-fit: contain;
   mix-blend-mode: multiply;
-  filter: contrast(1.04) saturate(1.05);
+  filter: contrast(1.18) brightness(1.02) saturate(1.05);
 }
 @media (max-width: 600px) {
   .nav-logo { height: 44px; }
@@ -260,7 +258,7 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
 }
 
 /* ── Section heading ── */
-.s-head { margin-bottom: 56px; }
+.s-head { margin-bottom: 40px; }
 .s-head.center { text-align: center; max-width: 640px; margin-left: auto; margin-right: auto; }
 .s-head .eyebrow { margin-bottom: 18px; }
 .s-head h1, .s-head h2 { margin-bottom: 16px; }
@@ -269,7 +267,7 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
 
 /* ── Hero ── */
 .hero {
-  padding: clamp(56px, 7vw, 96px) 0 clamp(72px, 9vw, 120px);
+  padding: clamp(32px, 4vw, 56px) 0 clamp(40px, 5vw, 72px);
   position: relative;
   overflow: hidden;
   background:
@@ -575,7 +573,9 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
 
 /* ── About page ── */
 .about-hero {
-  padding: clamp(56px, 7vw, 96px) 0 clamp(48px, 6vw, 80px);
+  padding: clamp(32px, 4vw, 56px) 0 clamp(24px, 3vw, 48px);
+  position: relative;
+  overflow: hidden;
   background:
     radial-gradient(60vw 50vh at -10% 0%, var(--blush), transparent 60%),
     radial-gradient(50vw 50vh at 110% 100%, var(--sage-soft), transparent 60%),
@@ -704,7 +704,7 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
 }
 
 /* ── Contact / Aside grid (shared by contact, afspraak, faq) ── */
-.contact-section { padding: clamp(56px, 7vw, 96px) 0; }
+.contact-section { padding: clamp(32px, 4vw, 64px) 0; }
 .contact-grid {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
@@ -715,11 +715,41 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
 .contact-grid--reverse {
   grid-template-columns: 1fr 1.4fr;
 }
+/* Grid-items mogen niet uitdijen tot intrinsieke breedte van third-party kinderen
+   (zoals de VirtuaGym <vg-guest-booking> die ~470px minimum vraagt). */
+.contact-grid > *,
+.contact-grid--reverse > * {
+  min-width: 0;
+}
+/* Afspraak: tighter mobile spacing — widget moet dicht op de breadcrumb staan */
+.contact-grid--widget-first { margin-top: 32px; }
 .contact-form-wrap {
   background: var(--white);
   border: 1px solid var(--line-soft);
   border-radius: var(--r-lg);
   padding: 44px;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* VirtuaGym booking widget — force responsive */
+.afspraak-widget-wrap {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: clamp(16px, 3vw, 32px);
+  min-height: 460px;
+  overflow-x: auto;
+}
+.afspraak-widget-wrap > vg-guest-booking,
+.afspraak-widget-wrap vg-guest-booking {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+vg-guest-booking iframe,
+vg-guest-booking * {
+  max-width: 100% !important;
 }
 .contact-form { display: flex; flex-direction: column; gap: 20px; }
 .contact-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
@@ -772,6 +802,9 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
   border: 1px solid var(--line-soft);
   border-radius: var(--r-md);
   overflow: hidden;
+  width: 100%;
+  max-width: 420px;
+  margin-inline: auto;
 }
 .contact-card-image {
   aspect-ratio: 5/4;
@@ -827,7 +860,7 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
 .breadcrumb [aria-current="page"] { color: var(--ink); }
 
 /* ── Recipe detail ── */
-.recipe-detail-section { padding: clamp(40px, 6vw, 80px) 0 clamp(72px, 9vw, 120px); }
+.recipe-detail-section { padding: clamp(24px, 3vw, 48px) 0 clamp(48px, 6vw, 80px); }
 .recipe-detail-section .container { max-width: 920px; }
 .recipe-detail-back {
   display: inline-flex; align-items: center; gap: 8px;
@@ -1009,7 +1042,7 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
 }
 
 /* ── Blog detail ── */
-.blog-detail-section { padding: clamp(40px, 6vw, 80px) 0 clamp(72px, 9vw, 120px); }
+.blog-detail-section { padding: clamp(24px, 3vw, 48px) 0 clamp(48px, 6vw, 80px); }
 .blog-detail-section .container { max-width: 760px; }
 .blog-detail-header { margin-bottom: 40px; }
 .blog-detail-header .badge {
@@ -1174,61 +1207,6 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
 }
 .footer > .container { position: relative; z-index: 1; }
 
-.footer-cta {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 48px;
-  align-items: center;
-  padding-bottom: 40px;
-  border-bottom: 1px solid rgba(246, 239, 229, 0.14);
-  margin-bottom: 40px;
-}
-.footer-cta-eyebrow {
-  display: inline-flex; align-items: center; gap: 10px;
-  font-family: var(--font-body);
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--pink-soft);
-  margin-bottom: 14px;
-}
-.footer-cta-eyebrow::before {
-  content: '';
-  width: 24px; height: 1px; background: var(--pink-soft);
-}
-.footer-cta-heading {
-  font-family: var(--font-head);
-  font-size: clamp(1.8rem, 3.4vw, 2.6rem);
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  color: var(--bg);
-  margin: 0;
-  max-width: 460px;
-}
-.footer-cta-heading em { font-style: italic; color: var(--pink); }
-.footer-cta-right p {
-  color: rgba(246, 239, 229, 0.85);
-  font-size: 0.98rem;
-  line-height: 1.65;
-  margin-bottom: 20px;
-  max-width: 440px;
-}
-.footer-cta-actions {
-  display: flex; gap: 12px; flex-wrap: wrap;
-}
-.footer-cta-actions .btn-outline {
-  background: transparent;
-  border-color: rgba(246, 239, 229, 0.4);
-  color: var(--bg);
-}
-.footer-cta-actions .btn-outline:hover {
-  background: var(--bg);
-  color: var(--mocha-deep);
-  border-color: var(--bg);
-}
-
 .footer h4 {
   color: var(--bg);
   margin-bottom: 16px;
@@ -1244,14 +1222,6 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
   grid-template-columns: 1.6fr 1fr 1fr 1fr;
   gap: 48px;
   padding-bottom: 32px;
-}
-.footer-logo {
-  height: 54px;
-  width: auto;
-  display: block;
-  margin-bottom: 16px;
-  mix-blend-mode: screen;
-  filter: brightness(1.08) contrast(0.92);
 }
 .footer-tagline {
   color: rgba(246, 239, 229, 0.85);
@@ -1333,11 +1303,50 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
     grid-template-columns: 1fr;
   }
   .contact-grid--reverse .contact-aside { order: -1; }
-  .hero-grid { gap: 48px; }
+  /* Afspraak: widget eerst, fallback-kaart als afsluiting + minder spacing */
+  .contact-grid--widget-first .contact-aside { order: 1; }
+  .contact-grid--widget-first { margin-top: 16px; }
+  .contact-grid--widget-first .s-head { margin-bottom: 28px; }
+  /* Bij gestapelde contact-grid layouts op mobiel: centreer s-head, eyebrow en card-tekst */
+  .contact-grid .s-head:not(.center),
+  .contact-grid--reverse .s-head:not(.center) {
+    text-align: center;
+  }
+  .contact-grid .s-head:not(.center) p,
+  .contact-grid--reverse .s-head:not(.center) p {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 520px;
+  }
+  .contact-grid .contact-card-body,
+  .contact-grid--reverse .contact-card-body {
+    text-align: center;
+  }
+  .contact-grid .contact-card-body .btn,
+  .contact-grid--reverse .contact-card-body .btn {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .contact-grid .contact-social,
+  .contact-grid--reverse .contact-social {
+    text-align: left;
+  }
+  /* Hero op mobiel: titel → foto → rest van de tekst */
+  .hero-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .hero-text { display: contents; }
+  .hero .eyebrow { order: 1; }
+  .hero h1 { order: 2; }
+  .hero-image { order: 3; margin: 8px 0 32px; }
+  .hero-lede { order: 4; }
+  .hero-actions { order: 5; }
+  .hero-meta { order: 6; }
   .nav-links { display: none; }
   .nav-toggle { display: inline-flex; }
   .nav-cta { display: none; }
-  .footer-cta { grid-template-columns: 1fr; gap: 32px; padding-bottom: 48px; margin-bottom: 48px; align-items: start; }
   .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; padding-bottom: 48px; }
   .footer-brand { grid-column: 1 / -1; }
   .about-story-aside { position: static; margin-bottom: 32px; }
@@ -1351,13 +1360,14 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
 }
 @media (max-width: 640px) {
   :root { --gutter: 20px; }
-  .section { padding: 56px 0; }
+  .section { padding: 32px 0; }
+  .section--tight { padding: 24px 0; }
   .recipe-grid, .features-grid, .approach-grid,
   .related-content .grid-3 {
     grid-template-columns: 1fr;
   }
   .nutrition-grid { grid-template-columns: repeat(2, 1fr); }
-  .hero { padding: 32px 0 56px; }
+  .hero { padding: 16px 0 32px; }
   .hero-meta { gap: 20px; flex-wrap: wrap; }
   .hero-meta-num { font-size: 1.7rem; }
   .hero-meta-pillar { font-size: 1.05rem; }
@@ -1367,7 +1377,7 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
   .footer { padding: 56px 0 24px; }
   .footer-grid { grid-template-columns: 1fr; gap: 32px; padding-bottom: 32px; }
   .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
-  .s-head { margin-bottom: 40px; }
+  .s-head { margin-bottom: 28px; }
   .about-story-body p:first-child::first-letter,
   .blog-detail-content > p:first-of-type::first-letter {
     font-size: 2.6rem;
@@ -1376,7 +1386,10 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
   .feature { padding: 28px 24px; }
   .recipes-preview-head { margin-bottom: 32px; }
   .contact-card-body { padding: 22px; }
-  .contact-form-wrap { padding: 22px; border-radius: var(--r-md); }
+  .contact-form-wrap { padding: 18px; border-radius: var(--r-md); }
+  .contact-section:has(.contact-grid--widget-first) { padding-top: 24px; }
+  .contact-grid--widget-first { margin-top: 8px; }
+  .contact-grid--widget-first .s-head { margin-bottom: 20px; }
   .filter-bar { gap: 8px; }
   .chip { padding: 8px 14px; font-size: 0.8rem; }
   .recipe-detail-ingredients, .recipe-detail-steps, .recipe-detail-nutrition { padding: 24px; }
