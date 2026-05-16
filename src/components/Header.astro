@@ -9,7 +9,6 @@ const links = [
   { href: `${base}blog`, label: 'Blog' },
   { href: `${base}faq`, label: 'FAQ' },
   { href: `${base}contact`, label: 'Contact' },
-  { href: `${base}afspraak`, label: 'Plan afspraak' },
 ]
 
 function isActive(href: string): boolean {
@@ -20,56 +19,89 @@ function isActive(href: string): boolean {
 }
 ---
 
-<nav class="header-nav" id="header-nav">
-  <div class="container header-inner">
-    <a href={base} class="header-logo" aria-label="fit.foodbyshyla home">
-      <img src={`${base}logo.jpeg`} alt="fit.foodbyshyla logo" class="header-logo-img" />
+<nav class="nav" id="site-nav">
+  <div class="container nav-inner">
+    <a href={base} class="nav-brand" aria-label="fit.foodbyshyla home">
+      <img src={`${base}logo.jpeg`} alt="fit.foodbyshyla" class="nav-logo" />
     </a>
-    <ul class="header-links" id="header-links" role="list">
+    <ul class="nav-links">
       {links.map((link) => (
         <li>
           <a
             href={link.href}
-            class:list={[
-              'header-link',
-              { 'header-link--active': isActive(link.href) },
-              { 'btn btn-primary header-cta': link.label === 'Plan afspraak' },
-            ]}
+            class:list={['nav-link', { active: isActive(link.href) }]}
           >
             {link.label}
           </a>
         </li>
       ))}
+      <li>
+        <a href={`${base}afspraak`} class="btn btn-pink nav-cta">Plan afspraak</a>
+      </li>
     </ul>
-    <button class="hamburger" id="hamburger" aria-label="Menu openen" aria-expanded="false">
-      <span></span><span></span><span></span>
+    <button
+      class="nav-toggle"
+      id="nav-toggle"
+      aria-label="Menu openen"
+      aria-expanded="false"
+      aria-controls="mobile-drawer"
+    >
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <line x1="4" y1="7" x2="20" y2="7" />
+        <line x1="4" y1="12" x2="20" y2="12" />
+        <line x1="4" y1="17" x2="20" y2="17" />
+      </svg>
     </button>
   </div>
 </nav>
 
+<div class="mobile-drawer" id="mobile-drawer" role="dialog" aria-modal="true" aria-label="Menu">
+  <button class="mobile-drawer-close" id="mobile-drawer-close" aria-label="Menu sluiten">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <line x1="6" y1="6" x2="18" y2="18" />
+      <line x1="18" y1="6" x2="6" y2="18" />
+    </svg>
+  </button>
+  {links.map((link) => (
+    <a
+      href={link.href}
+      class:list={['nav-link', { active: isActive(link.href) }]}
+    >
+      {link.label}
+    </a>
+  ))}
+  <a href={`${base}afspraak`} class="btn btn-pink mobile-drawer-cta">Plan afspraak</a>
+</div>
+
 <script>
-  const nav = document.getElementById('header-nav')
-  const hamburger = document.getElementById('hamburger')
-  const links = document.getElementById('header-links')
+  const nav = document.getElementById('site-nav')
+  const toggle = document.getElementById('nav-toggle')
+  const drawer = document.getElementById('mobile-drawer')
+  const closeBtn = document.getElementById('mobile-drawer-close')
 
-  // Sticky shadow on scroll
-  window.addEventListener('scroll', () => {
-    nav?.classList.toggle('header-scrolled', window.scrollY > 10)
-  })
+  // Sticky scrolled state
+  const onScroll = () => {
+    if (window.scrollY > 10) nav?.classList.add('scrolled')
+    else nav?.classList.remove('scrolled')
+  }
+  window.addEventListener('scroll', onScroll, { passive: true })
+  onScroll()
 
-  // Hamburger toggle
-  hamburger?.addEventListener('click', () => {
-    const isOpen = links?.classList.toggle('header-links--open')
-    hamburger.setAttribute('aria-expanded', String(isOpen))
-    hamburger.classList.toggle('hamburger--open', isOpen ?? false)
-  })
+  function openDrawer() {
+    drawer?.classList.add('open')
+    toggle?.setAttribute('aria-expanded', 'true')
+    document.body.style.overflow = 'hidden'
+  }
+  function closeDrawer() {
+    drawer?.classList.remove('open')
+    toggle?.setAttribute('aria-expanded', 'false')
+    document.body.style.overflow = ''
+  }
 
-  // Close menu on link click
-  links?.querySelectorAll('.header-link').forEach((link) => {
-    link.addEventListener('click', () => {
-      links.classList.remove('header-links--open')
-      hamburger?.classList.remove('hamburger--open')
-      hamburger?.setAttribute('aria-expanded', 'false')
-    })
+  toggle?.addEventListener('click', openDrawer)
+  closeBtn?.addEventListener('click', closeDrawer)
+  drawer?.querySelectorAll('a').forEach((a) => a.addEventListener('click', closeDrawer))
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && drawer?.classList.contains('open')) closeDrawer()
   })
 </script>

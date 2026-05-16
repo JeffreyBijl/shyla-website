@@ -10,197 +10,129 @@ const base = import.meta.env.BASE_URL
   description="Leer Shyla kennen: haar verhaal, missie en aanpak als voedingscoach."
 >
   <Breadcrumb items={[{ name: 'Home', href: '' }, { name: 'Over mij' }]} />
-  <section class="section about-section">
-    <div class="about-bg-shape" aria-hidden="true"></div>
+
+  <!-- ── About hero ── -->
+  <section class="about-hero">
     <div class="container">
-      <div class="section-title">
-        <span class="section-label">Even voorstellen</span>
-        <h1>Hoi, ik ben <em class="text-pink">Shyla!</em></h1>
-        <p>Voedingscoach, foodlover en jouw gids naar een gezonder leven</p>
-      </div>
-
-      <div class="about-grid">
-        <div class="about-image-wrap">
-          <div class="about-image-decoration" aria-hidden="true"></div>
-          <img src={`${base}images/shyla/over-mij.jpg`} alt="Shyla, voedingscoach" class="about-image" />
-          <div class="about-image-badge">
-            <span>🌿</span>
-            <span>Gecertificeerd voedingscoach</span>
+      <div class="about-hero-grid">
+        <div>
+          <span class="eyebrow">Even voorstellen</span>
+          <h1>Hoi, ik ben <em>Shyla</em></h1>
+          <p>
+            Voedingscoach, foodlover en jouw gids naar een gezonder leven. Geen strenge regels — wel echte balans en blijvende verandering.
+          </p>
+          <div class="values">
+            <span class="value-chip">Duurzame verandering</span>
+            <span class="value-chip">Zonder verboden</span>
+            <span class="value-chip">Plezier in eten</span>
+            <span class="value-chip">Op jouw tempo</span>
           </div>
-          <div class="about-image-stat">
-            <span class="about-stat-number">3+</span>
-            <span class="about-stat-label">jaar ervaring</span>
+          <div class="hero-actions" style="margin-bottom: 0;">
+            <a href={`${base}afspraak`} class="btn btn-primary">
+              Plan een afspraak
+              <svg class="btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+            <a href={`${base}recepten`} class="btn btn-outline">Mijn recepten</a>
           </div>
         </div>
+        <div class="about-hero-image">
+          <img src={`${base}images/shyla/over-mij.jpg`} alt="Shyla, voedingscoach" />
+        </div>
+      </div>
+    </div>
+  </section>
 
-        <div class="about-block about-block--verhaal">
+  <!-- ── Story ── -->
+  <section class="section about-story">
+    <div class="container">
+      <div class="about-story-grid">
+        <aside class="about-story-aside">
           <h3>Mijn verhaal</h3>
-          <p>
-            In 2022 veranderde mijn leven compleet. Ik verloor plots mijn man
-            en werd op 27-jarige leeftijd weduwe en alleenstaande moeder.
+          <h2>Van houvast naar <em>balans</em></h2>
+          <p style="font-size: 0.95rem;">
+            Hoe een persoonlijke crisis mij leerde dat gezond leven écht anders kan — zonder strenge diëten, en met liefde voor mezelf.
           </p>
-          <p>
-            Waar mijn avonden eerst gevuld waren met samen op de bank, series
-            kijken en lachen, zat ik ineens alleen. Het gemis, de leegte en het
-            verdriet probeerde ik te verzachten met eten.
-          </p>
-          <p>
-            Eten werd mijn houvast. Mijn troost.<br>
-            Maar ook mijn valkuil.
-          </p>
-          <p>
-            Ik raakte steeds vaker in patronen van emotie-eten en binge-eating.
-            Avonden waarin ik mijn gevoelens wegat en me daarna alleen maar
-            slechter voelde.
-          </p>
-          <p>
-            En voordat ik het doorhad, kwam ik flink aan.
-          </p>
-          <p>
-            Begin 2024 keek ik in de spiegel en dacht ik:<br>
-            wie is dit?
-          </p>
-          <p>
-            Ik herkende mezelf niet meer. En &eacute;&eacute;n gedachte bleef hangen.<br>
-            Ben ik nog wel gezond genoeg? Wat als er iets met mij gebeurt?<br>
-            Voor mijn zoontje. Voor mezelf. Voor mijn toekomst.<br>
-            Dat werd mijn omslagpunt.
-          </p>
-          <p>
-            Ik besloot het anders te doen. Niet vanuit straf, maar vanuit liefde.<br>
-            Ik verloor 15 kilo, en geloof me, met mijn 1,53 m is dat echt veel.
-            Ik begon met sporten, verdiepte me in voeding en bouwde stap voor
-            stap een nieuwe lifestyle.
-          </p>
-          <p>
-            Zonder strenge di&euml;ten.<br>
-            Zonder regels die je gek maken.<br>
-            Zonder een lijstje met wat wel en niet mag.
-          </p>
-          <p>
-            Maar met balans. Met eten waar ik blij van werd.<br>
-            En vooral met rust in mijn hoofd rondom voeding.
-          </p>
-          <p>
-            En nu wil ik jou daarbij helpen.
-          </p>
-        </div>
+        </aside>
 
-        <figure class="about-inline-image">
-          <img src={`${base}images/shyla/sfeer-43.jpg`} alt="Shyla in de keuken" loading="lazy" />
-        </figure>
+        <div class="about-story-body">
+          <p>
+            In 2022 veranderde mijn leven compleet. Ik verloor plots mijn man en werd op 27-jarige leeftijd weduwe en alleenstaande moeder. Waar mijn avonden eerst gevuld waren met samen op de bank, series kijken en lachen, zat ik ineens alleen.
+          </p>
+          <p>
+            Het gemis, de leegte en het verdriet probeerde ik te verzachten met eten. Eten werd mijn houvast. Mijn troost. Maar ook mijn valkuil.
+          </p>
+          <p>
+            Ik raakte steeds vaker in patronen van emotie-eten en binge-eating. Avonden waarin ik mijn gevoelens wegat en me daarna alleen maar slechter voelde. En voordat ik het doorhad, kwam ik flink aan.
+          </p>
 
-        <div class="about-block about-block--betekenen">
-          <h3>Wat ik voor jou kan betekenen</h3>
-          <p>
-            Of je nu wilt afvallen, aankomen of gewoon een betere relatie met
-            voeding wilt krijgen, ik sta naast je.
-          </p>
-          <p>
-            Ik geloof niet in strenge di&euml;ten en ook niet in standaard
-            maaltijdplannen die niemand volhoudt.
-          </p>
-          <p>
-            Ik geloof in een manier van eten die bij jou past. Waar je van geniet.
-            En die je helpt om uit de vicieuze cirkel van binge-eating en
-            emotie-eten te stappen.
-          </p>
-          <p>
-            Samen werken we aan een lifestyle die je niet alleen volhoudt, maar
-            waar je ook echt blij van wordt.
-          </p>
-          <p><strong>Dit kun je verwachten:</strong></p>
-          <ul class="about-list">
-            <li>1-op-1 coaching, persoonlijk en betrokken</li>
-            <li>Wekelijkse check-ins</li>
-            <li>Toegang tot mijn persoonlijke app waarin je alles kunt tracken en waarin ik workouts voor je maak</li>
-            <li>Food inspiratie met makkelijke recepten</li>
-            <li>Inzicht in jouw calorie&euml;n en macro&rsquo;s, zodat je vrijheid hebt in wat je eet, zonder de grip te verliezen</li>
-            <li>24/7 contactmogelijkheid</li>
-            <li>Elke 2 weken een persoonlijke call</li>
-            <li>Slimme food swaps zonder dat je het gevoel hebt dat je iets mist</li>
-          </ul>
-          <p>
-            Geen quick fixes.<br>
-            Geen alles-of-niets mentaliteit.<br>
-            Maar &eacute;chte, blijvende verandering.
-          </p>
-        </div>
+          <div class="about-portrait">
+            <img src={`${base}images/shyla/sfeer-43.jpg`} alt="Shyla in de keuken" loading="lazy" />
+            <img src={`${base}images/shyla/sfeer-54.jpg`} alt="Sfeer" loading="lazy" />
+          </div>
 
-        <div class="about-block about-block--motto">
-          <h3>Mijn motto</h3>
           <p>
-            De gezondste versie van jezelf worden moet leuk zijn.<br>
-            Want als je er plezier in hebt, hou je het vol.<br>
-            En dat is waar de magie gebeurt.
+            Begin 2024 keek ik in de spiegel en dacht ik: wie is dit? Ik herkende mezelf niet meer. En één gedachte bleef hangen — ben ik nog wel gezond genoeg? Voor mijn zoontje. Voor mezelf. Voor mijn toekomst.
           </p>
-        </div>
+          <p>
+            Ik besloot het anders te doen. Niet vanuit straf, maar vanuit liefde. Ik verloor 15 kilo, begon met sporten, verdiepte me in voeding en bouwde stap voor stap een nieuwe lifestyle.
+          </p>
 
-        <div class="about-values">
-          <div class="value-chip"><span>🥦</span> Duurzame verandering</div>
-          <div class="value-chip"><span>💪</span> Zonder verboden</div>
-          <div class="value-chip"><span>❤️</span> Plezier in eten</div>
-          <div class="value-chip"><span>🌱</span> Op jouw tempo</div>
-        </div>
+          <div class="about-story-pull">
+            De gezondste versie van jezelf worden moet leuk zijn. Want als je er plezier in hebt, hou je het vol — en dat is waar de magie gebeurt.
+          </div>
 
-        <div class="about-cta-row">
-          <a href={`${base}afspraak`} class="btn btn-primary">Plan je afspraak</a>
-          <a href={`${base}recepten`} class="btn btn-outline">Bekijk mijn recepten</a>
+          <p>
+            Zonder strenge diëten. Zonder regels die je gek maken. Maar met balans, met eten waar ik blij van werd, en vooral met rust in mijn hoofd rondom voeding. En nu wil ik jou daarbij helpen.
+          </p>
         </div>
       </div>
+    </div>
+  </section>
 
-      <!-- Approach cards -->
-      <div class="about-approach">
-        <div class="section-title" style="margin-top: 5rem;">
-          <span class="section-label">Werkwijze</span>
-          <h2>Hoe ik werk</h2>
+  <!-- ── Approach ── -->
+  <section class="section approach">
+    <div class="container">
+      <div class="s-head center">
+        <span class="eyebrow center">Werkwijze</span>
+        <h2>Hoe ik <em>werk</em></h2>
+        <p>Een traject begint altijd met luisteren — daarna bouwen we samen iets dat past.</p>
+      </div>
+      <div class="approach-grid">
+        <div class="approach-step">
+          <h3>Kennismaking</h3>
+          <p>We starten met een gratis gesprek om jouw doelen, leefstijl en wensen te begrijpen.</p>
         </div>
-        <div class="grid-3 approach-grid">
-          <div class="approach-card">
-            <div class="approach-number">01</div>
-            <h3>Kennismaking</h3>
-            <p>We starten met een gratis kennismakingsgesprek om jouw doelen en leefstijl te begrijpen.</p>
-          </div>
-          <div class="approach-card approach-card--accent">
-            <div class="approach-number">02</div>
-            <h3>Persoonlijk plan</h3>
-            <p>Op basis van jouw situatie stel ik een realistisch en lekker voedingsplan voor je op.</p>
-          </div>
-          <div class="approach-card">
-            <div class="approach-number">03</div>
-            <h3>Begeleiding</h3>
-            <p>Ik blijf je begeleiden, aanmoedigen en bijsturen — totdat het een natuurlijk onderdeel van je leven is.</p>
-          </div>
+        <div class="approach-step">
+          <h3>Persoonlijk plan</h3>
+          <p>Op basis van jouw situatie maak ik een realistisch en lekker voedingsplan op maat.</p>
+        </div>
+        <div class="approach-step">
+          <h3>Begeleiding</h3>
+          <p>Ik blijf je begeleiden, aanmoedigen en bijsturen tot het een natuurlijk deel van je leven is.</p>
         </div>
       </div>
+    </div>
+  </section>
 
-      <!-- Missie & Visie -->
-      <div class="about-mission-vision">
-        <div class="about-mv-block">
-          <div class="section-title" style="margin-top: 5rem;">
-            <span class="section-label">Missie</span>
-            <h2>Mijn missie</h2>
-          </div>
-          <p>
-            Ik help mensen om weer in balans te komen met voeding, los te komen
-            van emotie-eten en binge-eating en zich sterker, energieker en
-            zelfverzekerder te voelen op een manier die echt bij hen past.
-          </p>
+  <!-- ── Final CTA ── -->
+  <section class="section cta">
+    <div class="container">
+      <div class="cta-grid">
+        <div class="cta-body">
+          <span class="eyebrow">Aan de slag</span>
+          <h2 style="margin-top: 18px;">Klaar voor jouw <span class="accent">nieuwe stap?</span></h2>
+          <p>Geen quick fixes. Geen alles-of-niets mentaliteit. Maar échte, blijvende verandering.</p>
+          <a href={`${base}afspraak`} class="btn btn-pink">
+            Plan je afspraak
+            <svg class="btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
         </div>
-
-        <div class="about-mv-block">
-          <div class="section-title" style="margin-top: 4rem;">
-            <span class="section-label">Visie</span>
-            <h2>Mijn visie</h2>
-          </div>
-          <p>
-            Ik geloof in een wereld waarin gezond leven niet draait om perfectie
-            of strikte regels, maar om balans en vrijheid.<br>
-            Waarin je kunt genieten van eten zonder schuldgevoel.<br>
-            Waarin je leert luisteren naar je lichaam.<br>
-            En waarin je loskomt van patronen zoals binge-eating en emotie-eten.<br>
-            Zodat jij je niet alleen fysiek sterker voelt, maar ook mentaal vrij.
-          </p>
+        <div class="cta-image">
+          <img src={`${base}images/shyla/sfeer-92.jpg`} alt="Shyla" />
         </div>
       </div>
     </div>

@@ -12,34 +12,34 @@ const apiUrl = isProd ? `${base}api/contact.php` : ''
   description="Neem contact op met Shyla voor vragen over voeding, samenwerkingen of persoonlijke begeleiding."
 >
   <Breadcrumb items={[{ name: 'Home', href: '' }, { name: 'Contact' }]} />
-  <section class="section contact-section">
-    <div class="contact-bg-blob" aria-hidden="true"></div>
+
+  <section class="contact-section">
     <div class="container">
-      <div class="section-title">
-        <span class="section-label">Samenwerken?</span>
-        <h1>Neem <em class="text-pink">contact</em> op</h1>
-        <p>Heb je een vraag of wil je graag samenwerken? Ik hoor het graag!</p>
+      <div class="s-head center" style="margin-bottom: 16px;">
+        <span class="eyebrow center">Samenwerken</span>
+        <h1>Neem <em>contact</em> op</h1>
+        <p>Vraag, opmerking of zin om samen te werken? Stuur me gerust een bericht.</p>
       </div>
 
       <div class="contact-grid">
         <!-- Form -->
         <div class="contact-form-wrap">
           <form class="contact-form" id="contact-form" novalidate data-api-url={apiUrl}>
-            <div class="form-row">
-              <div class="form-group">
+            <div class="contact-form-row">
+              <div class="field">
                 <label for="name">Naam</label>
                 <input type="text" id="name" name="name" placeholder="Jouw naam" required autocomplete="name" />
               </div>
-              <div class="form-group">
+              <div class="field">
                 <label for="email">E-mailadres</label>
                 <input type="email" id="email" name="email" placeholder="jouw@email.nl" required autocomplete="email" />
               </div>
             </div>
-            <div class="form-group">
+            <div class="field">
               <label for="subject">Onderwerp</label>
               <input type="text" id="subject" name="subject" placeholder="Waarover wil je contact?" />
             </div>
-            <div class="form-group">
+            <div class="field">
               <label for="message">Bericht</label>
               <textarea id="message" name="message" rows="6" placeholder="Schrijf hier je bericht..." required></textarea>
             </div>
@@ -47,10 +47,10 @@ const apiUrl = isProd ? `${base}api/contact.php` : ''
               <label for="website">Website (laat dit veld leeg)</label>
               <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
             </div>
-            <button type="submit" class="btn btn-primary contact-submit">
+            <button type="submit" class="btn btn-primary contact-submit" style="align-self: flex-start; margin-top: 8px;">
               Verstuur bericht
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              <svg class="btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
               </svg>
             </button>
             <div class="form-feedback" id="form-feedback" hidden role="alert"></div>
@@ -59,40 +59,38 @@ const apiUrl = isProd ? `${base}api/contact.php` : ''
 
         <!-- Aside -->
         <aside class="contact-aside">
-          <div class="contact-info-card card">
-            <div class="contact-info-header">
-              <div class="contact-info-avatar">
-                <img src={`${base}images/shyla/contact.jpg`} alt="Shyla" />
-              </div>
-              <div>
-                <strong>Shyla</strong>
-                <span>Voedingscoach</span>
-              </div>
+          <div class="contact-card">
+            <div class="contact-card-image">
+              <img src={`${base}images/shyla/contact.jpg`} alt="Shyla" />
             </div>
-            <p>Ik reageer doorgaans binnen 1-2 werkdagen. Kijk ook gerust op mijn socials!</p>
-
-            <div class="contact-social-list">
-              <a href="https://instagram.com" target="_blank" rel="noopener" class="contact-social-link contact-social-link--instagram">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+            <div class="contact-card-body">
+              <h3>Shyla</h3>
+              <div class="role">Voedingscoach</div>
+              <p>Ik reageer doorgaans binnen 1-2 werkdagen. Liever direct iets inplannen? Klik dan op de knop hieronder.</p>
+              <a href={`${base}afspraak`} class="btn btn-pink">
+                Plan kennismaking
+                <svg class="btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
                 </svg>
-                <div>
-                  <strong>Instagram</strong>
-                  <span>@fit.foodbyshyla</span>
-                </div>
               </a>
+              <div class="contact-social">
+                <a href="https://instagram.com/fit.foodbyshyla" target="_blank" rel="noopener">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+                  </svg>
+                  Instagram
+                  <span class="handle">@fit.foodbyshyla</span>
+                </a>
+                <a href="mailto:info@fitfoodbyshyla.nl">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                  </svg>
+                  E-mail
+                  <span class="handle">info@fitfoodbyshyla.nl</span>
+                </a>
+              </div>
             </div>
-          </div>
-
-          <div class="contact-faq contact-faq--link">
-            <h3>Veelgestelde vragen</h3>
-            <p>Antwoorden op vragen over coaching, voeding, schema's en mijn aanpak.</p>
-            <a href={`${base}faq`} class="btn btn-outline">
-              Bekijk alle vragen
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-              </svg>
-            </a>
           </div>
         </aside>
       </div>
@@ -128,7 +126,7 @@ const apiUrl = isProd ? `${base}api/contact.php` : ''
     const originalLabel = submitBtn.innerHTML
     submitBtn.disabled = true
     submitBtn.textContent = 'Versturen...'
-    feedback && (feedback.hidden = true)
+    if (feedback) feedback.hidden = true
 
     try {
       const formData = new FormData(form)

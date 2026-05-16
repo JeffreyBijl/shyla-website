@@ -3,13 +3,19 @@ import BaseLayout from '../../layouts/BaseLayout.astro'
 import Breadcrumb from '../../components/Breadcrumb.astro'
 import RecipeCard from '../../components/RecipeCard.astro'
 import type { Recipe, RecipeCategory } from '../../data/types.ts'
-import { RECIPE_CATEGORY_EMOJIS } from '../../data/types.ts'
 import recipesData from '../../data/recipes.json'
 
 const base = import.meta.env.BASE_URL
 const recipes = recipesData as Recipe[]
 
-const categories: Array<'alle' | RecipeCategory> = ['alle', 'ontbijt', 'lunch', 'diner', 'snack', 'dessert']
+const filters: Array<{ value: 'alle' | RecipeCategory; label: string }> = [
+  { value: 'alle', label: 'Alles' },
+  { value: 'ontbijt', label: 'Ontbijt' },
+  { value: 'lunch', label: 'Lunch' },
+  { value: 'diner', label: 'Diner' },
+  { value: 'snack', label: 'Snack' },
+  { value: 'dessert', label: 'Dessert' },
+]
 ---
 
 <BaseLayout
@@ -18,37 +24,58 @@ const categories: Array<'alle' | RecipeCategory> = ['alle', 'ontbijt', 'lunch', 
 >
   <Breadcrumb items={[{ name: 'Home', href: '' }, { name: 'Recepten' }]} />
 
-  <section class="section recipes-section">
+  <section class="section section--tight">
     <div class="container">
-      <div class="recipes-intro">
-        <div class="section-title recipes-intro-text">
-          <span class="section-label">Voeding</span>
-          <h1>Heerlijke <em class="text-pink">recepten</em></h1>
-          <p>Voedzaam, lekker en klaar in een handomdraai. Recepten waar ik zelf van geniet — makkelijk te maken en passend in een gebalanceerde leefstijl.</p>
+      <div class="recipes-preview-head" style="align-items: flex-end;">
+        <div class="s-head" style="margin-bottom: 0;">
+          <span class="eyebrow">De keuken van Shyla</span>
+          <h1>Eerlijke <em>recepten</em>, elke dag</h1>
+          <p>Bekijk lekkere, voedzame gerechten die je gemakkelijk in jouw week past — zonder dat het saai wordt.</p>
         </div>
-        <div class="recipes-intro-image-wrap">
-          <img src={`${base}images/shyla/sfeer-14.jpg`} alt="Shyla maakt een ontbijtbowl" class="recipes-intro-image" />
-        </div>
+        <span class="recipes-count" id="recipes-count">{recipes.length} recepten</span>
       </div>
+
       <div class="filter-bar">
-        {categories.map(cat => (
+        {filters.map((f, i) => (
           <button
-            class={`filter-btn ${cat === 'alle' ? 'filter-btn--active' : ''}`}
-            data-filter={cat}
+            class:list={['chip', { active: i === 0 }]}
+            data-filter={f.value}
+            type="button"
           >
-            {RECIPE_CATEGORY_EMOJIS[cat]}
-            {cat.charAt(0).toUpperCase() + cat.slice(1)}
+            {f.label}
           </button>
         ))}
       </div>
-      <div class="grid-3 recipes-grid" id="recipes-grid">
-        {recipes.map(recipe => (
-          <RecipeCard recipe={recipe} />
-        ))}
+
+      <div class="recipe-grid" id="recipes-grid">
+        {recipes.map(recipe => <RecipeCard recipe={recipe} />)}
       </div>
+
       <div class="recipes-empty" id="recipes-empty" hidden>
-        <span>😔</span>
+        <span aria-hidden="true">🍳</span>
         <p>Geen recepten gevonden in deze categorie.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Closing CTA ── -->
+  <section class="section cta">
+    <div class="container">
+      <div class="cta-grid">
+        <div class="cta-body">
+          <span class="eyebrow">Persoonlijke aanpak</span>
+          <h2 style="margin-top: 18px;">Wil je een plan op <span class="accent">maat?</span></h2>
+          <p>Recepten zijn het begin. Voor blijvende verandering loop ik 1-op-1 met je mee — eerlijk en zonder oordeel.</p>
+          <a href={`${base}afspraak`} class="btn btn-pink">
+            Plan een kennismaking
+            <svg class="btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
+        </div>
+        <div class="cta-image">
+          <img src={`${base}images/shyla/sfeer-32.jpg`} alt="Shyla in de keuken" />
+        </div>
       </div>
     </div>
   </section>
@@ -57,23 +84,25 @@ const categories: Array<'alle' | RecipeCategory> = ['alle', 'ontbijt', 'lunch', 
 <script>
   const grid = document.getElementById('recipes-grid')
   const empty = document.getElementById('recipes-empty')
-  const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn')
+  const counter = document.getElementById('recipes-count')
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.chip[data-filter]')
+  const total = grid?.querySelectorAll('.recipe-card-link').length ?? 0
 
   buttons.forEach(btn => {
     btn.addEventListener('click', () => {
       const filter = btn.dataset.filter!
+      buttons.forEach(b => b.classList.remove('active'))
+      btn.classList.add('active')
 
-      buttons.forEach(b => b.classList.remove('filter-btn--active'))
-      btn.classList.add('filter-btn--active')
-
-      let visibleCount = 0
+      let visible = 0
       grid?.querySelectorAll<HTMLElement>('.recipe-card-link').forEach(link => {
         const show = filter === 'alle' || link.dataset.category === filter
         link.style.display = show ? '' : 'none'
-        if (show) visibleCount++
+        if (show) visible++
       })
 
-      if (empty) empty.hidden = visibleCount > 0
+      if (empty) empty.hidden = visible > 0
+      if (counter) counter.textContent = `${visible} recept${visible === 1 ? '' : 'en'}`
     })
   })
 </script>

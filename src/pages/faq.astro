@@ -63,24 +63,34 @@ const faqSchema = {
   extraSchemas={[faqSchema]}
 >
   <Breadcrumb items={[{ name: 'Home', href: '' }, { name: 'Veelgestelde vragen' }]} />
-  <section class="section">
+
+  <section class="contact-section">
     <div class="container">
-      <div class="section-title">
-        <span class="section-label">FAQ</span>
-        <h1>Veelgestelde <em class="text-pink">vragen</em></h1>
-        <p>Antwoorden op de meest gestelde vragen</p>
+      <div class="s-head center" style="margin-bottom: 16px;">
+        <span class="eyebrow center">FAQ</span>
+        <h1>Veelgestelde <em>vragen</em></h1>
+        <p>Antwoorden op de meest gestelde vragen over coaching en voeding.</p>
       </div>
-      <div class="faq-grid">
-        <aside class="faq-aside">
-          <div class="faq-aside-image-wrap">
-            <img src={`${base}images/shyla/sfeer-74.jpg`} alt="Shyla" class="faq-aside-image" />
-          </div>
-          <div class="faq-aside-card">
-            <h3>Vraag staat er niet bij?</h3>
-            <p>Stel jouw vraag gerust persoonlijk. Ik antwoord doorgaans binnen 1-2 werkdagen.</p>
-            <a href={`${base}contact`} class="btn btn-primary">Neem contact op</a>
+
+      <div class="contact-grid contact-grid--reverse">
+        <aside class="contact-aside">
+          <div class="contact-card">
+            <div class="contact-card-image">
+              <img src={`${base}images/shyla/sfeer-74.jpg`} alt="Shyla" />
+            </div>
+            <div class="contact-card-body">
+              <h3>Vraag staat er niet bij?</h3>
+              <p>Stel jouw vraag gerust persoonlijk. Ik antwoord doorgaans binnen 1-2 werkdagen.</p>
+              <a href={`${base}contact`} class="btn btn-pink">
+                Neem contact op
+                <svg class="btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+                </svg>
+              </a>
+            </div>
           </div>
         </aside>
+
         <div class="faq-list">
           {faqs.map(faq => (
             <details class="faq-item">

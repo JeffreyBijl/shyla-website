@@ -60,7 +60,7 @@ const hasNutrition = recipe.nutrition && recipe.nutrition.kcal > 0
       )}
 
       <div class="recipe-detail-header">
-        <span class="badge badge-pink">{recipe.category}</span>
+        <span class="badge">{recipe.category.charAt(0).toUpperCase() + recipe.category.slice(1)}</span>
         <h1>{recipe.title}</h1>
         <div class="recipe-detail-meta">
           <span class="recipe-meta-item">

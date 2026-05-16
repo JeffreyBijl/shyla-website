@@ -48,21 +48,22 @@ const articleSchema = buildArticleSchema(
     { name: post.title },
   ]} />
 
-  <section class="section blog-detail-section">
+  <section class="blog-detail-section">
     <div class="container">
       <a href={`${base}blog`} class="recipe-detail-back">&larr; Terug naar blog</a>
 
       {post.image && (
-        <div class="recipe-detail-hero">
+        <div class="recipe-detail-hero recipe-detail-hero--portrait">
           <img src={`${base}${post.image}`} alt={post.title} />
         </div>
       )}
 
       <div class="blog-detail-header">
-        <span class="badge badge-pink">{post.category}</span>
+        <span class="badge">{post.category}</span>
         <h1>{post.title}</h1>
         <div class="blog-detail-meta">
           <time datetime={post.date}>{formatDateDutch(post.date)}</time>
+          <span>·</span>
           <span>{post.readTime} leestijd</span>
         </div>
       </div>
