@@ -3,11 +3,49 @@ import BaseLayout from '../layouts/BaseLayout.astro'
 import Breadcrumb from '../components/Breadcrumb.astro'
 
 const base = import.meta.env.BASE_URL
+const siteUrl = Astro.site?.origin ?? ''
+
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Shyla',
+  alternateName: 'fit.foodbyshyla',
+  jobTitle: 'Voedingscoach',
+  description:
+    'Nederlandse voedingscoach gespecialiseerd in duurzame leefstijlverandering zonder strenge diëten, met focus op emotie-eten en binge-eating recovery. Werkt 1-op-1 met klanten via persoonlijke coaching, wekelijkse check-ins en een eigen app.',
+  image: `${siteUrl}${base}images/shyla/over-mij.jpg`,
+  url: `${siteUrl}${base}over-mij`,
+  sameAs: [
+    'https://instagram.com/fit.foodbyshyla',
+  ],
+  email: 'info@fitfoodbyshyla.nl',
+  knowsAbout: [
+    'Voedingscoaching',
+    'Emotie-eten',
+    'Binge-eating recovery',
+    'Duurzame leefstijlverandering',
+    'Persoonlijke coaching',
+    'Gezonde voeding',
+    'Balans in eetpatroon',
+    'Macro\'s en calorieën',
+  ],
+  worksFor: {
+    '@type': 'Organization',
+    name: 'fit.foodbyshyla',
+    url: `${siteUrl}${base}`,
+  },
+  knowsLanguage: 'nl',
+  nationality: {
+    '@type': 'Country',
+    name: 'Nederland',
+  },
+}
 ---
 
 <BaseLayout
   title="Over Shyla — Voedingscoach"
   description="Leer Shyla kennen: haar verhaal, missie en aanpak als voedingscoach."
+  extraSchemas={[personSchema]}
 >
   <Breadcrumb items={[{ name: 'Home', href: '' }, { name: 'Over mij' }]} />
 

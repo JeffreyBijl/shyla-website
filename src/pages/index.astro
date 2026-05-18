@@ -2,11 +2,45 @@
 import BaseLayout from '../layouts/BaseLayout.astro'
 
 const base = import.meta.env.BASE_URL
+const siteUrl = Astro.site?.origin ?? ''
+
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: '1-op-1 voedingscoaching',
+  serviceType: 'Voedingscoaching',
+  description:
+    'Persoonlijke voedingscoaching met wekelijkse check-ins, een plan op maat, toegang tot een coaching-app met workouts, en elke twee weken een 1-op-1 call. Geen strenge diëten — focus op duurzame balans, emotie-eten en blijvende verandering.',
+  provider: {
+    '@type': 'Person',
+    name: 'Shyla',
+    jobTitle: 'Voedingscoach',
+    url: `${siteUrl}${base}over-mij`,
+  },
+  areaServed: {
+    '@type': 'Country',
+    name: 'Nederland',
+  },
+  audience: {
+    '@type': 'Audience',
+    audienceType: 'Volwassenen met focus op duurzame leefstijlverandering, emotie-eten of binge-eating',
+  },
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'EUR',
+    name: 'Gratis kennismakingsgesprek',
+    description: 'Vrijblijvende intake om te kijken of het klikt en welk traject past.',
+    url: `${siteUrl}${base}afspraak`,
+  },
+  url: `${siteUrl}${base}`,
+}
 ---
 
 <BaseLayout
   title="Voedingscoach Shyla — Gezond & lekker eten"
   description="Voedingscoach Shyla helpt je een gezonde lifestyle op te bouwen zonder strenge diëten — met focus op balans, emotie-eten en duurzame verandering."
+  extraSchemas={[serviceSchema]}
 >
   <!-- ── Hero ── -->
   <section class="hero">
