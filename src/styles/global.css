@@ -389,6 +389,11 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
+.features-grid--two {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 820px;
+  margin: 0 auto;
+}
 .feature {
   padding: 36px 32px;
   border: 1px solid var(--line-soft);

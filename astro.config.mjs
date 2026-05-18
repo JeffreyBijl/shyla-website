@@ -9,7 +9,7 @@ export default defineConfig({
   base: isProd ? '/' : '/shyla-website/',
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('admin-shyla'),
+      filter: (page) => !page.includes('admin-shyla') && !page.includes('/recepten'),
     }),
     vue({ appEntrypoint: '/src/admin/main' }),
   ],

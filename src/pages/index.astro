@@ -1,12 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro'
-import RecipeCard from '../components/RecipeCard.astro'
-import type { Recipe } from '../data/types.ts'
-import recipesData from '../data/recipes.json'
 
 const base = import.meta.env.BASE_URL
-const recipes = recipesData as Recipe[]
-const featuredRecipes = recipes.slice(0, 3)
 ---
 
 <BaseLayout
@@ -71,20 +66,9 @@ const featuredRecipes = recipes.slice(0, 3)
         <p>Persoonlijke coaching, eerlijke recepten en kennis die je écht verder helpt.</p>
       </div>
 
-      <div class="features-grid">
-        <div class="feature">
-          <span class="feature-num">01 — Recepten</span>
-          <h3>Lekker &amp; voedzaam</h3>
-          <p>Heerlijke gerechten voor elk moment van de dag. Niet streng, wel doordacht.</p>
-          <a href={`${base}recepten`} class="btn-ghost">
-            Bekijk recepten
-            <svg class="btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
-            </svg>
-          </a>
-        </div>
+      <div class="features-grid features-grid--two">
         <div class="feature feature--accent">
-          <span class="feature-num">02 — Coaching</span>
+          <span class="feature-num">01 — Coaching</span>
           <h3>1-op-1 begeleiding</h3>
           <p>Persoonlijk, betrokken en zonder oordeel. Wekelijkse check-ins en een plan dat bij jou past.</p>
           <a href={`${base}afspraak`} class="btn-ghost">
@@ -95,7 +79,7 @@ const featuredRecipes = recipes.slice(0, 3)
           </a>
         </div>
         <div class="feature">
-          <span class="feature-num">03 — Blog</span>
+          <span class="feature-num">02 — Blog</span>
           <h3>Eerlijke kennis</h3>
           <p>Artikelen over voeding, emotie-eten en leefstijl — geschreven vanuit eigen ervaring.</p>
           <a href={`${base}blog`} class="btn-ghost">
@@ -108,30 +92,6 @@ const featuredRecipes = recipes.slice(0, 3)
       </div>
     </div>
   </section>
-
-  <!-- ── Recipes preview ── -->
-  {featuredRecipes.length > 0 && (
-    <section class="section recipes-preview">
-      <div class="container">
-        <div class="recipes-preview-head">
-          <div class="s-head">
-            <span class="eyebrow">Uit de keuken</span>
-            <h2>Recepten die <span class="accent">eerlijk smaken</span></h2>
-          </div>
-          <a href={`${base}recepten`} class="btn btn-outline">
-            Alle recepten
-            <svg class="btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
-            </svg>
-          </a>
-        </div>
-
-        <div class="recipe-grid">
-          {featuredRecipes.map(recipe => <RecipeCard recipe={recipe} />)}
-        </div>
-      </div>
-    </section>
-  )}
 
   <!-- ── CTA banner ── -->
   <section class="section cta">
