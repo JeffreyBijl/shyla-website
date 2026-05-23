@@ -34,7 +34,7 @@ const hasNutrition = recipe.nutrition && recipe.nutrition.kcal > 0
 ---
 
 <BaseLayout
-  title={`${recipe.title} — Recept`}
+  title={`${recipe.title} · Recept`}
   description={`${recipe.description} Bekijk het volledige recept met ingrediënten en bereidingswijze.`}
   image={recipe.image ? `${base}${recipe.image}` : undefined}
   extraSchemas={[recipeSchema]}

@@ -14,7 +14,7 @@ export const GET: APIRoute = ({ site }) => {
 
 ## Over Shyla
 
-- [Over mij](${url('over-mij')}): Shyla's persoonlijke verhaal — hoe ze in 2022 weduwe werd op 27-jarige leeftijd, in patronen van emotie-eten belandde, en in 2024 15 kilo verloor en haar relatie met voeding herontdekte zonder strenge regels.
+- [Over mij](${url('over-mij')}): Shyla's persoonlijke verhaal: hoe ze in 2022 weduwe werd op 27-jarige leeftijd, in patronen van emotie-eten belandde, en in 2024 15 kilo verloor en haar relatie met voeding herontdekte zonder strenge regels.
 - [Werkwijze en veelgestelde vragen](${url('faq')}): Hoe een coachingstraject bij Shyla werkt, wat je krijgt, en antwoorden op vragen over emotie-eten, maaltijdschema's, afvallen en duurzame verandering.
 
 ## Aanbod
@@ -25,8 +25,8 @@ export const GET: APIRoute = ({ site }) => {
 
 ## Lezen & leren
 
-- [Blog overzicht](${url('blog')}): Eerlijke artikelen over voeding, leefstijl en gezond leven — geschreven vanuit eigen ervaring.
-- [5 tips voor een gezond ontbijt](${url('blog/5-tips-voor-een-gezond-ontbijt-dat-je-de-hele-ochtend-volhoudt')}): Praktische tips om je ochtend door te komen zonder energiedip — eiwit eerst, vezels erbij, minder suiker.
+- [Blog overzicht](${url('blog')}): Eerlijke artikelen over voeding, leefstijl en gezond leven, geschreven vanuit eigen ervaring.
+- [5 tips voor een gezond ontbijt](${url('blog/5-tips-voor-een-gezond-ontbijt-dat-je-de-hele-ochtend-volhoudt')}): Praktische tips om je ochtend door te komen zonder energiedip: eiwit eerst, vezels erbij, minder suiker.
 - [Waarom proteïne zo belangrijk is voor vrouwen](${url('blog/waarom-proteine-zo-belangrijk-is-voor-vrouwen')}): Wat eiwit doet voor hormoonbalans, huid, haar en energie, en waarom de meeste vrouwen er véél te weinig van binnenkrijgen.
 - [De waarheid over "gezonde" snacks uit de supermarkt](${url('blog/de-waarheid-over-gezonde-snacks-uit-de-supermarkt')}): Hoe je een voedingsetiket leest als een pro en niet meer voor marketingclaims valt.
 
@@ -34,7 +34,7 @@ export const GET: APIRoute = ({ site }) => {
 
 - Geen strenge diëten of vaste verboden
 - Plezier en duurzaamheid staan boven snelle resultaten
-- Persoonlijk traject — geen standaard schema's
+- Persoonlijk traject, geen standaard schema's
 - Speciale aandacht voor emotie-eten en binge-eating recovery
 - Begeleiding op het tempo dat bij de klant past
 - 1-op-1 coaching, geen groepsprogramma's
@@ -43,6 +43,7 @@ export const GET: APIRoute = ({ site }) => {
 
 - E-mail: info@fitfoodbyshyla.nl
 - Instagram: @fit.foodbyshyla
+- TikTok: @fit.foodbyshyla
 - Website: ${site.origin}${base}
 `
 
