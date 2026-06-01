@@ -5,7 +5,8 @@ import BlogCard from '../../components/BlogCard.astro'
 import blogData from '../../data/blog.json'
 import type { BlogPost } from '../../data/types.ts'
 
-const blogPosts: BlogPost[] = blogData as BlogPost[]
+// Meest recente artikel eerst (bovenaan op mobiel, linksboven op desktop)
+const blogPosts: BlogPost[] = [...(blogData as BlogPost[])].sort((a, b) => b.date.localeCompare(a.date))
 ---
 
 <BaseLayout
