@@ -757,7 +757,7 @@ vg-guest-booking * {
 }
 .contact-form { display: flex; flex-direction: column; gap: 20px; }
 .contact-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.field { display: flex; flex-direction: column; gap: 8px; }
+.field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .field label {
   font-size: 0.78rem;
   font-weight: 600;
@@ -767,6 +767,7 @@ vg-guest-booking * {
 }
 .field input, .field textarea {
   font: inherit;
+  width: 100%;
   padding: 14px 16px;
   border: 1.5px solid var(--line);
   border-radius: var(--r-sm);
