@@ -185,8 +185,6 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
   width: auto;
   display: block;
   object-fit: contain;
-  mix-blend-mode: multiply;
-  filter: contrast(1.18) brightness(1.02) saturate(1.05);
 }
 @media (max-width: 600px) {
   .nav-logo { height: 44px; }
@@ -1352,6 +1350,8 @@ vg-guest-booking * {
   .nav-links { display: none; }
   .nav-toggle { display: inline-flex; }
   .nav-cta { display: none; }
+  .nav-inner { position: relative; justify-content: center; }
+  .nav-toggle { position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
   .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; padding-bottom: 48px; }
   .footer-brand { grid-column: 1 / -1; }
   .about-story-aside { position: static; margin-bottom: 32px; }
