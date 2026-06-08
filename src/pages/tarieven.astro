@@ -21,10 +21,11 @@ const base = import.meta.env.BASE_URL
 
       <div class="tarieven-frame-wrap">
         <iframe
+          id="tarieven-frame"
           src="https://fitfoodbyshyla.virtuagym.com/webshop/?club=TFJiTlA1bWs4WFpiakNFQlYrU3kyUT09&embedded=1"
           title="Tarieven en pakketten van fit.foodbyshyla"
           loading="lazy"
-          scrolling="yes"
+          scrolling="no"
         ></iframe>
       </div>
 
@@ -39,6 +40,26 @@ const base = import.meta.env.BASE_URL
       </div>
     </div>
   </section>
+
+  <script is:inline>
+    // Virtuagym stuurt (soms) zijn inhoudshoogte via postMessage. Vangen we die op,
+    // dan zetten we de iframe exact zo hoog zodat er nooit een interne scrollbar is.
+    // Zonder bericht blijft de vaste hoogte uit de CSS als fallback gelden.
+    (function () {
+      var frame = document.getElementById('tarieven-frame')
+      if (!frame) return
+      window.addEventListener('message', function (e) {
+        if (typeof e.origin === 'string' && e.origin.indexOf('virtuagym.com') === -1) return
+        var d = e.data
+        var h
+        if (typeof d === 'number') h = d
+        else if (typeof d === 'string') { try { var o = JSON.parse(d); h = o.height || o.iframeHeight || o.scrollHeight } catch (err) {} }
+        else if (d && typeof d === 'object') h = d.height || d.iframeHeight || d.scrollHeight || (d.payload && d.payload.height)
+        h = Number(h)
+        if (h > 200) frame.style.height = h + 'px'
+      })
+    })()
+  </script>
 </BaseLayout>
 
 <style>
@@ -54,13 +75,13 @@ const base = import.meta.env.BASE_URL
   .tarieven-frame-wrap iframe {
     display: block;
     width: 100%;
-    height: 1480px;
+    height: 1440px;
     border: none;
   }
 
   @media (max-width: 720px) {
     .tarieven-frame-wrap iframe {
-      height: 2200px;
+      height: 2600px;
     }
   }
 
