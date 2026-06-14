@@ -508,6 +508,12 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
 .recipe-photo--portrait img {
   object-position: center 15%;
 }
+.recipe-photo img[src*="high-protein"],
+.recipe-detail-hero img[src*="high-protein"],
+.recipe-photo img[src*="Noten"],
+.recipe-detail-hero img[src*="Noten"] {
+  object-position: center top;
+}
 .recipe-photo-fallback {
   width: 100%; height: 100%;
   display: grid; place-items: center;
