@@ -19,7 +19,7 @@ export const GET: APIRoute = ({ site }) => {
 
 ## Aanbod
 
-- [Plan een kennismaking](${url('afspraak')}): Gratis intake-gesprek. Bij een match: 1-op-1 coaching met wekelijkse check-ins, een persoonlijk voedingsplan, toegang tot Shyla's coaching-app met workouts, elke twee weken een call, en 24/7 contactmogelijkheid.
+- [Plan een kennismaking](${url('afspraak')}): Gratis kennismakingsgesprek. Bij een match: 1-op-1 coaching met wekelijkse check-ins, een persoonlijk voedingsplan, toegang tot Shyla's coaching-app met workouts, elke twee weken een call, en 24/7 contactmogelijkheid.
 - [Contact](${url('contact')}): Bericht sturen voor vragen, samenwerkingen, of als je wilt overleggen welk traject bij jou past. Reactie binnen 1-2 werkdagen.
 - [Samenwerkingen](${url('samenwerkingen')}): Mogelijkheden voor merken die passen bij gezond en lekker eten.
 
