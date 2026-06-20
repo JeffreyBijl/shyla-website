@@ -45,36 +45,42 @@ const base = import.meta.env.BASE_URL
 
 <style>
   /*
-   * De webshop scrollt binnen deze container, zodat een interne navigatie of
-   * focus in de iframe nooit de hele pagina kan wegtrekken.
+   * De webshop wordt opgesloten in een vak met vaste hoogte, zodat een interne
+   * navigatie of focus in de iframe nooit de hele pagina kan wegtrekken.
    *
-   * Belangrijk voor iOS (Safari/Chrome draaien beide op WebKit): WebKit negeert
-   * de hoogte op de iframe en laat 'm uitdijen tot de volledige inhoudshoogte.
-   * Daarom zetten we de scroll op de WRAPPER (overflow:auto + momentum-scrolling)
-   * i.p.v. op de iframe. De wrapper wordt zo een echte scroll-container die de
-   * (uitgedijde) iframe wel binnen z'n vak houdt op zowel desktop als iOS.
+   * Cruciaal voor iOS (Safari én Chrome draaien op WebKit): WebKit laat een
+   * iframe in de normale flow uitdijen tot de volledige inhoudshoogte, en
+   * overflow op de ouder houdt dat in Chrome niet tegen. Daarom positioneren we
+   * de iframe ABSOLUUT binnen de container: zo staat hij buiten de flow en kan
+   * hij de pagina niet langer maken, terwijl height:100% wel wordt afgedwongen.
+   * De iframe scrollt intern (scrolling=auto). Hoogte in dvh zodat het vak met
+   * de adresbalk van mobiele browsers meebeweegt.
    */
   .tarieven-frame-wrap {
+    position: relative;
     max-width: 820px;
     margin-inline: auto;
     background: var(--white, #FFFCF7);
     border-radius: 18px;
     box-shadow: 0 18px 48px rgba(74, 58, 44, 0.08);
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden;
     height: min(82vh, 1000px);
+    height: min(82dvh, 1000px);
   }
 
   .tarieven-frame-wrap iframe {
-    display: block;
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     border: none;
+    -webkit-overflow-scrolling: touch;
   }
 
   @media (max-width: 720px) {
     .tarieven-frame-wrap {
       height: min(78vh, 760px);
+      height: min(78dvh, 760px);
     }
   }
 
