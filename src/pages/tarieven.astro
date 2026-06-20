@@ -20,12 +20,20 @@ const base = import.meta.env.BASE_URL
       </div>
 
       <div class="tarieven-frame-wrap">
+        <!--
+          sandbox blokkeert dat de webshop bij het laden ongevraagd het
+          topvenster wegnavigeert (in Chrome op iOS sprong de pagina daardoor
+          naar de homepage). allow-top-navigation-by-user-activation laat een
+          echte klik (bv. afrekenen) wel toe; allow-same-origin houdt de eigen
+          sessie/cookies van de webshop intact.
+        -->
         <iframe
           id="tarieven-frame"
           src="https://fitfoodbyshyla.virtuagym.com/webshop/?club=TFJiTlA1bWs4WFpiakNFQlYrU3kyUT09&embedded=1"
           title="Tarieven en pakketten van fit.foodbyshyla"
           loading="lazy"
           scrolling="auto"
+          sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
         ></iframe>
       </div>
 
