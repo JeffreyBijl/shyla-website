@@ -25,7 +25,7 @@ const base = import.meta.env.BASE_URL
           src="https://fitfoodbyshyla.virtuagym.com/webshop/?club=TFJiTlA1bWs4WFpiakNFQlYrU3kyUT09&embedded=1"
           title="Tarieven en pakketten van fit.foodbyshyla"
           loading="lazy"
-          scrolling="no"
+          scrolling="auto"
         ></iframe>
       </div>
 
@@ -41,28 +41,15 @@ const base = import.meta.env.BASE_URL
     </div>
   </section>
 
-  <script is:inline>
-    // Virtuagym stuurt (soms) zijn inhoudshoogte via postMessage. Vangen we die op,
-    // dan zetten we de iframe exact zo hoog zodat er nooit een interne scrollbar is.
-    // Zonder bericht blijft de vaste hoogte uit de CSS als fallback gelden.
-    (function () {
-      var frame = document.getElementById('tarieven-frame')
-      if (!frame) return
-      window.addEventListener('message', function (e) {
-        if (typeof e.origin === 'string' && e.origin.indexOf('virtuagym.com') === -1) return
-        var d = e.data
-        var h
-        if (typeof d === 'number') h = d
-        else if (typeof d === 'string') { try { var o = JSON.parse(d); h = o.height || o.iframeHeight || o.scrollHeight } catch (err) {} }
-        else if (d && typeof d === 'object') h = d.height || d.iframeHeight || d.scrollHeight || (d.payload && d.payload.height)
-        h = Number(h)
-        if (h > 200) frame.style.height = h + 'px'
-      })
-    })()
-  </script>
 </BaseLayout>
 
 <style>
+  /*
+   * De webshop scrollt INTERN binnen deze container (eigen scroll), zodat een
+   * interne navigatie of focus in de iframe nooit de hele pagina kan wegtrekken.
+   * De native scrollbar van de iframe blijft zichtbaar, maar de content blijft
+   * wel netjes uitgelijnd (geen horizontale verschuiving).
+   */
   .tarieven-frame-wrap {
     max-width: 820px;
     margin-inline: auto;
@@ -70,18 +57,19 @@ const base = import.meta.env.BASE_URL
     border-radius: 18px;
     box-shadow: 0 18px 48px rgba(74, 58, 44, 0.08);
     overflow: hidden;
+    height: min(82vh, 1000px);
   }
 
   .tarieven-frame-wrap iframe {
     display: block;
     width: 100%;
-    height: 1440px;
+    height: 100%;
     border: none;
   }
 
   @media (max-width: 720px) {
-    .tarieven-frame-wrap iframe {
-      height: 2600px;
+    .tarieven-frame-wrap {
+      height: min(78vh, 760px);
     }
   }
 
