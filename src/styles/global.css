@@ -623,23 +623,12 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
 .about-story {
   background: var(--white);
 }
-.about-story-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.3fr;
-  gap: clamp(40px, 6vw, 88px);
+.about-story-body {
+  max-width: 720px;
+  margin: 0 auto;
 }
-.about-story-aside { position: sticky; top: 120px; align-self: start; }
-.about-story-aside h3 {
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--mocha);
-  font-family: var(--font-body);
-  margin-bottom: 14px;
-}
-.about-story-aside h2 { margin-bottom: 24px; }
-.about-story-body p { margin-bottom: 20px; font-size: 1.02rem; line-height: 1.75; }
+/* Shyla schrijft in korte losse regels; te veel ruimte ertussen breekt dat ritme */
+.about-story-body p { margin-bottom: 10px; font-size: 1.02rem; line-height: 1.75; }
 .about-story-body p:first-child::first-letter {
   font-family: var(--font-head);
   font-size: 3.2rem;
@@ -647,25 +636,6 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
   line-height: 0.9;
   padding: 6px 12px 0 0;
   color: var(--mocha);
-}
-.about-story-pull {
-  margin: 36px 0;
-  padding: 32px 36px;
-  background: var(--pink-soft);
-  border-radius: var(--r-md);
-  font-family: var(--font-head);
-  font-style: italic;
-  font-size: 1.35rem;
-  line-height: 1.4;
-  color: var(--mocha-deep);
-}
-.about-story-pull::before {
-  content: '"';
-  display: block;
-  font-size: 3rem;
-  line-height: 0.5;
-  color: var(--pink);
-  margin-bottom: 16px;
 }
 .about-portrait {
   margin: 56px 0;
@@ -1392,7 +1362,7 @@ vg-guest-booking * {
 }
 @media (max-width: 900px) {
   .hero-grid, .about-hero-grid, .cta-grid, .contact-grid, .contact-grid--reverse,
-  .about-story-grid, .about-pillars-grid, .recipe-detail-content {
+  .about-pillars-grid, .recipe-detail-content {
     grid-template-columns: 1fr;
   }
   .contact-grid--reverse .contact-aside { order: -1; }
@@ -1444,7 +1414,6 @@ vg-guest-booking * {
   .nav-toggle { position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
   .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; padding-bottom: 48px; }
   .footer-brand { grid-column: 1 / -1; }
-  .about-story-aside { position: static; margin-bottom: 32px; }
   .contact-form-row { grid-template-columns: 1fr; }
   .contact-form-wrap { padding: 28px; }
   .recipes-preview-head { flex-direction: column; align-items: flex-start; gap: 24px; }
@@ -1477,7 +1446,6 @@ vg-guest-booking * {
   .blog-detail-content > p:first-of-type::first-letter {
     font-size: 2.6rem;
   }
-  .about-story-pull { padding: 24px 22px; font-size: 1.15rem; }
   .about-motto-quote { padding: 24px 22px; font-size: 1.15rem; }
   .about-pillar { padding: 28px 24px; }
   .feature { padding: 28px 24px; }
