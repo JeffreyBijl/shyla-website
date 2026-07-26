@@ -443,7 +443,9 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
 }
 .cta h2 { color: var(--white); margin-bottom: 20px; }
 .cta h2 .accent { color: var(--pink); }
-.cta-body p { color: rgba(246, 239, 229, 0.88); font-size: 1.05rem; margin-bottom: 32px; max-width: 480px; }
+/* Korte regels onder elkaar; alleen onder de laatste ruimte voor de knop */
+.cta-body p { color: rgba(246, 239, 229, 0.88); font-size: 1.05rem; margin-bottom: 10px; max-width: 480px; }
+.cta-body p:last-of-type { margin-bottom: 32px; }
 .cta-image {
   aspect-ratio: 5/4;
   border-radius: var(--r-md);
@@ -607,7 +609,8 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
   align-items: center;
 }
 .about-hero h1 { margin: 18px 0 24px; }
-.about-hero p { font-size: 1.05rem; max-width: 440px; }
+.about-hero p { font-size: 1.05rem; max-width: 440px; margin-bottom: 14px; }
+.about-hero p:last-of-type { margin-bottom: 0; }
 .about-hero-image {
   aspect-ratio: 4/5;
   border-radius: 32px;
@@ -677,6 +680,76 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
   border-radius: var(--r-md);
 }
 .about-portrait img:nth-child(2) { margin-top: 48px; }
+
+/* Wat ik voor jou kan betekenen */
+.about-offer { background: var(--cream); }
+.about-offer-body {
+  max-width: 720px;
+  margin: 0 auto;
+}
+.about-offer-body p { margin-bottom: 16px; font-size: 1.02rem; line-height: 1.75; }
+.about-offer-body h3 {
+  margin: 36px 0 20px;
+  font-size: 1.25rem;
+}
+.about-offer-list { margin-bottom: 32px; }
+.about-offer-list li {
+  position: relative;
+  padding: 0 0 0 34px;
+  margin-bottom: 14px;
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+.about-offer-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 16px;
+  height: 9px;
+  border-left: 2px solid var(--pink);
+  border-bottom: 2px solid var(--pink);
+  transform: rotate(-45deg);
+}
+
+/* Motto */
+.about-motto { background: var(--white); }
+.about-motto-quote {
+  margin: 20px 0 0;
+  padding: 36px 40px;
+  background: var(--pink-soft);
+  border-radius: var(--r-md);
+  font-family: var(--font-head);
+  font-style: italic;
+  font-size: 1.35rem;
+  line-height: 1.4;
+  color: var(--mocha-deep);
+}
+.about-motto-quote::before {
+  content: '"';
+  display: block;
+  font-size: 3rem;
+  line-height: 0.5;
+  color: var(--pink);
+  margin-bottom: 16px;
+}
+
+/* Missie & visie */
+.about-pillars { background: var(--white); }
+.about-pillars-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+.about-pillar {
+  background: var(--cream);
+  padding: 40px 36px;
+  border-radius: var(--r-md);
+}
+.about-pillar h2 { margin-bottom: 20px; font-size: 1.6rem; }
+.about-pillar p { margin-bottom: 12px; line-height: 1.75; }
+.about-pillar p:last-child { margin-bottom: 0; }
 
 /* Approach */
 .approach { background: var(--cream); }
@@ -1319,7 +1392,7 @@ vg-guest-booking * {
 }
 @media (max-width: 900px) {
   .hero-grid, .about-hero-grid, .cta-grid, .contact-grid, .contact-grid--reverse,
-  .about-story-grid, .recipe-detail-content {
+  .about-story-grid, .about-pillars-grid, .recipe-detail-content {
     grid-template-columns: 1fr;
   }
   .contact-grid--reverse .contact-aside { order: -1; }
@@ -1405,6 +1478,8 @@ vg-guest-booking * {
     font-size: 2.6rem;
   }
   .about-story-pull { padding: 24px 22px; font-size: 1.15rem; }
+  .about-motto-quote { padding: 24px 22px; font-size: 1.15rem; }
+  .about-pillar { padding: 28px 24px; }
   .feature { padding: 28px 24px; }
   .recipes-preview-head { margin-bottom: 32px; }
   .contact-card-body { padding: 22px; }
