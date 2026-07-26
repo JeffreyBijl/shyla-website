@@ -4,12 +4,11 @@ import Breadcrumb from '../../components/Breadcrumb.astro'
 import RelatedContent from '../../components/RelatedContent.astro'
 import { buildArticleSchema } from '../../utils/seo.ts'
 import { formatDateDutch } from '../../utils/formatting.ts'
-import blogData from '../../data/blog.json'
+import { getPublishedPosts } from '../../utils/blog.ts'
 import type { BlogPost } from '../../data/types.ts'
 
 export function getStaticPaths() {
-  const posts = blogData as BlogPost[]
-  return posts.map((post) => ({
+  return getPublishedPosts().map((post) => ({
     params: { slug: post.slug },
     props: { post },
   }))

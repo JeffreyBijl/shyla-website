@@ -1,6 +1,5 @@
 ---
-import type { BlogPost } from '../data/types.ts'
-import blogData from '../data/blog.json'
+import { getPublishedPostsNewestFirst } from '../utils/blog.ts'
 
 interface Props {
   type: 'recipe' | 'blog'
@@ -9,13 +8,11 @@ interface Props {
 
 const { type, currentSlug } = Astro.props
 const base = import.meta.env.BASE_URL
-const blogPosts = blogData as BlogPost[]
 
 // Altijd doorlinken naar blog-artikelen (recepten-pagina is niet meer in gebruik),
 // meest recente eerst en het huidige artikel uitgesloten.
-const items = blogPosts
+const items = getPublishedPostsNewestFirst()
   .filter(p => p.slug !== currentSlug)
-  .sort((a, b) => b.date.localeCompare(a.date))
   .slice(0, 3)
   .map(p => ({
     title: p.title,

@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro'
+import { getPublishedPostsNewestFirst } from '../utils/blog.ts'
 
 export const GET: APIRoute = ({ site }) => {
   if (!site) {
@@ -7,6 +8,12 @@ export const GET: APIRoute = ({ site }) => {
 
   const base = import.meta.env.BASE_URL
   const url = (path: string) => `${site.origin}${base}${path}`.replace(/([^:])\/\//g, '$1/')
+
+  // Meest recente artikelen, zodat deze lijst niet naar verwijderde blogs verwijst
+  const recentPosts = getPublishedPostsNewestFirst()
+    .slice(0, 6)
+    .map((post) => `- [${post.title}](${url(`blog/${post.slug}`)}): ${post.shortDescription}`)
+    .join('\n')
 
   const body = `# fit.foodbyshyla
 
@@ -26,9 +33,7 @@ export const GET: APIRoute = ({ site }) => {
 ## Lezen & leren
 
 - [Blog overzicht](${url('blog')}): Eerlijke artikelen over voeding, leefstijl en gezond leven, geschreven vanuit eigen ervaring.
-- [5 tips voor een gezond ontbijt](${url('blog/5-tips-voor-een-gezond-ontbijt-dat-je-de-hele-ochtend-volhoudt')}): Praktische tips om je ochtend door te komen zonder energiedip: eiwit eerst, vezels erbij, minder suiker.
-- [Waarom proteïne zo belangrijk is voor vrouwen](${url('blog/waarom-proteine-zo-belangrijk-is-voor-vrouwen')}): Wat eiwit doet voor hormoonbalans, huid, haar en energie, en waarom de meeste vrouwen er véél te weinig van binnenkrijgen.
-- [De waarheid over "gezonde" snacks uit de supermarkt](${url('blog/de-waarheid-over-gezonde-snacks-uit-de-supermarkt')}): Hoe je een voedingsetiket leest als een pro en niet meer voor marketingclaims valt.
+${recentPosts}
 
 ## Filosofie & uitgangspunten
 

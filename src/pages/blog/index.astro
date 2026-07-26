@@ -2,11 +2,11 @@
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import Breadcrumb from '../../components/Breadcrumb.astro'
 import BlogCard from '../../components/BlogCard.astro'
-import blogData from '../../data/blog.json'
+import { getPublishedPostsNewestFirst } from '../../utils/blog.ts'
 import type { BlogPost } from '../../data/types.ts'
 
 // Meest recente artikel eerst (bovenaan op mobiel, linksboven op desktop)
-const blogPosts: BlogPost[] = [...(blogData as BlogPost[])].sort((a, b) => b.date.localeCompare(a.date))
+const blogPosts: BlogPost[] = getPublishedPostsNewestFirst()
 ---
 
 <BaseLayout

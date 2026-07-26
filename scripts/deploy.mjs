@@ -1,6 +1,6 @@
 import SftpClient from 'ssh2-sftp-client'
 import { resolve } from 'node:path'
-import { existsSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 
 const envFile = resolve('.env.deploy')
 if (!existsSync(envFile)) {
@@ -81,6 +81,25 @@ try {
 
   console.log(`→ Uploaden ${localPath} → ${remotePath}`)
   await sftp.uploadDir(localPath, remotePath)
+
+  // Blogmappen die niet (meer) in de build zitten weghalen. Bewust alleen binnen
+  // /blog/: de rest van de server wordt niet gespiegeld, want build:prod laat
+  // bijvoorbeeld het admin-paneel expres weg.
+  const localBlogDir = resolve(localPath, 'blog')
+  const remoteBlogDir = `${remotePath}/blog`
+  if (existsSync(localBlogDir) && (await sftp.exists(remoteBlogDir))) {
+    const localSlugs = new Set(
+      readdirSync(localBlogDir, { withFileTypes: true })
+        .filter((e) => e.isDirectory())
+        .map((e) => e.name),
+    )
+    const remoteEntries = await sftp.list(remoteBlogDir)
+    for (const entry of remoteEntries) {
+      if (entry.type !== 'd' || localSlugs.has(entry.name)) continue
+      await sftp.rmdir(`${remoteBlogDir}/${entry.name}`, true)
+      console.log(`  ✓ blog offline gehaald: ${entry.name}`)
+    }
+  }
 
   const seconds = ((Date.now() - start) / 1000).toFixed(1)
   console.log(`✓ Klaar — ${uploaded} bestanden in ${seconds}s`)
