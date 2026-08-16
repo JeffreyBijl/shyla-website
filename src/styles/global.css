@@ -518,7 +518,13 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
 }
 /* Banner met tekst links: links uitlijnen zodat de tekst niet wegvalt bij de 4:3-crop */
 .recipe-photo img[src*="caseine-kwark"],
-.recipe-photo img[src*="Havermout"] {
+.recipe-photo img[src*="Havermout"],
+.recipe-photo img[src*="glycemische-index"],
+.recipe-photo img[src*="groente-en-fruit"],
+.recipe-photo img[src*="simpele-vs-complexe"],
+.recipe-detail-hero img[src*="glycemische-index"],
+.recipe-detail-hero img[src*="groente-en-fruit"],
+.recipe-detail-hero img[src*="simpele-vs-complexe"] {
   object-position: left center;
 }
 /* Infographic met tekst tot aan de randen: volledig tonen in plaats van bijsnijden */
