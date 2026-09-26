@@ -2,20 +2,22 @@ import SftpClient from 'ssh2-sftp-client'
 import { resolve } from 'node:path'
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 
+// Lokaal komen de gegevens uit .env.deploy; in GitHub Actions uit secrets (env vars).
 const envFile = resolve('.env.deploy')
-if (!existsSync(envFile)) {
+if (existsSync(envFile)) {
+  for (const line of readFileSync(envFile, 'utf-8').split(/\r?\n/)) {
+    const trimmed = line.trim()
+    if (!trimmed || trimmed.startsWith('#')) continue
+    const eq = trimmed.indexOf('=')
+    if (eq === -1) continue
+    const key = trimmed.slice(0, eq).trim()
+    const val = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, '')
+    if (!(key in process.env)) process.env[key] = val
+  }
+} else if (!process.env.SFTP_HOST) {
   console.error('❌ .env.deploy ontbreekt.')
   console.error('   Kopieer .env.deploy.example naar .env.deploy en vul de TransIP-gegevens in.')
   process.exit(1)
-}
-for (const line of readFileSync(envFile, 'utf-8').split(/\r?\n/)) {
-  const trimmed = line.trim()
-  if (!trimmed || trimmed.startsWith('#')) continue
-  const eq = trimmed.indexOf('=')
-  if (eq === -1) continue
-  const key = trimmed.slice(0, eq).trim()
-  const val = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, '')
-  if (!(key in process.env)) process.env[key] = val
 }
 
 const required = ['SFTP_HOST', 'SFTP_USER', 'SFTP_PASS', 'SFTP_REMOTE_PATH']

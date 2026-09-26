@@ -1,0 +1,58 @@
+name: Wekelijkse deploy (fitfoodbyshyla.nl)
+
+# Blogs met een datum in de toekomst worden niet meegebouwd (src/utils/blog.ts).
+# Deze workflow bouwt elke maandag om 07:00 (Amsterdam) opnieuw en zet de site
+# op TransIP, zodat klaargezette blogs op hun datum vanzelf live gaan.
+
+on:
+  schedule:
+    # GitHub cron is altijd UTC: 05:00 UTC = 07:00 zomertijd, 06:00 UTC = 07:00 wintertijd.
+    - cron: '0 5 * * 1'
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Van de twee crons mag alleen die van 07:00 Amsterdam-tijd doorgaan.
+      # Gekeken wordt naar de huidige UTC-offset, niet naar de klok, zodat een
+      # vertraagde run van GitHub niet per ongeluk wordt overgeslagen.
+      - name: Controleer zomer-/wintertijd
+        id: guard
+        run: |
+          offset=$(TZ=Europe/Amsterdam date +%z)
+          schedule='${{ github.event.schedule }}'
+          run=true
+          if [ "$schedule" = '0 5 * * 1' ] && [ "$offset" != '+0200' ]; then run=false; fi
+          if [ "$schedule" = '0 6 * * 1' ] && [ "$offset" != '+0100' ]; then run=false; fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+          echo "Schedule: '${schedule:-handmatig}', offset $offset, deployen: $run"
+
+      - if: steps.guard.outputs.run == 'true'
+        uses: actions/checkout@v4
+      - if: steps.guard.outputs.run == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - if: steps.guard.outputs.run == 'true'
+        run: npm ci
+      - if: steps.guard.outputs.run == 'true'
+        run: npm run deploy
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_PASS: ${{ secrets.SFTP_PASS }}
+          SFTP_REMOTE_PATH: ${{ secrets.SFTP_REMOTE_PATH }}
