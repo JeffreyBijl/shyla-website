@@ -507,9 +507,6 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
   object-fit: cover;
   transition: transform 700ms cubic-bezier(.2,.7,.3,1);
 }
-.recipe-photo--portrait img {
-  object-position: center 15%;
-}
 .recipe-photo img[src*="high-protein"],
 .recipe-detail-hero img[src*="high-protein"],
 .recipe-photo img[src*="Noten"],
@@ -530,6 +527,25 @@ p { color: var(--ink-soft); line-height: 1.7; text-wrap: pretty; }
 /* Infographic met tekst tot aan de randen: volledig tonen in plaats van bijsnijden */
 .recipe-photo img[src*="Nutri-score"] {
   object-fit: contain;
+}
+/* Blogbanners zijn breed en bevatten vaak tekst: in het overzicht altijd volledig tonen
+   in plaats van bijsnijden. 16:9 past bij de meeste banners; wijkt er een af, dan vult
+   de achtergrondkleur de rand. Gaat voor de uitlijnregels hierboven. */
+.recipe-photo--blog { aspect-ratio: 16/9; }
+.recipe-photo.recipe-photo--blog img[src] {
+  object-fit: contain;
+  object-position: center;
+}
+/* Gewone foto's zonder tekst (deels staand) wel bijsnijden, anders worden de randen te groot */
+.recipe-photo.recipe-photo--blog img[src*="Noten"],
+.recipe-photo.recipe-photo--blog img[src*="high-protein"] {
+  object-fit: cover;
+  object-position: center top;
+}
+.recipe-photo.recipe-photo--blog img[src*="avocado-toast"],
+.recipe-photo.recipe-photo--blog img[src*="spaghetti-with-olives"],
+.recipe-photo.recipe-photo--blog img[src*="sfeer-"] {
+  object-fit: cover;
 }
 .recipe-photo-fallback {
   width: 100%; height: 100%;
@@ -949,6 +965,9 @@ vg-guest-booking * {
 }
 .recipe-detail-hero img { width: 100%; height: 100%; object-fit: cover; }
 .recipe-detail-hero--portrait img { object-position: center 15%; }
+/* Extra brede banners (breder dan ongeveer 2:1): het vak krijgt de vorm van de banner,
+   anders valt er bij 16:10 te veel van de zijkanten weg */
+.recipe-detail-hero:has(img[src*="vetpercentage-man-vs-vrouw"]) { aspect-ratio: 2048 / 768; }
 .recipe-detail-hero--fallback {
   display: grid; place-items: center;
   font-size: 6rem;
@@ -1176,7 +1195,10 @@ vg-guest-booking * {
 .blog-detail-content img {
   border-radius: var(--r-md);
   margin: 24px 0;
+  width: 100%;
+  height: auto;
 }
+.blog-detail-content a:has(> img) { display: block; }
 
 /* ── FAQ ── */
 .faq-list {

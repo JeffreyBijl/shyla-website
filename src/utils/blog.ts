@@ -15,8 +15,12 @@ function buildDate(): string {
  * Blogs met een datum in de toekomst worden niet meegebouwd. Zo kun je een blog
  * alvast committen zonder dat een tussentijdse deploy hem te vroeg live zet;
  * hij verschijnt bij de eerste deploy op of na zijn publicatiedatum.
+ *
+ * Met SHOW_SCHEDULED=1 (alleen lokaal, bijv. `SHOW_SCHEDULED=1 npm run dev`) worden
+ * ingeplande blogs wel getoond, om ze vooraf te kunnen bekijken.
  */
 export function getPublishedPosts(): BlogPost[] {
+  if (process.env.SHOW_SCHEDULED === '1') return blogData as BlogPost[]
   const today = buildDate()
   return (blogData as BlogPost[]).filter((post) => post.date <= today)
 }
