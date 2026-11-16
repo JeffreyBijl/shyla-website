@@ -21,9 +21,10 @@ interface Props {
 const { post } = Astro.props
 const base = import.meta.env.BASE_URL
 
-// Plaatjes en links in de blogtekst verwijzen naar "images/..."; zet de base ervoor
-// zodat ze zowel op fitfoodbyshyla.nl als op GitHub Pages (/shyla-website/) werken.
-const content = post.content.replace(/(src|href)="images\//g, `$1="${base}images/`)
+// Plaatjes en links in de blogtekst verwijzen naar "images/..." of naar een andere blog
+// ("blog/..."); zet de base ervoor zodat ze zowel op fitfoodbyshyla.nl als op
+// GitHub Pages (/shyla-website/) werken.
+const content = post.content.replace(/(src|href)="(images|blog)\//g, `$1="${base}$2/`)
 
 const imageUrl = post.image
   ? new URL(base + post.image, Astro.site).href
